@@ -3,6 +3,9 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       Title="Owner Home" Background="{StaticResource Bg}">
     <Grid>
+        <Frame x:Name="page" Panel.ZIndex="100" NavigationUIVisibility="Hidden"
+               Background="{StaticResource Bg}" Visibility="Collapsed"/>
+
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="32,28">
 
