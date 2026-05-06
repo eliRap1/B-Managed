@@ -97,6 +97,9 @@
                             <Button Grid.Column="2" Content="🔔  Notifications" Click="Notifications_Click"
                                     Style="{StaticResource SecondaryButton}" Height="56" Margin="4"/>
                         </Grid>
+                        <Button Content="⚙ Settings — change password / profile" Click="Settings_Click"
+                                Style="{StaticResource GhostButton}" HorizontalAlignment="Left" Margin="4,10,0,0"
+                                ToolTip="Open Settings to change your password or contact info"/>
                     </StackPanel>
                 </Border>
             </Border>

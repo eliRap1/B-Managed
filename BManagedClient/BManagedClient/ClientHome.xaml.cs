@@ -58,6 +58,9 @@ namespace BManagedClient
             catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex.Message); }
         }
 
+        private void Settings_Click(object s, RoutedEventArgs e)
+            => NavigationService?.Navigate(new Settings());
+
         private void Logout_Click(object s, RoutedEventArgs e)
         {
             pollTimer?.Stop();

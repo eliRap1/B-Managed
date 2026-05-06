@@ -65,6 +65,9 @@ namespace BManagedClient
         private void Notifications_Click(object s, RoutedEventArgs e)
             => NavigationService?.Navigate(new Notifications());
 
+        private void Settings_Click(object s, RoutedEventArgs e)
+            => NavigationService?.Navigate(new Settings());
+
         private void Logout_Click(object s, RoutedEventArgs e)
         {
             pollTimer?.Stop();

@@ -40,8 +40,21 @@ namespace BManagedClient
                 sign.PreferredCurrency = user.PreferredCurrency;
                 sign.IsActive          = user.IsActive;
 
+                // If they signed in with the manager-issued temp password,
+                // jump straight to Settings so they can pick their own.
+                bool tempPassword = string.Equals(p, "reset1234", StringComparison.Ordinal);
+                if (tempPassword)
+                {
+                    MessageBox.Show(
+                        "You're signed in with the temporary password 'reset1234'.\n" +
+                        "Please choose a new password in the Settings page.",
+                        "Change your password",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+
                 page.Visibility = Visibility.Visible;
-                if (sign.IsOwner)         page.Navigate(new OwnerHome());
+                if (tempPassword)         page.Navigate(new Settings());
+                else if (sign.IsOwner)    page.Navigate(new OwnerHome());
                 else if (sign.IsEmployee) page.Navigate(new EmployeeHome());
                 else                      page.Navigate(new ClientHome());
             }

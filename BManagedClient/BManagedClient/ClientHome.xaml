@@ -21,8 +21,12 @@
                     </StackPanel>
                     <TextBlock Text="Your invoices and balance." Style="{StaticResource Body}" Margin="0,4,0,0"/>
                 </StackPanel>
-                <Button Grid.Column="1" Content="Logout" Click="Logout_Click"
-                        Style="{StaticResource PrimaryButton}" VerticalAlignment="Top"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                    <Button Content="⚙ Settings" Click="Settings_Click"
+                            Style="{StaticResource SecondaryButton}" Margin="0,0,8,0"
+                            ToolTip="Change password or contact info"/>
+                    <Button Content="Logout" Click="Logout_Click" Style="{StaticResource PrimaryButton}"/>
+                </StackPanel>
             </Grid>
 
             <!-- Outstanding card -->
