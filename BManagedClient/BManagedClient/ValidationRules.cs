@@ -62,7 +62,7 @@ namespace BManagedClient
                 try
                 {
                     bsrv.Service1Client srv = new bsrv.Service1Client();
-                    UserInfo user = srv.GetUserById(int.Parse(id), "Teacher");
+                    var user = srv.GetUserById(int.Parse(id));
                     if (user != null)
                     {
                         return ValidationResult.ValidResult;

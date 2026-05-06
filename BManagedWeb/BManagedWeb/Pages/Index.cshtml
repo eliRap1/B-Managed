@@ -1,7 +1,7 @@
 @page
 @{
     ViewData["Title"] = "Welcome";
-    var role = Context.Session.GetString("Role");
+    var role = HttpContext.Session.GetString("Role");
     if (string.IsNullOrEmpty(role)) { Response.Redirect("/Login"); return; }
     if (role == "Owner")    { Response.Redirect("/Owner/Home");    return; }
     if (role == "Employee") { Response.Redirect("/Employee/Home"); return; }
