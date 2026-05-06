@@ -3,116 +3,127 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       Title="Owner Home" Background="{StaticResource Bg}">
     <Grid>
-        <Frame x:Name="page" Panel.ZIndex="100"/>
+        <Frame x:Name="page" Panel.ZIndex="100" NavigationUIVisibility="Hidden"/>
         <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="30">
-                <Grid Margin="0,0,0,20">
+            <StackPanel Margin="32,28">
+
+                <!-- Header -->
+                <Grid Margin="0,0,0,28">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0">
-                        <TextBlock Text="Welcome back," Foreground="#888" FontSize="14"/>
-                        <TextBlock x:Name="welcome" Foreground="{StaticResource Cyan}"
-                                   FontSize="32" FontWeight="Bold"/>
+                        <Border Style="{StaticResource EyebrowPill}">
+                            <TextBlock Text="OWNER" Style="{StaticResource Eyebrow}"/>
+                        </Border>
+                        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                            <TextBlock Text="Hi, " Style="{StaticResource DisplayLg}"/>
+                            <TextBlock x:Name="welcome" Style="{StaticResource DisplayLg}" Foreground="{StaticResource Accent}"/>
+                            <TextBlock Text="." Style="{StaticResource DisplayLg}"/>
+                        </StackPanel>
+                        <TextBlock Text="Your money, in motion." Style="{StaticResource Body}" Margin="0,4,0,0"/>
                     </StackPanel>
-                    <Button Grid.Column="1" Content="🔔" FontSize="20" Background="Transparent"
-                            BorderThickness="0" Cursor="Hand" Click="Notifications_Click"
-                            Foreground="{StaticResource Cyan}" Width="40" Height="40"
-                            ToolTip="Notifications">
-                        <Button.Template>
-                            <ControlTemplate TargetType="Button">
-                                <Grid>
-                                    <ContentPresenter HorizontalAlignment="Center"
-                                                      VerticalAlignment="Center"/>
-                                    <Border x:Name="badge" Background="{StaticResource Red}"
-                                            CornerRadius="8" Padding="4,1"
-                                            HorizontalAlignment="Right" VerticalAlignment="Top"
-                                            Visibility="Collapsed">
-                                        <TextBlock x:Name="badgeText" Text="0" Foreground="White"
-                                                   FontSize="9" FontWeight="Bold"/>
-                                    </Border>
-                                </Grid>
-                            </ControlTemplate>
-                        </Button.Template>
+
+                    <Button Grid.Column="1" Click="Notifications_Click" Style="{StaticResource NavButton}"
+                            ToolTip="Notifications" VerticalAlignment="Top">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🔔" FontSize="14" Margin="0,0,4,0"/>
+                            <TextBlock Text="Notifications"/>
+                        </StackPanel>
                     </Button>
+                    <Button Grid.Column="2" Content="Logout" Click="Logout_Click"
+                            Style="{StaticResource PrimaryButton}" VerticalAlignment="Top"/>
                 </Grid>
 
-                <Grid Margin="0,0,0,20">
+                <!-- Stat cards -->
+                <Grid Margin="0,0,0,16">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Border Grid.Column="0" Style="{StaticResource CardBorder}">
-                        <StackPanel HorizontalAlignment="Center">
-                            <TextBlock x:Name="customersCount" Text="0" FontSize="28"
-                                       FontWeight="Bold" Foreground="{StaticResource Cyan}"
-                                       HorizontalAlignment="Center"/>
-                            <TextBlock Text="Customers" FontSize="12" Foreground="#888"
-                                       HorizontalAlignment="Center"/>
-                        </StackPanel>
+
+                    <Border Grid.Column="0" Style="{StaticResource ShellCard}" Margin="0,0,8,0">
+                        <Border Style="{StaticResource CoreCard}" Padding="20">
+                            <StackPanel>
+                                <TextBlock Text="CUSTOMERS" Style="{StaticResource Eyebrow}"/>
+                                <TextBlock x:Name="customersCount" Text="0" Style="{StaticResource Display}" Margin="0,8,0,0"/>
+                            </StackPanel>
+                        </Border>
                     </Border>
-                    <Border Grid.Column="1" Style="{StaticResource CardBorder}" BorderBrush="{StaticResource Green}">
-                        <StackPanel HorizontalAlignment="Center">
-                            <TextBlock x:Name="activeProjects" Text="0" FontSize="28"
-                                       FontWeight="Bold" Foreground="{StaticResource Green}"
-                                       HorizontalAlignment="Center"/>
-                            <TextBlock Text="Active Projects" FontSize="12" Foreground="#888"
-                                       HorizontalAlignment="Center"/>
-                        </StackPanel>
+
+                    <Border Grid.Column="1" Style="{StaticResource ShellCard}" Margin="4,0">
+                        <Border Style="{StaticResource CoreCard}" Padding="20">
+                            <StackPanel>
+                                <TextBlock Text="ACTIVE PROJECTS" Style="{StaticResource Eyebrow}"/>
+                                <TextBlock x:Name="activeProjects" Text="0" Style="{StaticResource Display}"
+                                           Foreground="{StaticResource Mint}" Margin="0,8,0,0"/>
+                            </StackPanel>
+                        </Border>
                     </Border>
-                    <Border Grid.Column="2" Style="{StaticResource CardBorder}" BorderBrush="{StaticResource Orange}">
-                        <StackPanel HorizontalAlignment="Center">
-                            <TextBlock x:Name="unpaidCount" Text="0" FontSize="28"
-                                       FontWeight="Bold" Foreground="{StaticResource Orange}"
-                                       HorizontalAlignment="Center"/>
-                            <TextBlock Text="Unpaid Invoices" FontSize="12" Foreground="#888"
-                                       HorizontalAlignment="Center"/>
-                        </StackPanel>
+
+                    <Border Grid.Column="2" Style="{StaticResource ShellCard}" Margin="4,0">
+                        <Border Style="{StaticResource CoreCard}" Padding="20">
+                            <StackPanel>
+                                <TextBlock Text="UNPAID" Style="{StaticResource Eyebrow}"/>
+                                <TextBlock x:Name="unpaidCount" Text="0" Style="{StaticResource Display}"
+                                           Foreground="{StaticResource Amber}" Margin="0,8,0,0"/>
+                            </StackPanel>
+                        </Border>
                     </Border>
-                    <Border Grid.Column="3" Style="{StaticResource CardBorder}" BorderBrush="{StaticResource Red}">
-                        <StackPanel HorizontalAlignment="Center">
-                            <TextBlock x:Name="overdueCount" Text="0" FontSize="28"
-                                       FontWeight="Bold" Foreground="{StaticResource Red}"
-                                       HorizontalAlignment="Center"/>
-                            <TextBlock Text="Overdue" FontSize="12" Foreground="#888"
-                                       HorizontalAlignment="Center"/>
-                        </StackPanel>
+
+                    <Border Grid.Column="3" Style="{StaticResource ShellCard}" Margin="8,0,0,0">
+                        <Border Style="{StaticResource CoreCard}" Padding="20">
+                            <StackPanel>
+                                <TextBlock Text="OVERDUE" Style="{StaticResource Eyebrow}"/>
+                                <TextBlock x:Name="overdueCount" Text="0" Style="{StaticResource Display}"
+                                           Foreground="{StaticResource Rose}" Margin="0,8,0,0"/>
+                            </StackPanel>
+                        </Border>
                     </Border>
                 </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Button Grid.Row="0" Grid.Column="0" Content="👥 Customers"
-                            Click="Customers_Click"  Style="{StaticResource PrimaryButton}" Margin="6" Height="48"/>
-                    <Button Grid.Row="0" Grid.Column="1" Content="📁 Projects"
-                            Click="Projects_Click"   Style="{StaticResource PrimaryButton}" Margin="6" Height="48"/>
-                    <Button Grid.Row="0" Grid.Column="2" Content="🧾 Invoices"
-                            Click="Invoices_Click"   Style="{StaticResource PrimaryButton}" Margin="6" Height="48"
-                            Background="{StaticResource Orange}"/>
-                    <Button Grid.Row="1" Grid.Column="0" Content="💸 Expenses"
-                            Click="Expenses_Click"   Style="{StaticResource PrimaryButton}" Margin="6" Height="48"
-                            Background="{StaticResource Red}"/>
-                    <Button Grid.Row="1" Grid.Column="1" Content="📊 Reports"
-                            Click="Reports_Click"    Style="{StaticResource PrimaryButton}" Margin="6" Height="48"
-                            Background="{StaticResource Green}"/>
-                    <Button Grid.Row="1" Grid.Column="2" Content="⚙ Settings"
-                            Click="Settings_Click"   Style="{StaticResource PrimaryButton}" Margin="6" Height="48"
-                            Background="#888"/>
-                </Grid>
+                <!-- Quick actions grid -->
+                <Border Style="{StaticResource ShellCard}">
+                    <Border Style="{StaticResource CoreCard}" Padding="22">
+                        <StackPanel>
+                            <TextBlock Text="QUICK ACTIONS" Style="{StaticResource Eyebrow}" Margin="0,0,0,14"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Button Grid.Row="0" Grid.Column="0" Content="👥  Customers"
+                                        Click="Customers_Click" Style="{StaticResource PrimaryButton}"
+                                        Height="56" Margin="4"/>
+                                <Button Grid.Row="0" Grid.Column="1" Content="📁  Projects"
+                                        Click="Projects_Click" Style="{StaticResource SecondaryButton}"
+                                        Height="56" Margin="4"/>
+                                <Button Grid.Row="0" Grid.Column="2" Content="🧾  Invoices"
+                                        Click="Invoices_Click" Style="{StaticResource AmberButton}"
+                                        Height="56" Margin="4"/>
+                                <Button Grid.Row="1" Grid.Column="0" Content="💸  Expenses"
+                                        Click="Expenses_Click" Style="{StaticResource RoseButton}"
+                                        Height="56" Margin="4"/>
+                                <Button Grid.Row="1" Grid.Column="1" Content="📊  Reports"
+                                        Click="Reports_Click" Style="{StaticResource MintButton}"
+                                        Height="56" Margin="4"/>
+                                <Button Grid.Row="1" Grid.Column="2" Content="⚙  Settings"
+                                        Click="Settings_Click" Style="{StaticResource SecondaryButton}"
+                                        Height="56" Margin="4"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Border>
 
-                <Button Content="Logout" Click="Logout_Click" Background="#555"
-                        Foreground="White" Margin="6,20,6,6" Height="32" Cursor="Hand"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>

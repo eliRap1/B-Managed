@@ -2,41 +2,55 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:local="clr-namespace:BManagedClient"
-      Title="LogIn" Background="{StaticResource Bg}">
+      Title="Sign in" Background="{StaticResource Bg}">
     <Grid>
-        <Frame x:Name="page" Panel.ZIndex="100"/>
-        <Border Style="{StaticResource CardBorder}" MaxWidth="380" Padding="30"
-                HorizontalAlignment="Center" VerticalAlignment="Center">
-            <StackPanel>
-                <TextBlock Text="B-Managed" FontSize="32" FontWeight="Bold"
-                           Foreground="{StaticResource Cyan}" HorizontalAlignment="Center" Margin="0,0,0,4"/>
-                <TextBlock Text="Small-Business Manager" FontSize="13"
-                           Foreground="#888" HorizontalAlignment="Center" Margin="0,0,0,24"/>
+        <Frame x:Name="page" Panel.ZIndex="100" NavigationUIVisibility="Hidden"/>
 
-                <TextBlock Text="Username" Foreground="#aaa" FontSize="12" Margin="0,0,0,4"/>
-                <TextBox x:Name="username" Background="#0E1A2B" Foreground="White"
-                         BorderBrush="{StaticResource Cyan}" Height="34" Padding="8" Margin="0,0,0,12">
-                    <TextBox.Text>
-                        <Binding Path="Username" UpdateSourceTrigger="PropertyChanged">
-                            <Binding.ValidationRules>
-                                <local:MinLenth/>
-                            </Binding.ValidationRules>
-                        </Binding>
-                    </TextBox.Text>
-                </TextBox>
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="420">
+            <Border Style="{StaticResource ShellCard}">
+                <Border Style="{StaticResource CoreCard}" Padding="36,30">
+                    <StackPanel>
+                        <Border Style="{StaticResource EyebrowPill}" HorizontalAlignment="Center">
+                            <TextBlock Text="WORKSPACE" Style="{StaticResource Eyebrow}"/>
+                        </Border>
 
-                <TextBlock Text="Password" Foreground="#aaa" FontSize="12" Margin="0,0,0,4"/>
-                <PasswordBox x:Name="pass" Background="#0E1A2B" Foreground="White"
-                             BorderBrush="{StaticResource Cyan}" Height="34" Padding="8" Margin="0,0,0,18"/>
+                        <TextBlock Text="Welcome back" Style="{StaticResource DisplayLg}"
+                                   HorizontalAlignment="Center" Margin="0,16,0,4"/>
+                        <TextBlock Text="Run your business — calmly."
+                                   Style="{StaticResource Body}" HorizontalAlignment="Center"
+                                   Margin="0,0,0,28"/>
 
-                <Button Content="Sign In" Style="{StaticResource PrimaryButton}"
-                        Click="signIn_Click" Height="38"/>
-                <Button Content="Create new account" Click="signUp_Click"
-                        Background="Transparent" Foreground="{StaticResource Cyan}"
-                        BorderThickness="0" Margin="0,8,0,0" Cursor="Hand"/>
-                <TextBlock x:Name="error" Foreground="{StaticResource Red}"
-                           HorizontalAlignment="Center" Margin="0,12,0,0" Visibility="Collapsed"/>
-            </StackPanel>
-        </Border>
+                        <TextBlock Text="USERNAME" Style="{StaticResource InputLabel}"/>
+                        <TextBox x:Name="username" Style="{StaticResource ModernTextBox}" Margin="0,0,0,14">
+                            <TextBox.Text>
+                                <Binding Path="Username" UpdateSourceTrigger="PropertyChanged">
+                                    <Binding.ValidationRules>
+                                        <local:MinLenth/>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
+
+                        <TextBlock Text="PASSWORD" Style="{StaticResource InputLabel}"/>
+                        <PasswordBox x:Name="pass" Style="{StaticResource ModernPasswordBox}" Margin="0,0,0,22"/>
+
+                        <Button Content="Sign in" Style="{StaticResource PrimaryButton}"
+                                Click="signIn_Click" Height="42"/>
+
+                        <Button Content="Create new account" Click="signUp_Click"
+                                Style="{StaticResource GhostButton}" Margin="0,12,0,0"/>
+
+                        <TextBlock x:Name="error" Foreground="{StaticResource Rose}"
+                                   HorizontalAlignment="Center" Margin="0,12,0,0"
+                                   Visibility="Collapsed" FontSize="12"/>
+
+                        <TextBlock Style="{StaticResource Caption}" HorizontalAlignment="Center"
+                                   Margin="0,18,0,0" TextAlignment="Center">
+                            Seeded admin: <Run FontWeight="SemiBold">admin</Run> / <Run FontWeight="SemiBold">admin1234</Run>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+            </Border>
+        </Grid>
     </Grid>
 </Page>
