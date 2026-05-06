@@ -39,17 +39,32 @@
         @if (Model.ContractId.HasValue) {
             <input type="hidden" name="ContractId" value="@Model.ContractId.Value"/>
         }
-        <div class="bg-paper-50 rounded-core p-6 shadow-inset grid md:grid-cols-3 gap-3">
-            <select asp-for="NewCustomerId" class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5">
-                <option value="0">@L.T(HttpContext,"Customer…","לקוח…")</option>
-                @foreach (var c in Model.Customers)
-                { <option value="@c.Id">@c.BusinessName</option> }
-            </select>
-            <input asp-for="NewDueDate" type="date" class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5" />
-            <select asp-for="NewCurrency" class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5">
-                <option>ILS</option><option>USD</option>
-            </select>
-            <button class="md:col-span-3 bg-ink text-paper-50 rounded-full px-6 py-3 mt-1 active:scale-[0.98]">@L.T(HttpContext,"Create draft invoice","צור טיוטת חשבונית")</button>
+        <div class="bg-paper-50 rounded-core p-6 shadow-inset">
+            <div class="grid md:grid-cols-3 gap-3">
+                <div>
+                    <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Customer (bill to)","לקוח (חיוב ל-)")</label>
+                    <select asp-for="NewCustomerId" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5">
+                        <option value="0">@L.T(HttpContext,"Pick a customer…","בחר לקוח…")</option>
+                        @foreach (var c in Model.Customers)
+                        { <option value="@c.Id">@c.BusinessName</option> }
+                    </select>
+                </div>
+                <div>
+                    <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Due date","תאריך לתשלום")</label>
+                    <input asp-for="NewDueDate" type="date" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5" />
+                </div>
+                <div>
+                    <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Currency","מטבע")</label>
+                    <select asp-for="NewCurrency" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5">
+                        <option>ILS</option><option>USD</option>
+                    </select>
+                </div>
+            </div>
+            <p class="text-xs text-ink/50 mt-3">
+                @L.T(HttpContext,"Creates a Draft invoice. After it's created, add line items below it (description, qty, unit price). VAT is added on the totals row — 18% for Murshe, 0% for Osek Patur.",
+                                  "יוצר טיוטת חשבונית. אחרי היצירה, הוסף שורות חיוב (תיאור, כמות, מחיר ליחידה). מע״מ מתווסף בשורת הסיכום — 18% למורשה, 0% לעוסק פטור.")
+            </p>
+            <button class="w-full bg-ink text-paper-50 rounded-full px-6 py-3 mt-3 active:scale-[0.98]">@L.T(HttpContext,"Create draft invoice","צור טיוטת חשבונית")</button>
         </div>
     </form>
 

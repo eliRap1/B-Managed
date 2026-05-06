@@ -30,6 +30,9 @@ namespace BManagedWeb.Pages.Owner
         public List<RecentInvoice> RecentInvoices { get; set; } = new();
         public List<ProfitLoss> Forecast { get; set; } = new();
 
+        public AnalyticsKpis Kpis  { get; set; } = new AnalyticsKpis();
+        public LoanSummary  Loans  { get; set; } = new LoanSummary();
+
         public class RecentInvoice
         {
             public string InvoiceNumber { get; set; }
@@ -127,6 +130,10 @@ namespace BManagedWeb.Pages.Owner
                 // 3-month cashflow forecast
                 var fcst = _srv.GetCashFlowForecast(id, 3, Currency);
                 if (fcst != null) Forecast = fcst.ToList();
+
+                // Quick-glance KPIs + loan exposure
+                try { Kpis  = _srv.GetAdvancedKpis(id, Currency) ?? new AnalyticsKpis(); } catch { }
+                try { Loans = _srv.GetLoanSummary(id, Currency) ?? new LoanSummary(); }    catch { }
             }
             catch { }
             return Page();

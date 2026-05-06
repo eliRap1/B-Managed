@@ -57,6 +57,93 @@
         </div>
     </div>
 
+    <!-- KPI quick-glance tiles (aging, on-time, concentration, debt) -->
+    <div class="reveal md:col-span-6 bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
+        <div class="bg-paper-50 rounded-core p-6 shadow-inset h-full">
+            <div class="flex items-center justify-between mb-3">
+                <span class="pill text-ink/40">@L.T(HttpContext,"Receivables aging","יתרת חייבים")</span>
+                <a asp-page="/Owner/Reports" class="text-xs text-accent hover:underline">@L.T(HttpContext,"Details","פירוט") →</a>
+            </div>
+            <div class="display text-3xl font-bold">@Model.Kpis.TotalOutstanding.ToString("N0") <span class="text-base text-ink/40">@Model.Currency</span></div>
+            <div class="grid grid-cols-4 gap-2 mt-4 text-xs">
+                <div class="bg-mint/10 rounded-xl px-2 py-2 text-center">
+                    <div class="pill text-ink/40">@L.T(HttpContext,"Current","שוטף")</div>
+                    <div class="font-semibold mt-1">@Model.Kpis.AgingCurrent.ToString("N0")</div>
+                </div>
+                <div class="bg-amber/10 rounded-xl px-2 py-2 text-center">
+                    <div class="pill text-ink/40">1–30</div>
+                    <div class="font-semibold mt-1">@Model.Kpis.Aging1To30.ToString("N0")</div>
+                </div>
+                <div class="bg-amber/15 rounded-xl px-2 py-2 text-center">
+                    <div class="pill text-ink/40">31–60</div>
+                    <div class="font-semibold mt-1">@Model.Kpis.Aging31To60.ToString("N0")</div>
+                </div>
+                <div class="bg-rose/10 rounded-xl px-2 py-2 text-center">
+                    <div class="pill text-ink/40">61+</div>
+                    <div class="font-semibold mt-1 text-rose">@Model.Kpis.Aging61Plus.ToString("N0")</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="reveal md:col-span-3 bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
+        <div class="bg-paper-50 rounded-core p-6 shadow-inset h-full">
+            <span class="pill text-ink/40">@L.T(HttpContext,"On-time payments","תשלומים בזמן")</span>
+            <div class="display text-3xl font-bold mt-3">@(Model.Kpis.OnTimeRatePct <= 0 ? "—" : Model.Kpis.OnTimeRatePct.ToString("N1") + "%")</div>
+            <div class="text-xs text-ink/50 mt-1">
+                @L.T(HttpContext,"Avg","ממוצע"):
+                @(Model.Kpis.AvgDaysToPayment <= 0 ? "—" : Model.Kpis.AvgDaysToPayment.ToString("N1") + " " + L.T(HttpContext,"days","ימים"))
+            </div>
+            @if (!string.IsNullOrEmpty(Model.Kpis.TopCustomerName))
+            {
+                <div class="text-xs text-ink/50 mt-3 border-t border-black/5 pt-2">
+                    @L.T(HttpContext,"Top customer","לקוח מרכזי"):
+                    <span class="font-semibold">@Model.Kpis.TopCustomerName</span> ·
+                    @Model.Kpis.TopCustomerSharePct.ToString("N1")%
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (Model.Loans != null && Model.Loans.LoanCount > 0)
+    {
+        <div class="reveal md:col-span-3 bg-amber/15 ring-1 ring-amber/30 rounded-shell p-1.5">
+            <div class="bg-paper-50 rounded-core p-6 shadow-inset h-full">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="pill text-ink/40">@L.T(HttpContext,"Loans (קרן)","הלוואות (קרן)")</span>
+                    <a asp-page="/Owner/Loans" class="text-xs text-accent hover:underline">@L.T(HttpContext,"Manage","ניהול") →</a>
+                </div>
+                <div class="display text-3xl font-bold">@Model.Loans.TotalRemaining.ToString("N0") <span class="text-base text-ink/40">@Model.Currency</span></div>
+                <div class="text-xs text-ink/50 mt-1">
+                    @Model.Loans.LoanCount @L.T(HttpContext,"active","פעילות")
+                    @if (Model.Loans.KerenBackedCount > 0)
+                    { <text>· @Model.Loans.KerenBackedCount @L.T(HttpContext,"state-backed","בערבות")</text> }
+                </div>
+                @if (Model.Loans.MonthlyDebtServiceRatioPct > 0)
+                {
+                    var color = Model.Loans.MonthlyDebtServiceRatioPct >= 40 ? "text-rose"
+                              : Model.Loans.MonthlyDebtServiceRatioPct >= 25 ? "text-amber" : "text-ink";
+                    <div class="text-xs mt-3 border-t border-black/5 pt-2 @color">
+                        @L.T(HttpContext,"Monthly burden","נטל חודשי"): @Model.Loans.MonthlyDebtServiceRatioPct.ToString("N1")%
+                        @L.T(HttpContext,"of income","מההכנסה")
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="reveal md:col-span-3 bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
+            <div class="bg-paper-50 rounded-core p-6 shadow-inset h-full flex flex-col">
+                <span class="pill text-ink/40">@L.T(HttpContext,"Loans (קרן)","הלוואות (קרן)")</span>
+                <div class="display text-3xl font-bold mt-3">@L.T(HttpContext,"None","אין")</div>
+                <div class="text-xs text-ink/50 mt-auto">
+                    <a asp-page="/Owner/Loans" class="text-accent hover:underline">@L.T(HttpContext,"+ Track a business loan","+ הוסף הלוואה עסקית")</a>
+                </div>
+            </div>
+        </div>
+    }
+
     @if (Model.Forecast != null && Model.Forecast.Count > 0)
     {
         <div class="reveal md:col-span-12 bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
