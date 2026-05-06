@@ -103,6 +103,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="EmployeeProjects.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="ManageUsers.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -172,6 +176,10 @@
     </Compile>
     <Compile Include="ForgotPassword.xaml.cs">
       <DependentUpon>ForgotPassword.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EmployeeProjects.xaml.cs">
+      <DependentUpon>EmployeeProjects.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ManageUsers.xaml.cs">

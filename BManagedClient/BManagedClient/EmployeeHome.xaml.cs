@@ -57,12 +57,7 @@ namespace BManagedClient
         }
 
         private void Projects_Click(object s, RoutedEventArgs e)
-        {
-            // Employees can browse the list of their assigned projects in detail.
-            // Re-purpose the Projects page: Projects.xaml hosts the Owner CRUD,
-            // so we just route Employee back to this dashboard which already shows them.
-            NavigationService?.Navigate(new EmployeeHome());
-        }
+            => NavigationService?.Navigate(new EmployeeProjects());
 
         private void Expenses_Click(object s, RoutedEventArgs e)
             => NavigationService?.Navigate(new Expenses());

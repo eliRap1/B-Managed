@@ -1,0 +1,86 @@
+<Page x:Class="BManagedClient.EmployeeProjects"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="My projects" Background="{StaticResource Bg}">
+    <Grid Margin="32,28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <Border Style="{StaticResource EyebrowPill}">
+                    <TextBlock Text="ASSIGNED" Style="{StaticResource Eyebrow}"/>
+                </Border>
+                <TextBlock Text="My projects." Style="{StaticResource DisplayLg}" Margin="0,10,0,0"/>
+                <TextBlock x:Name="subtitle" Style="{StaticResource Body}" Margin="0,4,0,0"/>
+            </StackPanel>
+            <ComboBox Grid.Column="1" x:Name="statusFilter" Width="200" Style="{StaticResource ModernCombo}"
+                      SelectionChanged="Filter_Changed" VerticalAlignment="Top" Margin="0,0,8,0">
+                <ComboBoxItem Content="All" IsSelected="True"/>
+                <ComboBoxItem Content="Active"/>
+                <ComboBoxItem Content="AwaitingPayment"/>
+                <ComboBoxItem Content="Done"/>
+                <ComboBoxItem Content="Cancelled"/>
+            </ComboBox>
+            <Button Grid.Column="2" Content="← Back" Click="Back_Click" Style="{StaticResource SecondaryButton}"
+                    VerticalAlignment="Top"/>
+        </Grid>
+
+        <Border Grid.Row="1" Style="{StaticResource ShellCard}" Margin="0,0,0,12">
+            <Border Style="{StaticResource CoreCard}" Padding="6">
+                <ListView x:Name="projectsList" Background="Transparent" BorderThickness="0"
+                          SelectionMode="Single" SelectionChanged="Project_Selected">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Title"    DisplayMemberBinding="{Binding Title}"   Width="240"/>
+                            <GridViewColumn Header="Status"   DisplayMemberBinding="{Binding Status}"  Width="140"/>
+                            <GridViewColumn Header="Start"    DisplayMemberBinding="{Binding StartDate, StringFormat=dd/MM/yyyy}" Width="110"/>
+                            <GridViewColumn Header="Due"      DisplayMemberBinding="{Binding DueDate,   StringFormat=dd/MM/yyyy}" Width="110"/>
+                            <GridViewColumn Header="Budget"   DisplayMemberBinding="{Binding TotalBudget, StringFormat=N2}"      Width="110"/>
+                            <GridViewColumn Header="Currency" DisplayMemberBinding="{Binding Currency}" Width="80"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </Border>
+        </Border>
+
+        <!-- Detail panel -->
+        <Border Grid.Row="2" Style="{StaticResource ShellCard}">
+            <Border Style="{StaticResource CoreCard}" Padding="22">
+                <StackPanel>
+                    <TextBlock Text="DETAILS" Style="{StaticResource Eyebrow}" Margin="0,0,0,10"/>
+                    <TextBlock x:Name="detTitle" Text="Select a project above to see its details." Style="{StaticResource Body}"
+                               FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                    <TextBlock x:Name="detDescription" Style="{StaticResource Body}" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                    <Grid Margin="0,4,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="CUSTOMER" Style="{StaticResource Eyebrow}"/>
+                            <TextBlock x:Name="detCustomer" Style="{StaticResource Body}" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="STATUS" Style="{StaticResource Eyebrow}"/>
+                            <TextBlock x:Name="detStatus" Style="{StaticResource Body}" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="DUE" Style="{StaticResource Eyebrow}"/>
+                            <TextBlock x:Name="detDue" Style="{StaticResource Body}" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</Page>
