@@ -28,7 +28,9 @@
 
         <Border Grid.Row="1" Style="{StaticResource ShellCard}">
             <Border Style="{StaticResource CoreCard}" Padding="6">
-                <ListView x:Name="notifList" Background="Transparent" BorderThickness="0">
+                <ListView x:Name="notifList" Background="Transparent" BorderThickness="0"
+                          MouseDoubleClick="Notif_DoubleClick"
+                          ToolTip="Double-click a 'ResetRequest' notification to open Manage Users">
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="Title"   DisplayMemberBinding="{Binding Title}"   Width="220"/>

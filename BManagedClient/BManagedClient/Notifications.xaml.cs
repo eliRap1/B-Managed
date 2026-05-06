@@ -1,6 +1,8 @@
+using BManagedClient.BMsrv;
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
 
 namespace BManagedClient
@@ -38,6 +40,26 @@ namespace BManagedClient
                 Refresh();
             }
             catch (Exception ex) { MessageBox.Show("Failed: " + ex.Message); }
+        }
+
+        private void Notif_DoubleClick(object s, MouseButtonEventArgs e)
+        {
+            if (notifList.SelectedItem is not Notification n) return;
+            try
+            {
+                ServiceGateway.Use(c => c.MarkNotificationAsRead(n.Id));
+            }
+            catch { }
+
+            // Owner-only: a reset-password request links to ManageUsers so
+            // the Owner can act on it.
+            if (ClientSession.IsOwner && n.NotificationType == "ResetRequest")
+            {
+                _pollTimer?.Stop();
+                NavigationService?.Navigate(new ManageUsers());
+                return;
+            }
+            Refresh();
         }
 
         private void Back_Click(object s, RoutedEventArgs e)

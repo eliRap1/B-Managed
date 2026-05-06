@@ -1,21 +1,77 @@
 <Page x:Class="BManagedClient.ClientHome"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      Title="Client Home" Background="{StaticResource Bg}">
-    <Grid Margin="32,40">
-        <Border Style="{StaticResource ShellCard}" MaxWidth="640" HorizontalAlignment="Center">
-            <Border Style="{StaticResource CoreCard}" Padding="40,32">
+      Title="Client Portal" Background="{StaticResource Bg}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="32,28">
+
+            <Grid Margin="0,0,0,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
                 <StackPanel>
                     <Border Style="{StaticResource EyebrowPill}">
                         <TextBlock Text="CLIENT PORTAL" Style="{StaticResource Eyebrow}"/>
                     </Border>
-                    <TextBlock x:Name="welcome" Style="{StaticResource DisplayLg}" Margin="0,12,0,8"/>
-                    <TextBlock Text="Use the web portal for full features (invoices, downloads). Logout when done."
-                               Style="{StaticResource Body}" TextWrapping="Wrap" Margin="0,0,0,20"/>
-                    <Button Content="Logout" Click="Logout_Click" Style="{StaticResource PrimaryButton}"
-                            HorizontalAlignment="Left"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                        <TextBlock Text="Welcome, " Style="{StaticResource DisplayLg}"/>
+                        <TextBlock x:Name="welcome" Style="{StaticResource DisplayLg}" Foreground="{StaticResource Accent}"/>
+                        <TextBlock Text="." Style="{StaticResource DisplayLg}"/>
+                    </StackPanel>
+                    <TextBlock Text="Your invoices and balance." Style="{StaticResource Body}" Margin="0,4,0,0"/>
                 </StackPanel>
+                <Button Grid.Column="1" Content="Logout" Click="Logout_Click"
+                        Style="{StaticResource PrimaryButton}" VerticalAlignment="Top"/>
+            </Grid>
+
+            <!-- Outstanding card -->
+            <Border Style="{StaticResource ShellCard}">
+                <Border Style="{StaticResource CoreCard}" Padding="32">
+                    <StackPanel>
+                        <TextBlock Text="OUTSTANDING BALANCE" Style="{StaticResource Eyebrow}"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <TextBlock x:Name="outstandingValue" Text="0" Style="{StaticResource DisplayLg}" FontSize="64"/>
+                            <TextBlock x:Name="outstandingCurrency" Text="ILS" FontSize="18"
+                                       Foreground="{StaticResource Ink40}" VerticalAlignment="Bottom" Margin="8,0,0,8"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                            <TextBlock Style="{StaticResource Caption}" Margin="0,0,16,0">
+                                <Run Text="UNPAID INVOICES "/>
+                                <Run x:Name="unpaidCount" FontWeight="Bold" Text="0"/>
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource Caption}">
+                                <Run Text="PAID "/>
+                                <Run x:Name="paidCount" FontWeight="Bold" Text="0"/>
+                            </TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
             </Border>
-        </Border>
-    </Grid>
+
+            <!-- Invoices list -->
+            <Border Style="{StaticResource ShellCard}" Margin="0,16,0,0">
+                <Border Style="{StaticResource CoreCard}" Padding="22">
+                    <StackPanel>
+                        <TextBlock Text="MY INVOICES" Style="{StaticResource Eyebrow}" Margin="0,0,0,12"/>
+                        <ListView x:Name="invoicesList" Background="Transparent" BorderThickness="0" Height="320">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="#"        DisplayMemberBinding="{Binding InvoiceNumber}" Width="140"/>
+                                    <GridViewColumn Header="Issued"   DisplayMemberBinding="{Binding IssueDate, StringFormat=dd/MM/yyyy}" Width="120"/>
+                                    <GridViewColumn Header="Due"      DisplayMemberBinding="{Binding DueDate,   StringFormat=dd/MM/yyyy}" Width="120"/>
+                                    <GridViewColumn Header="Total"    DisplayMemberBinding="{Binding Total,     StringFormat=N2}"        Width="110"/>
+                                    <GridViewColumn Header="Currency" DisplayMemberBinding="{Binding Currency}" Width="80"/>
+                                    <GridViewColumn Header="Status"   DisplayMemberBinding="{Binding Status}"   Width="110"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                        <TextBlock x:Name="emptyHint" Style="{StaticResource Caption}" Margin="0,12,0,0"
+                                   Visibility="Collapsed"
+                                   Text="No invoices yet. Contact your account owner if you expect one."/>
+                    </StackPanel>
+                </Border>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
 </Page>

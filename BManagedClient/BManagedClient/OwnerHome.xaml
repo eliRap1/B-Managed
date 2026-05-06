@@ -127,9 +127,10 @@
                                 <Button Grid.Row="1" Grid.Column="1" Content="📊  Reports"
                                         Click="Reports_Click" Style="{StaticResource MintButton}"
                                         Height="56" Margin="4"/>
-                                <Button Grid.Row="1" Grid.Column="2" Content="⚙  Settings"
+                                <Button Grid.Row="1" Grid.Column="2" Content="👥  Users"
                                         Click="Settings_Click" Style="{StaticResource SecondaryButton}"
-                                        Height="56" Margin="4"/>
+                                        Height="56" Margin="4"
+                                        ToolTip="Manage users, approve sign-ups, reset passwords"/>
                             </Grid>
                         </StackPanel>
                     </Border>

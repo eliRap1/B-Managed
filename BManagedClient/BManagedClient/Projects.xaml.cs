@@ -4,12 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace BManagedClient
 {
     public partial class Projects : Page
     {
         private List<Customer> _customers = new();
+        private List<User> _employees = new();
+        private Project _selected;
         private bool _ready;
 
         public Projects()
@@ -17,6 +20,7 @@ namespace BManagedClient
             InitializeComponent();
             if (!ClientSession.IsOwner) { NavigationService?.Navigate(new LogIn()); return; }
             LoadCustomers();
+            LoadEmployees();
             _ready = true;
             Refresh();
         }
@@ -29,6 +33,19 @@ namespace BManagedClient
                 _customers = (arr ?? new Customer[0]).ToList();
                 customerCombo.ItemsSource = _customers;
                 if (_customers.Count > 0) customerCombo.SelectedIndex = 0;
+            }
+            catch { }
+        }
+
+        private void LoadEmployees()
+        {
+            try
+            {
+                var users = ServiceGateway.Use(c => c.GetAllUsers());
+                _employees = users == null
+                    ? new List<User>()
+                    : users.Where(u => u.Role == "Employee" && u.IsActive).ToList();
+                employeeCombo.ItemsSource = _employees;
             }
             catch { }
         }
@@ -61,6 +78,35 @@ namespace BManagedClient
 
         private void Filter_Changed(object s, SelectionChangedEventArgs e) { if (_ready) Refresh(); }
 
+        private void Project_Selected(object s, SelectionChangedEventArgs e)
+        {
+            _selected = projectsList.SelectedItem as Project;
+            if (_selected == null)
+            {
+                selTitle.Text = "Select a project on the left.";
+                assignBtn.IsEnabled = false;
+                statusBtn.IsEnabled = false;
+                return;
+            }
+            selTitle.Text = _selected.Title + "  ·  " + _selected.Status;
+            assignBtn.IsEnabled = true;
+            statusBtn.IsEnabled = true;
+
+            // Pre-select current employee + status if known.
+            if (_selected.AssignedEmployeeId.HasValue)
+                employeeCombo.SelectedValue = _selected.AssignedEmployeeId.Value;
+            else
+                employeeCombo.SelectedIndex = -1;
+
+            statusCombo.SelectedIndex = (_selected.Status ?? "Active") switch
+            {
+                "AwaitingPayment" => 1,
+                "Done"            => 2,
+                "Cancelled"       => 3,
+                _                 => 0,
+            };
+        }
+
         private void Add_Click(object s, RoutedEventArgs e)
         {
             if (customerCombo.SelectedValue == null || string.IsNullOrWhiteSpace(titleBox.Text)) return;
@@ -69,18 +115,57 @@ namespace BManagedClient
             {
                 ServiceGateway.Use(c => c.AddProject(new Project
                 {
-                    CustomerId = (int)customerCombo.SelectedValue,
-                    Title = titleBox.Text,
-                    Status = "Active",
-                    StartDate = DateTime.Today,
-                    DueDate = DateTime.Today.AddDays(30),
+                    CustomerId  = (int)customerCombo.SelectedValue,
+                    Title       = titleBox.Text,
+                    Status      = "Active",
+                    StartDate   = DateTime.Today,
+                    DueDate     = DateTime.Today.AddDays(30),
                     TotalBudget = budget,
-                    Currency = LogIn.sign.PreferredCurrency
+                    Currency    = LogIn.sign.PreferredCurrency
                 }));
                 titleBox.Text = ""; budgetBox.Text = "0";
                 Refresh();
             }
             catch (Exception ex) { MessageBox.Show("Add failed: " + ex.Message); }
+        }
+
+        private void Assign_Click(object s, RoutedEventArgs e)
+        {
+            if (_selected == null || employeeCombo.SelectedValue == null) return;
+            int empId = (int)employeeCombo.SelectedValue;
+            try
+            {
+                ServiceGateway.Use(c => c.AssignEmployee(_selected.Id, empId));
+                ShowOk("Employee assigned.");
+                Refresh();
+            }
+            catch (Exception ex) { ShowErr("Assign failed: " + ex.Message); }
+        }
+
+        private void UpdateStatus_Click(object s, RoutedEventArgs e)
+        {
+            if (_selected == null) return;
+            var newStatus = (statusCombo.SelectedItem as ComboBoxItem)?.Content?.ToString();
+            if (string.IsNullOrEmpty(newStatus)) return;
+            try
+            {
+                ServiceGateway.Use(c => c.SetProjectStatus(_selected.Id, newStatus));
+                ShowOk("Status set to " + newStatus + ".");
+                Refresh();
+            }
+            catch (Exception ex) { ShowErr("Update failed: " + ex.Message); }
+        }
+
+        private void ShowOk(string msg)
+        {
+            manageStatus.Text = msg;
+            manageStatus.Foreground = (Brush)Application.Current.Resources["Mint"];
+        }
+
+        private void ShowErr(string msg)
+        {
+            manageStatus.Text = msg;
+            manageStatus.Foreground = (Brush)Application.Current.Resources["Rose"];
         }
 
         private void Back_Click(object s, RoutedEventArgs e) => NavigationService?.Navigate(new OwnerHome());

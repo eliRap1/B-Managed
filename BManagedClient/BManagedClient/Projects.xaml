@@ -6,6 +6,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -21,8 +22,9 @@
                 </Border>
                 <TextBlock Text="Projects." Style="{StaticResource DisplayLg}" Margin="0,10,0,0"/>
             </StackPanel>
-            <ComboBox Grid.Column="1" x:Name="statusFilter" Width="180" Style="{StaticResource ModernCombo}"
-                      SelectionChanged="Filter_Changed" VerticalAlignment="Top" Margin="0,0,8,0">
+            <ComboBox Grid.Column="1" x:Name="statusFilter" Width="200" Style="{StaticResource ModernCombo}"
+                      SelectionChanged="Filter_Changed" VerticalAlignment="Top" Margin="0,0,8,0"
+                      ToolTip="Filter projects by current status">
                 <ComboBoxItem Content="All" IsSelected="True"/>
                 <ComboBoxItem Content="Active"/>
                 <ComboBoxItem Content="AwaitingPayment"/>
@@ -33,38 +35,110 @@
                     VerticalAlignment="Top"/>
         </Grid>
 
-        <Border Grid.Row="1" Style="{StaticResource ShellCard}">
-            <Border Style="{StaticResource CoreCard}" Padding="14">
+        <!-- Cheat-sheet -->
+        <Border Grid.Row="1" Style="{StaticResource ShellCard}" Margin="0,0,0,12">
+            <Border Style="{StaticResource CoreCard}" Padding="18,12">
+                <StackPanel>
+                    <TextBlock Text="HOW TO ADD A PROJECT" Style="{StaticResource Eyebrow}" Margin="0,0,0,6"/>
+                    <TextBlock TextWrapping="Wrap" Style="{StaticResource Body}">
+                        <Run FontWeight="SemiBold">Customer</Run> — who you bill ·
+                        <Run FontWeight="SemiBold">Title</Run> — short name ·
+                        <Run FontWeight="SemiBold">Budget</Run> — total agreed amount in your default currency.
+                        After the project is added, select it below to assign an employee or change status.
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- Add new project -->
+        <Border Grid.Row="2" Style="{StaticResource ShellCard}">
+            <Border Style="{StaticResource CoreCard}" Padding="18">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="220"/>
                         <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="160"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <ComboBox x:Name="customerCombo" Grid.Column="0" Style="{StaticResource ModernCombo}"
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="CUSTOMER" Style="{StaticResource InputLabel}" Margin="0,0,8,4"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="PROJECT TITLE" Style="{StaticResource InputLabel}" Margin="0,0,8,4"/>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="BUDGET (TOTAL)" Style="{StaticResource InputLabel}" Margin="0,0,8,4"/>
+
+                    <ComboBox Grid.Row="1" Grid.Column="0" x:Name="customerCombo" Style="{StaticResource ModernCombo}"
                               DisplayMemberPath="BusinessName" SelectedValuePath="Id" Margin="0,0,8,0"/>
-                    <TextBox x:Name="titleBox" Grid.Column="1" Style="{StaticResource ModernTextBox}" Margin="0,0,8,0"/>
-                    <TextBox x:Name="budgetBox" Grid.Column="2" Style="{StaticResource ModernTextBox}" Margin="0,0,8,0" Text="0"/>
-                    <Button Grid.Column="3" Content="➕ Add project" Click="Add_Click" Style="{StaticResource MintButton}"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" x:Name="titleBox" Style="{StaticResource ModernTextBox}"
+                             Margin="0,0,8,0" ToolTip="Short, descriptive title — e.g. 'Website redesign Q1'"/>
+                    <TextBox Grid.Row="1" Grid.Column="2" x:Name="budgetBox" Style="{StaticResource ModernTextBox}"
+                             Margin="0,0,8,0" Text="0"
+                             ToolTip="Total agreed amount for this project, before VAT, in your default currency"/>
+                    <Button  Grid.Row="1" Grid.Column="3" Content="➕ Add project" Click="Add_Click" Style="{StaticResource MintButton}"/>
                 </Grid>
             </Border>
         </Border>
 
-        <Border Grid.Row="2" Style="{StaticResource ShellCard}">
-            <Border Style="{StaticResource CoreCard}" Padding="6">
-                <ListView x:Name="projectsList" Background="Transparent" BorderThickness="0" SelectionMode="Single">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Title"    DisplayMemberBinding="{Binding Title}"  Width="280"/>
-                            <GridViewColumn Header="Status"   DisplayMemberBinding="{Binding Status}" Width="160"/>
-                            <GridViewColumn Header="Due"      DisplayMemberBinding="{Binding DueDate, StringFormat=dd/MM/yyyy}" Width="120"/>
-                            <GridViewColumn Header="Budget"   DisplayMemberBinding="{Binding TotalBudget, StringFormat=N2}"     Width="110"/>
-                            <GridViewColumn Header="Currency" DisplayMemberBinding="{Binding Currency}" Width="80"/>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+        <!-- Project list + selection panel -->
+        <Grid Grid.Row="3" Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="320"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource ShellCard}" Margin="0,0,12,0">
+                <Border Style="{StaticResource CoreCard}" Padding="6">
+                    <ListView x:Name="projectsList" Background="Transparent" BorderThickness="0"
+                              SelectionMode="Single" SelectionChanged="Project_Selected">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Title"    DisplayMemberBinding="{Binding Title}"  Width="240"/>
+                                <GridViewColumn Header="Status"   DisplayMemberBinding="{Binding Status}" Width="130"/>
+                                <GridViewColumn Header="Due"      DisplayMemberBinding="{Binding DueDate, StringFormat=dd/MM/yyyy}" Width="100"/>
+                                <GridViewColumn Header="Budget"   DisplayMemberBinding="{Binding TotalBudget, StringFormat=N2}"     Width="100"/>
+                                <GridViewColumn Header="Currency" DisplayMemberBinding="{Binding Currency}" Width="70"/>
+                                <GridViewColumn Header="Employee" Width="120">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding AssignedEmployeeId, StringFormat='Emp #{0}', TargetNullValue='—'}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Border>
             </Border>
-        </Border>
+
+            <Border Grid.Column="1" Style="{StaticResource ShellCard}">
+                <Border Style="{StaticResource CoreCard}" Padding="18">
+                    <StackPanel>
+                        <TextBlock Text="MANAGE SELECTED" Style="{StaticResource Eyebrow}" Margin="0,0,0,8"/>
+                        <TextBlock x:Name="selTitle" Style="{StaticResource Body}" FontWeight="SemiBold"
+                                   Text="Select a project on the left." TextWrapping="Wrap" Margin="0,0,0,16"/>
+
+                        <TextBlock Text="ASSIGN EMPLOYEE" Style="{StaticResource InputLabel}"/>
+                        <ComboBox x:Name="employeeCombo" Style="{StaticResource ModernCombo}"
+                                  DisplayMemberPath="Username" SelectedValuePath="Id" Margin="0,0,0,8"/>
+                        <Button Content="Assign" Click="Assign_Click" Style="{StaticResource PrimaryButton}"
+                                IsEnabled="False" x:Name="assignBtn" HorizontalAlignment="Stretch" Margin="0,0,0,18"/>
+
+                        <TextBlock Text="STATUS" Style="{StaticResource InputLabel}"/>
+                        <ComboBox x:Name="statusCombo" Style="{StaticResource ModernCombo}" Margin="0,0,0,8">
+                            <ComboBoxItem Content="Active"/>
+                            <ComboBoxItem Content="AwaitingPayment"/>
+                            <ComboBoxItem Content="Done"/>
+                            <ComboBoxItem Content="Cancelled"/>
+                        </ComboBox>
+                        <Button Content="Update status" Click="UpdateStatus_Click" Style="{StaticResource AmberButton}"
+                                IsEnabled="False" x:Name="statusBtn" HorizontalAlignment="Stretch"/>
+
+                        <TextBlock x:Name="manageStatus" Style="{StaticResource Caption}" Margin="0,12,0,0" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+            </Border>
+        </Grid>
     </Grid>
 </Page>
