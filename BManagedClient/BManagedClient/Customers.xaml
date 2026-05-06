@@ -6,6 +6,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -40,13 +41,58 @@
                              Margin="0,0,8,0"/>
                     <Button Grid.Column="1" Content="🔍 Search" Click="Search_Click" Style="{StaticResource PrimaryButton}"
                             Margin="0,0,8,0"/>
-                    <Button Grid.Column="2" Content="➕ New customer" Click="Add_Click" Style="{StaticResource MintButton}"/>
+                    <Button Grid.Column="2" Content="➕ New customer" Click="ToggleAdd_Click" Style="{StaticResource MintButton}"/>
+                </Grid>
+            </Border>
+        </Border>
+
+        <!-- Add-customer form (toggled by + New customer) -->
+        <Border Grid.Row="2" x:Name="addPanel" Style="{StaticResource ShellCard}" Visibility="Collapsed" Margin="0,12,0,0">
+            <Border Style="{StaticResource CoreCard}" Padding="18">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="BUSINESS NAME *" Style="{StaticResource InputLabel}" Margin="0,0,6,4"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="CONTACT NAME"    Style="{StaticResource InputLabel}" Margin="6,0,6,4"/>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="TAX ID (ח.פ / ע.מ)" Style="{StaticResource InputLabel}" Margin="6,0,0,4"/>
+                    <TextBox   Grid.Row="1" Grid.Column="0" x:Name="bizBox"     Style="{StaticResource ModernTextBox}" Margin="0,0,6,8"/>
+                    <TextBox   Grid.Row="1" Grid.Column="1" x:Name="contactBox" Style="{StaticResource ModernTextBox}" Margin="6,0,6,8"/>
+                    <TextBox   Grid.Row="1" Grid.Column="2" x:Name="taxBox"     Style="{StaticResource ModernTextBox}" Margin="6,0,0,8"/>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="EMAIL"    Style="{StaticResource InputLabel}" Margin="0,0,6,4"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="PHONE"    Style="{StaticResource InputLabel}" Margin="6,0,6,4"/>
+                    <TextBlock Grid.Row="2" Grid.Column="2" Text="CURRENCY" Style="{StaticResource InputLabel}" Margin="6,0,0,4"/>
+                    <TextBox   Grid.Row="3" Grid.Column="0" x:Name="emailBox" Style="{StaticResource ModernTextBox}" Margin="0,0,6,8"/>
+                    <TextBox   Grid.Row="3" Grid.Column="1" x:Name="phoneBox" Style="{StaticResource ModernTextBox}" Margin="6,0,6,8"/>
+                    <ComboBox  Grid.Row="3" Grid.Column="2" x:Name="curBox"   Style="{StaticResource ModernCombo}"   Margin="6,0,0,8">
+                        <ComboBoxItem Content="ILS" IsSelected="True"/>
+                        <ComboBoxItem Content="USD"/>
+                    </ComboBox>
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="ADDRESS / NOTES" Style="{StaticResource InputLabel}" Margin="0,0,6,4"/>
+                    <TextBox   Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" x:Name="addressBox"
+                               Style="{StaticResource ModernTextBox}" Margin="0,18,6,0"/>
+                    <StackPanel Grid.Row="4" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,12,0,0">
+                        <Button Content="Cancel" Click="CancelAdd_Click" Style="{StaticResource GhostButton}" Margin="0,0,6,0"/>
+                        <Button Content="Save customer" Click="SaveAdd_Click" Style="{StaticResource MintButton}"/>
+                    </StackPanel>
                 </Grid>
             </Border>
         </Border>
 
         <!-- List -->
-        <Border Grid.Row="2" Style="{StaticResource ShellCard}">
+        <Border Grid.Row="3" Style="{StaticResource ShellCard}" Margin="0,12,0,0">
             <Border Style="{StaticResource CoreCard}" Padding="6">
                 <ListView x:Name="customersList" Background="Transparent" BorderThickness="0" SelectionMode="Single">
                     <ListView.View>
@@ -62,6 +108,6 @@
             </Border>
         </Border>
 
-        <TextBlock Grid.Row="3" x:Name="status" Style="{StaticResource Caption}" Margin="0,8,0,0"/>
+        <TextBlock Grid.Row="4" x:Name="status" Style="{StaticResource Caption}" Margin="0,8,0,0"/>
     </Grid>
 </Page>
