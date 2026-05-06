@@ -82,6 +82,35 @@ namespace BManagedWeb.Pages.Owner
             return OnGet();
         }
 
+        public IActionResult OnGetCsv()
+        {
+            var role = HttpContext.Session.GetString("Role");
+            if (role != "Owner") return RedirectToPage("/Login");
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            var cats = _srv.GetExpenseCategories() ?? new ExpenseCategory[0];
+            var list = _srv.GetExpensesByOwner(ownerId) ?? new Expense[0];
+
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("Id,Date,Category,Vendor,Description,Amount,VatPaid,Currency");
+            foreach (var e in list)
+            {
+                var catName = cats.FirstOrDefault(c => c.Id == (e.CategoryId ?? 0))?.Name ?? "";
+                sb.AppendLine(string.Join(",",
+                    e.Id, e.Date.ToString("yyyy-MM-dd"), Csv(catName), Csv(e.Vendor),
+                    Csv(e.Description), e.Amount, e.VatPaid, Csv(e.Currency)));
+            }
+            byte[] bytes = new System.Text.UTF8Encoding(true).GetBytes(sb.ToString());
+            return File(bytes, "text/csv", "BManaged_Expenses.csv");
+        }
+
+        private static string Csv(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return "";
+            if (s.IndexOfAny(new[] { ',', '"', '\n', '\r' }) >= 0)
+                return "\"" + s.Replace("\"", "\"\"") + "\"";
+            return s;
+        }
+
         public IActionResult OnPostDelete(int id)
         {
             if (HttpContext.Session.GetString("Role") != "Owner") return RedirectToPage("/Login");
