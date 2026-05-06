@@ -62,5 +62,51 @@ namespace BManagedWeb.Pages.Owner
             });
             return RedirectToPage();
         }
+
+        // ---- Multi-employee assignment ----
+
+        public IActionResult OnGetAssignees(int projectId)
+        {
+            if (HttpContext.Session.GetString("Role") != "Owner")
+                return new JsonResult(new { error = "unauthorized" });
+            try
+            {
+                var assigned = _srv.GetProjectAssignees(projectId) ?? new User[0];
+                var allUsers = _srv.GetAllUsers();
+                IEnumerable<User> all = allUsers != null ? (IEnumerable<User>)allUsers : new User[0];
+                var assignedIds = assigned.Select(u => u.Id).ToHashSet();
+                var available = all
+                    .Where(u => u.Role == "Employee" && u.IsActive && !assignedIds.Contains(u.Id))
+                    .Select(u => new { id = u.Id, username = u.Username })
+                    .ToArray();
+                var assignedDto = assigned
+                    .Select(u => new { id = u.Id, username = u.Username })
+                    .ToArray();
+                return new JsonResult(new { assigned = assignedDto, available });
+            }
+            catch (System.Exception ex) { return new JsonResult(new { error = ex.Message }); }
+        }
+
+        public IActionResult OnPostAddAssignee(int projectId, int employeeId)
+        {
+            if (HttpContext.Session.GetString("Role") != "Owner") return Unauthorized();
+            try { _srv.AddProjectAssignment(projectId, employeeId); return new JsonResult(new { ok = true }); }
+            catch (System.Exception ex) { return new JsonResult(new { error = ex.Message }); }
+        }
+
+        public IActionResult OnPostRemoveAssignee(int projectId, int employeeId)
+        {
+            if (HttpContext.Session.GetString("Role") != "Owner") return Unauthorized();
+            try { _srv.RemoveProjectAssignment(projectId, employeeId); return new JsonResult(new { ok = true }); }
+            catch (System.Exception ex) { return new JsonResult(new { error = ex.Message }); }
+        }
+
+        public IActionResult OnPostStatus(int projectId, string newStatus)
+        {
+            if (HttpContext.Session.GetString("Role") != "Owner") return Unauthorized();
+            try { _srv.SetProjectStatus(projectId, newStatus); }
+            catch { }
+            return RedirectToPage(new { Q, StatusFilter });
+        }
     }
 }

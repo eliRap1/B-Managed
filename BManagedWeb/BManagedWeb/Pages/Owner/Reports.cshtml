@@ -22,6 +22,42 @@
     </form>
 </div>
 
+@if (TempData["VatMsg"] is string vatMsg)
+{
+    <div class="reveal mb-6 px-4 py-2 rounded-full inline-block bg-mint/10 text-mint border border-mint/20">@vatMsg</div>
+}
+
+<!-- VAT explainer -->
+<details class="reveal max-w-3xl mb-8 bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
+    <summary class="bg-paper-50 rounded-core p-5 shadow-inset cursor-pointer text-sm">
+        <span class="pill text-ink/40">@L.T(HttpContext,"How does the Owner pay VAT?","איך הבעלים משלם מע״מ?")</span>
+        <span class="text-ink/70 ml-2">@L.T(HttpContext,"Click to learn more about VAT collected, paid, and due.",
+                                              "לחץ להסבר על מע״מ עסקאות, תשומות וההפרש לתשלום.")</span>
+    </summary>
+    <div class="bg-paper-50 rounded-core px-5 pb-5 -mt-1 text-sm text-ink/70 space-y-2">
+        <p>
+            <span class="font-semibold">@L.T(HttpContext,"VAT collected","מע״מ עסקאות")</span> —
+            @L.T(HttpContext,"the 17 % VAT charged on top of every invoice you issue.",
+                              "17% המע״מ שגביית מהלקוחות בכל חשבונית.")
+        </p>
+        <p>
+            <span class="font-semibold">@L.T(HttpContext,"VAT paid","מע״מ תשומות")</span> —
+            @L.T(HttpContext,"the VAT portion of expenses you logged. Deductible against VAT collected.",
+                              "מרכיב המע״מ בהוצאות שדיווחת. ניתן לקיזוז מול מע״מ עסקאות.")
+        </p>
+        <p>
+            <span class="font-semibold">@L.T(HttpContext,"VAT due","מע״מ לתשלום")</span> =
+            <span class="font-mono">collected − paid</span>.
+            @L.T(HttpContext,"Owner files Form 836/874 with the Israel Tax Authority and transfers this amount via bank.",
+                              "הבעלים מגיש טופס 836/874 לרשות המסים ומעביר את הסכום בהעברה בנקאית.")
+        </p>
+        <p class="text-ink/50">
+            @L.T(HttpContext,"Click 'Mark as paid' on the VAT-due card after you have paid. The system records a matching expense entry against the Tax Authority so the next month starts clean.",
+                              "לחץ ‘סמן ששולם’ אחרי התשלום בפועל. המערכת תרשום הוצאה תואמת מול רשות המסים כדי שהחודש הבא יתחיל נקי.")
+        </p>
+    </div>
+</details>
+
 <section class="grid md:grid-cols-12 gap-4 md:gap-6 mb-12">
     <div class="reveal md:col-span-4 bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
         <div class="bg-paper-50 rounded-core p-8 shadow-inset h-full">
@@ -36,9 +72,17 @@
         </div>
     </div>
     <div class="reveal md:col-span-4 bg-ink rounded-shell p-1.5">
-        <div class="bg-ink-soft rounded-core p-8 text-paper-50 shadow-inset h-full">
+        <div class="bg-ink-soft rounded-core p-8 text-paper-50 shadow-inset h-full flex flex-col">
             <span class="pill text-paper-50/50">@L.T(HttpContext,"VAT due","מע״מ לתשלום")</span>
             <div class="display text-5xl font-bold mt-3">@Model.Vat.VatDue.ToString("N0") <span class="text-base text-paper-50/50">@Model.DisplayCurrency</span></div>
+            <form method="post" asp-page-handler="PayVat" class="mt-auto pt-4">
+                <input type="hidden" name="Year"  value="@Model.Year"/>
+                <input type="hidden" name="Month" value="@Model.Month"/>
+                <input type="hidden" name="DisplayCurrency" value="@Model.DisplayCurrency"/>
+                <button class="bg-mint text-white rounded-full px-4 py-2 text-sm w-full">
+                    @L.T(HttpContext,"Mark as paid to Tax Authority","סמן ששולם לרשות המסים")
+                </button>
+            </form>
         </div>
     </div>
 

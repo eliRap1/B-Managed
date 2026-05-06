@@ -38,16 +38,138 @@
     @foreach (var p in Model.Projects)
     {
         var color = p.Status switch { "Done" => "mint", "AwaitingPayment" => "amber", "Cancelled" => "rose", _ => "accent" };
-        <div class="bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5 hover:shadow-float transition-all duration-500 ease-spring">
+        <button type="button" data-proj-id="@p.Id" data-proj-title="@p.Title" data-proj-status="@p.Status"
+                class="proj-card text-left bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5 hover:shadow-float transition-all duration-500 ease-spring">
             <div class="bg-paper-50 rounded-core p-6 shadow-inset h-full">
                 <span class="pill text-ink/40">#@p.Id · @p.Currency</span>
                 <div class="display text-2xl font-semibold mt-2">@p.Title</div>
                 <div class="text-xs text-ink/40 mt-1">@L.T(HttpContext,"Due","יעד") @(p.DueDate?.ToString("dd MMM yyyy") ?? "—")</div>
                 <div class="display text-xl font-semibold mt-3">@p.TotalBudget.ToString("N0") <span class="text-ink/40 text-xs">@p.Currency</span></div>
                 <div class="pill rounded-full px-2 py-0.5 mt-4 inline-block bg-@(color)/10 text-@(color) border border-@(color)/20">@p.Status</div>
+                <div class="text-xs text-ink/40 mt-3">@L.T(HttpContext,"Click to manage employees + status","לחץ לניהול עובדים וסטטוס")</div>
             </div>
-        </div>
+        </button>
     }
     @if (Model.Projects.Count == 0)
     { <div class="md:col-span-3 text-center py-20 text-ink/40">@L.T(HttpContext,"No projects yet.","אין פרויקטים עדיין.")</div> }
 </section>
+
+<!-- Manage project modal -->
+<div id="proj-modal" class="hidden fixed inset-0 z-[60] grid place-items-center bg-black/40 backdrop-blur-md p-4">
+    <div class="bg-black/[0.04] ring-1 ring-black/10 rounded-shell p-1.5 shadow-float w-full max-w-2xl max-h-[85vh] overflow-hidden">
+        <div class="bg-paper-50 rounded-core p-8 shadow-inset overflow-y-auto max-h-[83vh]">
+            <div class="flex items-start justify-between gap-4 mb-6">
+                <div>
+                    <span class="pill text-ink/40">@L.T(HttpContext,"Project","פרויקט") · <span id="pm-status">—</span></span>
+                    <h2 class="display text-3xl font-bold mt-1" id="pm-title">—</h2>
+                </div>
+                <button type="button" id="pm-close"
+                        class="w-9 h-9 rounded-full bg-black/5 hover:bg-black/10 transition flex items-center justify-center">✕</button>
+            </div>
+
+            <h3 class="display font-semibold mt-2 mb-2">@L.T(HttpContext,"Assigned employees","עובדים מוקצים")</h3>
+            <div id="pm-assigned" class="space-y-1.5 text-sm text-ink/60 mb-4">—</div>
+
+            <div class="flex items-center gap-2 mb-6">
+                <select id="pm-add-pick"
+                        class="flex-1 bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5 text-sm">
+                </select>
+                <button type="button" id="pm-add-btn"
+                        class="bg-mint text-white rounded-full px-4 py-2 text-sm">+ @L.T(HttpContext,"Add","הוסף")</button>
+            </div>
+
+            <h3 class="display font-semibold mt-2 mb-2">@L.T(HttpContext,"Update status","עדכן סטטוס")</h3>
+            <form method="post" asp-page-handler="Status" class="flex items-center gap-2 mb-2">
+                <input type="hidden" id="pm-status-pid" name="projectId" value="0"/>
+                <select name="newStatus" class="flex-1 bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5 text-sm">
+                    <option value="Active">@L.T(HttpContext,"Active","פעיל")</option>
+                    <option value="AwaitingPayment">@L.T(HttpContext,"Awaiting Payment","ממתין לתשלום")</option>
+                    <option value="Done">@L.T(HttpContext,"Done","הסתיים")</option>
+                    <option value="Cancelled">@L.T(HttpContext,"Cancelled","בוטל")</option>
+                </select>
+                <button class="bg-amber text-white rounded-full px-4 py-2 text-sm">@L.T(HttpContext,"Save","שמור")</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+  const modal = document.getElementById('proj-modal');
+  const close = document.getElementById('pm-close');
+  close.addEventListener('click', () => modal.classList.add('hidden'));
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });
+
+  let currentPid = 0;
+
+  function row(name, removeFn) {
+    const w = document.createElement('div');
+    w.className = 'flex justify-between bg-paper-100 rounded-xl px-4 py-2';
+    const l = document.createElement('span'); l.textContent = name;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = '✕';
+    b.className = 'text-rose hover:opacity-70 transition';
+    b.addEventListener('click', removeFn);
+    w.appendChild(l); w.appendChild(b);
+    return w;
+  }
+
+  async function loadAssignees(pid) {
+    currentPid = pid;
+    const r = await fetch('/Owner/Projects?handler=Assignees&projectId=' + encodeURIComponent(pid));
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d.error) { alert(d.error); return; }
+
+    const wrap = document.getElementById('pm-assigned');
+    while (wrap.firstChild) wrap.removeChild(wrap.firstChild);
+    if (d.assigned.length === 0) {
+      const empty = document.createElement('div'); empty.className = 'text-ink/40';
+      empty.textContent = '—'; wrap.appendChild(empty);
+    } else {
+      d.assigned.forEach(u => wrap.appendChild(row(u.username, async () => {
+        const fd = new FormData();
+        fd.append('projectId', currentPid);
+        fd.append('employeeId', u.id);
+        await fetch('/Owner/Projects?handler=RemoveAssignee', { method: 'POST', body: fd });
+        loadAssignees(currentPid);
+      })));
+    }
+
+    const sel = document.getElementById('pm-add-pick');
+    while (sel.firstChild) sel.removeChild(sel.firstChild);
+    if (d.available.length === 0) {
+      const opt = document.createElement('option'); opt.value = ''; opt.textContent = '— no available employees —';
+      sel.appendChild(opt);
+    } else {
+      d.available.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u.id; opt.textContent = u.username;
+        sel.appendChild(opt);
+      });
+    }
+  }
+
+  document.getElementById('pm-add-btn').addEventListener('click', async () => {
+    const sel = document.getElementById('pm-add-pick');
+    if (!sel.value) return;
+    const fd = new FormData();
+    fd.append('projectId', currentPid);
+    fd.append('employeeId', sel.value);
+    await fetch('/Owner/Projects?handler=AddAssignee', { method: 'POST', body: fd });
+    loadAssignees(currentPid);
+  });
+
+  document.querySelectorAll('.proj-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const pid = card.getAttribute('data-proj-id');
+      document.getElementById('pm-title').textContent  = card.getAttribute('data-proj-title') || '';
+      document.getElementById('pm-status').textContent = card.getAttribute('data-proj-status') || '';
+      document.getElementById('pm-status-pid').value   = pid;
+      loadAssignees(pid);
+      modal.classList.remove('hidden');
+    });
+  });
+</script>
+}

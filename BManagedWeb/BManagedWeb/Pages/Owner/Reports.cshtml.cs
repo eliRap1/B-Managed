@@ -71,5 +71,40 @@ namespace BManagedWeb.Pages.Owner
         }
 
         private static string Esc(string v) => v == null ? "" : v.Replace(",", " ").Replace("\"", "'");
+
+        // Records the periodic VAT settlement as a single expense row tagged
+        // 'VAT payment to Tax Authority'. This zeroes the VAT-due figure for
+        // the next GetVatSummary call (since the new expense has VatPaid set).
+        public IActionResult OnPostPayVat()
+        {
+            var role = HttpContext.Session.GetString("Role");
+            if (role != "Owner") return RedirectToPage("/Login");
+            int id = HttpContext.Session.GetInt32("UserId") ?? 0;
+            var cur = string.IsNullOrEmpty(DisplayCurrency) ? "ILS" : DisplayCurrency;
+            try
+            {
+                var vat = _srv.GetVatSummary(id, Year, Month, cur);
+                decimal due = vat?.VatDue ?? 0m;
+                if (due <= 0)
+                {
+                    TempData["VatMsg"] = "No VAT is due for this period.";
+                    return RedirectToPage(new { Year, Month, DisplayCurrency = cur });
+                }
+
+                _srv.AddExpense(new Expense
+                {
+                    OwnerId     = id,
+                    Date        = DateTime.Today,
+                    Amount      = due,
+                    VatPaid     = 0,                 // payment to authority — not a VAT-deductible expense
+                    Vendor      = "Israel Tax Authority",
+                    Description = $"VAT settlement for {Year:D4}-{Month:D2}",
+                    Currency    = cur,
+                });
+                TempData["VatMsg"] = $"Recorded VAT payment of {due:N2} {cur} to Tax Authority.";
+            }
+            catch (Exception ex) { TempData["VatMsg"] = "Failed: " + ex.Message; }
+            return RedirectToPage(new { Year, Month, DisplayCurrency = cur });
+        }
     }
 }
