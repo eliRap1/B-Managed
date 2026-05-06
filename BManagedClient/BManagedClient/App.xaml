@@ -160,37 +160,36 @@
 
             <!-- ================== INPUTS ================== -->
             <Style x:Key="ModernTextBox" TargetType="TextBox">
-                <Setter Property="Background" Value="{StaticResource Paper100}"/>
+                <Setter Property="Background" Value="White"/>
                 <Setter Property="Foreground" Value="{StaticResource Ink}"/>
                 <Setter Property="CaretBrush" Value="{StaticResource Ink}"/>
                 <Setter Property="SelectionBrush" Value="{StaticResource Accent}"/>
-                <Setter Property="BorderBrush" Value="#1A000000"/>
+                <Setter Property="BorderBrush" Value="#33000000"/>
                 <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="FontFamily" Value="{StaticResource BodyFont}"/>
-                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="FontSize" Value="14"/>
                 <Setter Property="Padding" Value="12,8"/>
-                <Setter Property="Height" Value="38"/>
+                <Setter Property="MinHeight" Value="40"/>
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
                 <Setter Property="Template">
                     <Setter.Value>
-                        <ControlTemplate TargetType="TextBox">
-                            <Border x:Name="bd" CornerRadius="12"
+                        <ControlTemplate TargetType="{x:Type TextBox}">
+                            <Border x:Name="border" CornerRadius="12"
                                     Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}"
-                                    Padding="{TemplateBinding Padding}"
                                     SnapsToDevicePixels="True">
                                 <ScrollViewer x:Name="PART_ContentHost"
+                                              Margin="{TemplateBinding Padding}"
+                                              VerticalAlignment="Center"
                                               Focusable="False"
                                               HorizontalScrollBarVisibility="Hidden"
-                                              VerticalScrollBarVisibility="Hidden"/>
+                                              VerticalScrollBarVisibility="Hidden"
+                                              Background="Transparent"/>
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsKeyboardFocused" Value="True">
-                                    <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource Accent}"/>
-                                </Trigger>
-                                <Trigger Property="IsEnabled" Value="False">
-                                    <Setter TargetName="bd" Property="Opacity" Value="0.6"/>
+                                    <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource Accent}"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -199,34 +198,36 @@
             </Style>
 
             <Style x:Key="ModernPasswordBox" TargetType="PasswordBox">
-                <Setter Property="Background" Value="{StaticResource Paper100}"/>
+                <Setter Property="Background" Value="White"/>
                 <Setter Property="Foreground" Value="{StaticResource Ink}"/>
                 <Setter Property="CaretBrush" Value="{StaticResource Ink}"/>
                 <Setter Property="SelectionBrush" Value="{StaticResource Accent}"/>
-                <Setter Property="BorderBrush" Value="#1A000000"/>
+                <Setter Property="BorderBrush" Value="#33000000"/>
                 <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="FontFamily" Value="{StaticResource BodyFont}"/>
-                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="FontSize" Value="14"/>
                 <Setter Property="Padding" Value="12,8"/>
-                <Setter Property="Height" Value="38"/>
+                <Setter Property="MinHeight" Value="40"/>
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
                 <Setter Property="Template">
                     <Setter.Value>
-                        <ControlTemplate TargetType="PasswordBox">
-                            <Border x:Name="bd" CornerRadius="12"
+                        <ControlTemplate TargetType="{x:Type PasswordBox}">
+                            <Border x:Name="border" CornerRadius="12"
                                     Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}"
-                                    Padding="{TemplateBinding Padding}"
                                     SnapsToDevicePixels="True">
                                 <ScrollViewer x:Name="PART_ContentHost"
+                                              Margin="{TemplateBinding Padding}"
+                                              VerticalAlignment="Center"
                                               Focusable="False"
                                               HorizontalScrollBarVisibility="Hidden"
-                                              VerticalScrollBarVisibility="Hidden"/>
+                                              VerticalScrollBarVisibility="Hidden"
+                                              Background="Transparent"/>
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsKeyboardFocused" Value="True">
-                                    <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource Accent}"/>
+                                    <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource Accent}"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -295,9 +296,20 @@
             </Style>
 
             <!-- ================== DEFAULTS ================== -->
+            <!-- Force dark Ink everywhere by default; buttons override at the
+                 control level. Page-level Foreground propagates via inheritance. -->
+            <Style TargetType="Page">
+                <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+                <Setter Property="Background" Value="{StaticResource Bg}"/>
+                <Setter Property="FontFamily" Value="{StaticResource BodyFont}"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+            </Style>
+            <!-- Implicit TextBlock style sets only typography; Foreground stays
+                 inheritable so button content (rendered as TextBlock by
+                 ContentPresenter) picks up Button.Foreground correctly. -->
             <Style TargetType="TextBlock">
                 <Setter Property="FontFamily" Value="{StaticResource BodyFont}"/>
-                <Setter Property="Foreground" Value="{StaticResource Ink}"/>
                 <Setter Property="FontSize" Value="13"/>
             </Style>
 
