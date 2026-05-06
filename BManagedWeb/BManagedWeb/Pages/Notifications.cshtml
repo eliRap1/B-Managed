@@ -3,7 +3,7 @@
 @{ ViewData["Title"] = "Notifications"; }
 
 <div class="reveal mb-8">
-    <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">Inbox</span>
+    <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">@L.T(HttpContext, "Inbox", "תיבת דואר")</span>
     <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">@L.T(HttpContext, "Notifications", "התראות")</h1>
 </div>
 
