@@ -100,9 +100,83 @@
         </div>
     </div>
 
+    <!-- P&L card -->
     <div class="reveal md:col-span-12 bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
         <div class="bg-paper-50 rounded-core p-8 shadow-inset">
-            <h2 class="display text-2xl font-semibold mb-6">@L.T(HttpContext,"Top customers by revenue","לקוחות מובילים לפי הכנסה")</h2>
+            <div class="flex flex-wrap justify-between items-end mb-6 gap-4">
+                <div>
+                    <span class="pill text-ink/40">@L.T(HttpContext,"Profit & Loss","רווח והפסד")</span>
+                    <h2 class="display text-2xl font-semibold">@L.T(HttpContext,"Money in, money out, what's left.","הכנסות, הוצאות, מה נשאר.")</h2>
+                </div>
+                <div class="text-xs text-ink/40">@L.T(HttpContext,"Period","תקופה"): @Model.Year-@Model.Month.ToString("D2") · @Model.DisplayCurrency</div>
+            </div>
+
+            <!-- Month -->
+            <div class="grid md:grid-cols-3 gap-3 mb-6">
+                <div class="bg-paper-100 rounded-2xl px-5 py-4">
+                    <div class="pill text-ink/40">@L.T(HttpContext,"Income (this month)","הכנסות (החודש)")</div>
+                    <div class="display text-2xl font-semibold mt-1 text-mint">@Model.MonthPl.Income.ToString("N0") <span class="text-ink/40 text-xs">@Model.DisplayCurrency</span></div>
+                </div>
+                <div class="bg-paper-100 rounded-2xl px-5 py-4">
+                    <div class="pill text-ink/40">@L.T(HttpContext,"Expenses (this month)","הוצאות (החודש)")</div>
+                    <div class="display text-2xl font-semibold mt-1 text-rose">@Model.MonthPl.Expenses.ToString("N0") <span class="text-ink/40 text-xs">@Model.DisplayCurrency</span></div>
+                </div>
+                <div class="bg-paper-100 rounded-2xl px-5 py-4">
+                    <div class="pill text-ink/40">@L.T(HttpContext,"Gross profit (this month)","רווח ברוטו (החודש)")</div>
+                    <div class="display text-2xl font-semibold mt-1">@Model.MonthPl.Profit.ToString("N0") <span class="text-ink/40 text-xs">@Model.DisplayCurrency</span></div>
+                </div>
+            </div>
+
+            <!-- Year-to-year + tax brackets -->
+            <div class="grid md:grid-cols-4 gap-3">
+                <div class="bg-ink rounded-2xl px-5 py-4 text-paper-50">
+                    <div class="pill text-paper-50/50">@L.T(HttpContext,"Income (year)","הכנסות (שנתי)")</div>
+                    <div class="display text-2xl font-semibold mt-1">@Model.YearPl.Income.ToString("N0") <span class="text-paper-50/40 text-xs">@Model.DisplayCurrency</span></div>
+                </div>
+                <div class="bg-ink rounded-2xl px-5 py-4 text-paper-50">
+                    <div class="pill text-paper-50/50">@L.T(HttpContext,"Expenses (year)","הוצאות (שנתי)")</div>
+                    <div class="display text-2xl font-semibold mt-1">@Model.YearPl.Expenses.ToString("N0") <span class="text-paper-50/40 text-xs">@Model.DisplayCurrency</span></div>
+                </div>
+                <div class="bg-amber/20 rounded-2xl px-5 py-4 border border-amber/30">
+                    <div class="pill text-ink/50">@L.T(HttpContext,"Income tax (brackets)","מס הכנסה (מדרגות)")</div>
+                    <div class="display text-2xl font-semibold mt-1 text-amber">−@Model.YearTax.ToString("N0") <span class="text-ink/40 text-xs">@Model.DisplayCurrency</span></div>
+                    <div class="text-xs text-ink/50 mt-1">@L.T(HttpContext,"Computed on year gross profit","מחושב על רווח ברוטו שנתי")</div>
+                </div>
+                <div class="bg-mint/15 rounded-2xl px-5 py-4 border border-mint/30">
+                    <div class="pill text-ink/50">@L.T(HttpContext,"Net profit (year)","רווח נטו (שנתי)")</div>
+                    <div class="display text-2xl font-semibold mt-1 text-mint">@Model.YearNet.ToString("N0") <span class="text-ink/40 text-xs">@Model.DisplayCurrency</span></div>
+                    <div class="text-xs text-ink/50 mt-1">= @L.T(HttpContext,"Gross","ברוטו") − @L.T(HttpContext,"Tax","מס")</div>
+                </div>
+            </div>
+
+            <!-- Bracket table -->
+            <details class="mt-6 text-xs text-ink/60">
+                <summary class="cursor-pointer pill text-ink/40">@L.T(HttpContext,"Show 2025 income-tax brackets","הצג מדרגות מס 2025")</summary>
+                <table class="mt-3 w-full text-left">
+                    <thead><tr class="text-ink/40">
+                        <th class="py-1">@L.T(HttpContext,"From","מ-")</th>
+                        <th class="py-1">@L.T(HttpContext,"To","עד")</th>
+                        <th class="py-1">@L.T(HttpContext,"Rate","שיעור")</th>
+                    </tr></thead>
+                    <tbody>
+                        <tr><td>0</td><td>84,120</td><td>10%</td></tr>
+                        <tr><td>84,120</td><td>120,720</td><td>14%</td></tr>
+                        <tr><td>120,720</td><td>193,800</td><td>20%</td></tr>
+                        <tr><td>193,800</td><td>269,280</td><td>31%</td></tr>
+                        <tr><td>269,280</td><td>560,280</td><td>35%</td></tr>
+                        <tr><td>560,280</td><td>721,560</td><td>47%</td></tr>
+                        <tr><td>721,560</td><td>—</td><td>50%</td></tr>
+                    </tbody>
+                </table>
+                <p class="mt-2 text-ink/50">@L.T(HttpContext,"Approximate 2025 brackets for individuals (NIS). Real liability depends on credit points, deductions, and other adjustments — consult an accountant.",
+                                                 "מדרגות משוערות 2025 ליחיד (₪). חבות מס ממשית תלויה בנקודות זיכוי, ניכויים ועוד — היוועצו עם רו״ח.")</p>
+            </details>
+        </div>
+    </div>
+
+    <div class="reveal md:col-span-12 bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
+        <div class="bg-paper-50 rounded-core p-8 shadow-inset">
+            <h2 class="display text-2xl font-semibold mb-6">@L.T(HttpContext,"Customers — invoiced vs paid","לקוחות — חויב מול שולם")</h2>
             <div class="grid md:grid-cols-2 gap-3">
                 @foreach (var r in Model.TopCustomers)
                 {

@@ -20,6 +20,12 @@ namespace BManagedWeb.Pages.Owner
         public List<CustomerRevenueRow> TopCustomers { get; set; } = new();
         public List<ExpenseBreakdownRow> ExpenseBreakdown { get; set; } = new();
 
+        // P&L for the selected month (and year-to-date for tax-bracket calc)
+        public ProfitLoss MonthPl   { get; set; } = new ProfitLoss();
+        public ProfitLoss YearPl    { get; set; } = new ProfitLoss();
+        public decimal    YearTax   { get; set; }
+        public decimal    YearNet   { get; set; }
+
         public IEnumerable<SelectListItem> YearOptions =>
             Enumerable.Range(DateTime.Today.Year - 4, 5)
                       .Select(y => new SelectListItem(y.ToString(), y.ToString()));
@@ -43,9 +49,44 @@ namespace BManagedWeb.Pages.Owner
                 var last  = first.AddMonths(1).AddDays(-1);
                 var bd = _srv.GetExpenseBreakdown(id, first, last, DisplayCurrency);
                 if (bd != null) ExpenseBreakdown = new List<ExpenseBreakdownRow>(bd);
+
+                // P&L — month + full year (year is needed for progressive tax bracket calc)
+                MonthPl = _srv.GetProfitLoss(id, first, last, DisplayCurrency) ?? new ProfitLoss();
+                var yearStart = new DateTime(Year, 1, 1);
+                var yearEnd   = new DateTime(Year, 12, 31);
+                YearPl = _srv.GetProfitLoss(id, yearStart, yearEnd, DisplayCurrency) ?? new ProfitLoss();
+
+                YearTax = ComputeIsraeliIncomeTax(YearPl.Profit);
+                YearNet = YearPl.Profit - YearTax;
             }
             catch { }
             return Page();
+        }
+
+        // Israeli individual income-tax brackets (annual). Approximated 2025 levels.
+        // Progressive: only the slice that falls inside each bracket is taxed at its rate.
+        public static decimal ComputeIsraeliIncomeTax(decimal annualGross)
+        {
+            if (annualGross <= 0) return 0m;
+            var brackets = new (decimal upper, decimal rate)[]
+            {
+                ( 84120m,  0.10m),
+                (120720m,  0.14m),
+                (193800m,  0.20m),
+                (269280m,  0.31m),
+                (560280m,  0.35m),
+                (721560m,  0.47m),
+                (decimal.MaxValue, 0.50m),
+            };
+            decimal tax = 0, lastUpper = 0;
+            foreach (var (upper, rate) in brackets)
+            {
+                if (annualGross <= upper)
+                { tax += (annualGross - lastUpper) * rate; break; }
+                tax += (upper - lastUpper) * rate;
+                lastUpper = upper;
+            }
+            return Math.Round(tax, 2);
         }
 
         public IActionResult OnGetCsv(string displayCurrency)
