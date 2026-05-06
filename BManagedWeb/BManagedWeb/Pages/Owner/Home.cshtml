@@ -57,6 +57,34 @@
         </div>
     </div>
 
+    @if (Model.Forecast != null && Model.Forecast.Count > 0)
+    {
+        <div class="reveal md:col-span-12 bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
+            <div class="bg-paper-50 rounded-core p-6 shadow-inset">
+                <span class="pill text-ink/40">@L.T(HttpContext,"3-month cashflow forecast","תחזית תזרים 3 חודשים")</span>
+                <p class="text-xs text-ink/40 mt-1">
+                    @L.T(HttpContext,"Trailing-3-month average + outstanding invoices due in each month.",
+                                      "ממוצע 3 חודשים אחרונים + חשבוניות פתוחות לפי תאריך פירעון.")
+                </p>
+                <div class="grid md:grid-cols-3 gap-3 mt-4">
+                    @{ var fIdx = 0; var anchor = DateTime.Today; }
+                    @foreach (var f in Model.Forecast)
+                    {
+                        fIdx++;
+                        var monthLabel = anchor.AddMonths(fIdx).ToString("MMM yyyy");
+                        var posClass = f.Profit >= 0 ? "text-mint" : "text-rose";
+                        <div class="bg-paper-100 rounded-2xl px-5 py-4">
+                            <div class="pill text-ink/40">@monthLabel</div>
+                            <div class="text-sm mt-1">@L.T(HttpContext,"Income","הכנסות"): <span class="font-semibold">@f.Income.ToString("N0") @f.DisplayCurrency</span></div>
+                            <div class="text-sm">@L.T(HttpContext,"Expenses","הוצאות"): <span class="font-semibold">@f.Expenses.ToString("N0") @f.DisplayCurrency</span></div>
+                            <div class="display text-2xl font-semibold mt-2 @posClass">@f.Profit.ToString("N0") <span class="text-ink/40 text-xs">@f.DisplayCurrency</span></div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
     @if (Model.HasInsights)
     {
         <div class="reveal md:col-span-12 bg-amber/10 border border-amber/20 rounded-shell p-1.5">

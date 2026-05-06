@@ -299,6 +299,9 @@ namespace BManagedWeb.bsrv
         [OperationContract] ExpenseBreakdownRow[] GetExpenseBreakdown(int ownerId, DateTime from, DateTime to, string displayCurrency);
         [OperationContract] EmployeeRevenueRow[]  GetEmployeeRevenueReport(int ownerId, string displayCurrency);
 
+        [OperationContract] ProfitLoss[] GetCashFlowForecast(int ownerId, int months, string displayCurrency);
+        [OperationContract] int          EnsureOverdueNotifications(int ownerId);
+
         [OperationContract] double GetExchangeRate(string from, string to, DateTime asOfDate);
         [OperationContract] void   SetExchangeRate(string from, string to, double rate);
         [OperationContract] string[] GetSupportedCurrencies();
@@ -420,6 +423,11 @@ namespace BManagedWeb.bsrv
             => Channel.GetExpenseBreakdown(o, f, t, c);
         public EmployeeRevenueRow[] GetEmployeeRevenueReport(int o, string c)
             => Channel.GetEmployeeRevenueReport(o, c);
+
+        public ProfitLoss[] GetCashFlowForecast(int o, int m, string c)
+            => Channel.GetCashFlowForecast(o, m, c);
+        public int EnsureOverdueNotifications(int o)
+            => Channel.EnsureOverdueNotifications(o);
 
         public double GetExchangeRate(string f, string t, DateTime d) => Channel.GetExchangeRate(f, t, d);
         public void   SetExchangeRate(string f, string t, double r)   => Channel.SetExchangeRate(f, t, r);

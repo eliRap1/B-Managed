@@ -137,6 +137,13 @@ namespace WcfServiceLibrary1
         [OperationContract] List<ExpenseBreakdownRow> GetExpenseBreakdown(int ownerId, DateTime from, DateTime to, string displayCurrency);
         [OperationContract] List<EmployeeRevenueRow>  GetEmployeeRevenueReport(int ownerId, string displayCurrency);
 
+        // Project next-N-months cashflow based on trailing-3-month average + outstanding invoices.
+        [OperationContract] List<ProfitLoss> GetCashFlowForecast(int ownerId, int months, string displayCurrency);
+
+        // Walks unpaid invoices, fires a notification per overdue one (idempotent — checks
+        // for an existing Notification with the same invoice number in title).
+        [OperationContract] int EnsureOverdueNotifications(int ownerId);
+
         // ==================== CURRENCY ====================
 
         [OperationContract] double GetExchangeRate(string from, string to, DateTime asOfDate);

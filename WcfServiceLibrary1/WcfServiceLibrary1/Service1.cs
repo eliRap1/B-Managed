@@ -308,6 +308,95 @@ namespace WcfServiceLibrary1
         public List<EmployeeRevenueRow> GetEmployeeRevenueReport(int ownerId, string displayCurrency)
             => reportsDB.EmployeeRevenueReport(ownerId, displayCurrency ?? "ILS");
 
+        // Cashflow forecast: trailing 3-month average for income/expenses,
+        // projected forward for `months` periods. Adds outstanding invoices
+        // due in the projection window to the income side of the matching month.
+        public List<ProfitLoss> GetCashFlowForecast(int ownerId, int months, string displayCurrency)
+        {
+            var cur = displayCurrency ?? "ILS";
+            decimal sumInc = 0, sumExp = 0;
+            int n = 3;
+            var anchor = DateTime.Today;
+            for (int i = 1; i <= n; i++)
+            {
+                var first = new DateTime(anchor.Year, anchor.Month, 1).AddMonths(-i);
+                var last  = first.AddMonths(1).AddDays(-1);
+                var pl = reportsDB.ProfitLoss(ownerId, first, last, cur);
+                if (pl == null) continue;
+                sumInc += pl.Income;
+                sumExp += pl.Expenses;
+            }
+            decimal avgInc = sumInc / n;
+            decimal avgExp = sumExp / n;
+
+            // Outstanding invoices boost the month their dueDate falls in.
+            var outstanding = invDB.GetUnpaidForOwner(ownerId);
+
+            var result = new List<ProfitLoss>();
+            for (int i = 1; i <= months; i++)
+            {
+                var first = new DateTime(anchor.Year, anchor.Month, 1).AddMonths(i);
+                var last  = first.AddMonths(1).AddDays(-1);
+
+                decimal extraIncome = 0;
+                if (outstanding != null)
+                {
+                    foreach (var inv in outstanding)
+                    {
+                        if (inv.DueDate.Date >= first && inv.DueDate.Date <= last)
+                            extraIncome += inv.Total;
+                    }
+                }
+
+                result.Add(new ProfitLoss
+                {
+                    Income          = avgInc + extraIncome,
+                    Expenses        = avgExp,
+                    Profit          = (avgInc + extraIncome) - avgExp,
+                    DisplayCurrency = cur,
+                });
+            }
+            return result;
+        }
+
+        public int EnsureOverdueNotifications(int ownerId)
+        {
+            int created = 0;
+            try
+            {
+                var overdue = invDB.GetOverdueForOwner(ownerId) ?? new List<Invoice>();
+                var existing = notifDB.GetByUser(ownerId) ?? new List<Notification>();
+                var existingNumbers = new HashSet<string>();
+                foreach (var n in existing)
+                {
+                    if (!string.IsNullOrEmpty(n.Title) && n.NotificationType == "Overdue")
+                        existingNumbers.Add(n.Title);
+                }
+
+                foreach (var inv in overdue)
+                {
+                    string title = "Overdue: " + inv.InvoiceNumber;
+                    if (existingNumbers.Contains(title)) continue;
+                    var cust = custDB.GetById(inv.CustomerId);
+                    notifDB.Insert(new Notification
+                    {
+                        UserId  = ownerId,
+                        Title   = title,
+                        Message = "Invoice " + inv.InvoiceNumber +
+                                  " (" + (cust?.BusinessName ?? "?") + ") is past due since " +
+                                  inv.DueDate.ToString("dd/MM/yyyy") +
+                                  ". Total " + inv.Total.ToString("N2") + " " + inv.Currency + ".",
+                        NotificationType = "Overdue",
+                        IsRead = false,
+                        CreatedAt = DateTime.Now,
+                    });
+                    created++;
+                }
+            }
+            catch { }
+            return created;
+        }
+
         // ===================================================================
         // CURRENCY
         // ===================================================================

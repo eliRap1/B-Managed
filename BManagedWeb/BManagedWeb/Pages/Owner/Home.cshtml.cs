@@ -28,6 +28,7 @@ namespace BManagedWeb.Pages.Owner
         public string TaxSetAsideDisplay => TaxSetAside.ToString("N0");
 
         public List<RecentInvoice> RecentInvoices { get; set; } = new();
+        public List<ProfitLoss> Forecast { get; set; } = new();
 
         public class RecentInvoice
         {
@@ -119,6 +120,13 @@ namespace BManagedWeb.Pages.Owner
                     RevenueChangePct = Math.Round(((thisPl.Income - prevPl.Income) / prevPl.Income) * 100m, 1);
 
                 HasInsights = !string.IsNullOrEmpty(TopExpenseCategory) || RevenueChangePct != 0;
+
+                // Auto-create overdue-invoice notifications (idempotent server-side)
+                try { _srv.EnsureOverdueNotifications(id); } catch { }
+
+                // 3-month cashflow forecast
+                var fcst = _srv.GetCashFlowForecast(id, 3, Currency);
+                if (fcst != null) Forecast = fcst.ToList();
             }
             catch { }
             return Page();
