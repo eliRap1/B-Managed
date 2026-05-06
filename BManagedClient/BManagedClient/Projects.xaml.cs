@@ -10,12 +10,14 @@ namespace BManagedClient
     public partial class Projects : Page
     {
         private List<Customer> _customers = new();
+        private bool _ready;
 
         public Projects()
         {
             InitializeComponent();
             if (!ClientSession.IsOwner) { NavigationService?.Navigate(new LogIn()); return; }
             LoadCustomers();
+            _ready = true;
             Refresh();
         }
 
@@ -33,6 +35,7 @@ namespace BManagedClient
 
         private void Refresh()
         {
+            if (!_ready || projectsList == null) return;
             try
             {
                 var status = (statusFilter.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "All";
@@ -56,7 +59,7 @@ namespace BManagedClient
             catch (Exception ex) { MessageBox.Show("Load failed: " + ex.Message); }
         }
 
-        private void Filter_Changed(object s, SelectionChangedEventArgs e) => Refresh();
+        private void Filter_Changed(object s, SelectionChangedEventArgs e) { if (_ready) Refresh(); }
 
         private void Add_Click(object s, RoutedEventArgs e)
         {
