@@ -53,7 +53,7 @@
                 <span class="pill text-ink/40">@L.T(HttpContext,"6-month profit","רווח 6 חודשים")</span>
                 <span class="text-xs text-ink/40" id="spark-last">—</span>
             </div>
-            <canvas id="spark" height="90" class="mt-3"></canvas>
+            <canvas id="spark" height="140" class="mt-3" style="max-height:200px"></canvas>
         </div>
     </div>
 
@@ -183,6 +183,10 @@
       const last = d.data && d.data.length ? d.data[d.data.length - 1] : 0;
       document.getElementById('spark-last').textContent =
         Math.round(Number(last)).toLocaleString() + ' ' + (d.currency || '');
+      // Pad y-axis so the line never hits the very bottom or top of the canvas.
+      const dataMin = Math.min(0, ...d.data);
+      const dataMax = Math.max(...d.data, 0);
+      const pad     = Math.max(50, (dataMax - dataMin) * 0.15);
       new Chart(ctx, {
         type: 'line',
         data: {
@@ -192,15 +196,21 @@
             borderColor: '#3B5BFF',
             backgroundColor: 'rgba(59, 91, 255, 0.08)',
             fill: true,
-            tension: 0.4,
-            pointRadius: 0,
+            tension: 0.35,
+            pointRadius: 3,
+            pointBackgroundColor: '#3B5BFF',
             borderWidth: 2,
           }],
         },
         options: {
           plugins: { legend: { display: false } },
-          scales: { x: { display: false }, y: { display: false } },
+          scales: {
+            x: { display: true, ticks: { font: { size: 10 } }, grid: { display: false } },
+            y: { display: false, suggestedMin: dataMin - pad, suggestedMax: dataMax + pad },
+          },
           maintainAspectRatio: false,
+          responsive: true,
+          animation: false,
         },
       });
     } catch (e) {}
