@@ -98,6 +98,18 @@ namespace ViewDB
             }
         }
 
+        public void SetReceiptPath(int expenseId, string relPath)
+        {
+            using (var conn = GetConnection())
+            using (var cmd = new OleDbCommand("UPDATE [Expenses] SET [receiptPath]=? WHERE [id]=?", conn))
+            {
+                cmd.Parameters.Add(new OleDbParameter("@rp", OleDbType.VarWChar, 255) { Value = (object)relPath ?? DBNull.Value });
+                cmd.Parameters.Add(new OleDbParameter("@id", OleDbType.Integer)       { Value = expenseId });
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
         public void Delete(int id)
         {
             using (var conn = GetConnection())

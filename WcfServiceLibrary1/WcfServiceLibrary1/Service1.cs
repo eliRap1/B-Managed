@@ -187,6 +187,34 @@ namespace WcfServiceLibrary1
             => expDB.GetByPeriod(ownerId, from, to);
         public List<ExpenseCategory> GetExpenseCategories() => expDB.GetCategories();
 
+        public string UploadReceipt(int expenseId, byte[] fileBytes, string fileName)
+        {
+            try
+            {
+                if (fileBytes == null || fileBytes.Length == 0)
+                    throw new FaultException("Empty file.");
+                if (fileBytes.Length > 5 * 1024 * 1024)
+                    throw new FaultException("Receipt larger than 5 MB.");
+
+                string root = AppDomain.CurrentDomain.BaseDirectory;
+                string dir = System.IO.Path.Combine(root, "Receipts");
+                System.IO.Directory.CreateDirectory(dir);
+
+                string safeName = System.IO.Path.GetFileName(fileName ?? "receipt.bin");
+                foreach (char c in System.IO.Path.GetInvalidFileNameChars())
+                    safeName = safeName.Replace(c, '_');
+                string stamped = $"{expenseId}_{DateTime.Now:yyyyMMddHHmmss}_{safeName}";
+                string fullPath = System.IO.Path.Combine(dir, stamped);
+                System.IO.File.WriteAllBytes(fullPath, fileBytes);
+
+                string rel = "Receipts/" + stamped;
+                expDB.SetReceiptPath(expenseId, rel);
+                return rel;
+            }
+            catch (FaultException) { throw; }
+            catch (Exception ex) { throw new FaultException("UploadReceipt failed: " + ex.Message); }
+        }
+
         // ===================================================================
         // REPORTS / VAT
         // ===================================================================

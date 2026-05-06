@@ -268,6 +268,7 @@ namespace BManagedClient.bsrv
         [OperationContract] Expense[] GetExpensesByCategory(int ownerId, int categoryId);
         [OperationContract] Expense[] GetExpensesByPeriod(int ownerId, DateTime from, DateTime to);
         [OperationContract] ExpenseCategory[] GetExpenseCategories();
+        [OperationContract] string UploadReceipt(int expenseId, byte[] fileBytes, string fileName);
 
         // Reports
         [OperationContract] VatSummary GetVatSummary(int ownerId, int year, int month, string displayCurrency);
@@ -358,6 +359,8 @@ namespace BManagedClient.bsrv
         public Expense[] GetExpensesByPeriod(int o, DateTime f, DateTime t)
             => Channel.GetExpensesByPeriod(o, f, t);
         public ExpenseCategory[] GetExpenseCategories()    => Channel.GetExpenseCategories();
+        public string UploadReceipt(int expenseId, byte[] fileBytes, string fileName)
+            => Channel.UploadReceipt(expenseId, fileBytes, fileName);
 
         // Reports
         public VatSummary GetVatSummary(int o, int y, int m, string c)

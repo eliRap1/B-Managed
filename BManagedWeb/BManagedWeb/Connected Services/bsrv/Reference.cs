@@ -256,6 +256,7 @@ namespace BManagedWeb.bsrv
         [OperationContract] Expense[] GetExpensesByCategory(int ownerId, int categoryId);
         [OperationContract] Expense[] GetExpensesByPeriod(int ownerId, DateTime from, DateTime to);
         [OperationContract] ExpenseCategory[] GetExpenseCategories();
+        [OperationContract] string UploadReceipt(int expenseId, byte[] fileBytes, string fileName);
 
         [OperationContract] VatSummary GetVatSummary(int ownerId, int year, int month, string displayCurrency);
         [OperationContract] decimal    GetMonthlyTaxSetAside(int ownerId, int year, int month, string displayCurrency);
@@ -355,6 +356,8 @@ namespace BManagedWeb.bsrv
         public Expense[] GetExpensesByPeriod(int o, DateTime f, DateTime t)
             => Channel.GetExpensesByPeriod(o, f, t);
         public ExpenseCategory[] GetExpenseCategories()    => Channel.GetExpenseCategories();
+        public string UploadReceipt(int expenseId, byte[] fileBytes, string fileName)
+            => Channel.UploadReceipt(expenseId, fileBytes, fileName);
 
         public VatSummary GetVatSummary(int o, int y, int m, string c)
             => Channel.GetVatSummary(o, y, m, c);

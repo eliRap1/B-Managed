@@ -108,6 +108,9 @@ namespace WcfServiceLibrary1
         [OperationContract] List<Expense> GetExpensesByPeriod(int ownerId, DateTime from, DateTime to);
         [OperationContract] List<ExpenseCategory> GetExpenseCategories();
 
+        /// <summary>Persist receipt bytes; server writes to /Receipts and stores relative path on Expense.</summary>
+        [OperationContract] string UploadReceipt(int expenseId, byte[] fileBytes, string fileName);
+
         // ==================== REPORTS / VAT ====================
 
         [OperationContract] VatSummary GetVatSummary(int ownerId, int year, int month, string displayCurrency);

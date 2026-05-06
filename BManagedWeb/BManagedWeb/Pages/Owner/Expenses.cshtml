@@ -14,7 +14,12 @@
     </form>
 </div>
 
-<form method="post" asp-page-handler="Add" class="reveal mb-12 bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5 max-w-4xl">
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="reveal mb-6 px-4 py-2 rounded-full inline-block @(Model.IsSuccess ? "bg-mint/10 text-mint border border-mint/20" : "bg-rose/10 text-rose border border-rose/20")">@Model.Message</div>
+}
+
+<form method="post" asp-page-handler="Add" enctype="multipart/form-data" class="reveal mb-12 bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5 max-w-4xl">
     <div class="bg-paper-50 rounded-core p-6 shadow-inset grid md:grid-cols-4 gap-3">
         <select asp-for="NewCategoryId" class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5">
             <option value="0">@L.T(HttpContext,"Category…","קטגוריה…")</option>
@@ -28,6 +33,10 @@
         <select asp-for="NewCurrency" class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5">
             <option>ILS</option><option>USD</option>
         </select>
+        <label class="md:col-span-4 bg-paper-100 border border-dashed border-black/10 rounded-2xl px-4 py-3 text-sm text-ink/60 cursor-pointer hover:border-accent transition flex items-center gap-3">
+            <span class="pill">@L.T(HttpContext,"Receipt (optional, ≤5 MB)","קבלה (אופציונלי, עד 5MB)")</span>
+            <input asp-for="NewReceipt" type="file" accept="image/*,application/pdf" class="text-xs" />
+        </label>
         <button class="md:col-span-4 bg-rose text-white rounded-full px-6 py-3 mt-1 active:scale-[0.98]">@L.T(HttpContext,"Log expense","דווח הוצאה")</button>
     </div>
 </form>
