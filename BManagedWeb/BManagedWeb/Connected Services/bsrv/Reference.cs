@@ -4,7 +4,7 @@
 //
 // .NET 8 ServiceModel does NOT read app.config — Service1Client below
 // configures BasicHttpBinding programmatically using the URL from
-// appsettings.json (or hardcoded fallback localhost:8744).
+// appsettings.json (or hardcoded fallback localhost:8733).
 // ----------------------------------------------------------------------------
 
 using System;
@@ -280,9 +280,9 @@ namespace BManagedWeb.bsrv
     public partial class Service1Client : System.ServiceModel.ClientBase<IService1>, IService1
     {
         // .NET 8 has no app.config; binding is configured programmatically
-        // (URL fallback to localhost:8744 — change with WcfUrl env var).
+        // (URL fallback to localhost:8733 — change with WcfUrl env var).
         private const string DefaultUrl =
-            "http://localhost:8744/Design_Time_Addresses/WcfServiceLibrary1/Service1/";
+            "http://localhost:8733/Design_Time_Addresses/WcfServiceLibrary1/Service1/";
 
         public Service1Client()
             : base(MakeBinding(), MakeAddress()) { }

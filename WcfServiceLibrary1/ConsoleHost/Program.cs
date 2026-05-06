@@ -7,7 +7,7 @@ namespace ConsoleHost
 {
     /// <summary>
     /// Standalone WCF host. Run this project (set as startup, F5) to expose
-    /// Service1 at http://localhost:8744/. Endpoint config + behaviors are
+    /// Service1 at http://localhost:8733/. Endpoint config + behaviors are
     /// taken from this project's App.config.
     /// </summary>
     internal class Program
