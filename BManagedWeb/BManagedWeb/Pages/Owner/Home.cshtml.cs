@@ -38,6 +38,12 @@ namespace BManagedWeb.Pages.Owner
             public string Status        { get; set; }
         }
 
+        public string  TopExpenseCategory { get; set; }
+        public decimal TopExpenseAmount   { get; set; }
+        public decimal RevenueChangePct   { get; set; }
+        public bool    HasInsights        { get; set; }
+        public string  BusinessType       { get; set; } = "Individual";
+
         public IActionResult OnGet()
         {
             var role = HttpContext.Session.GetString("Role");
@@ -45,6 +51,14 @@ namespace BManagedWeb.Pages.Owner
             int id = HttpContext.Session.GetInt32("UserId") ?? 0;
             Username = HttpContext.Session.GetString("Username") ?? "";
             Currency = HttpContext.Session.GetString("Currency") ?? "ILS";
+
+            try
+            {
+                var u = _srv.GetUserById(id);
+                if (u != null && !string.IsNullOrEmpty(u.BusinessType))
+                    BusinessType = u.BusinessType;
+            }
+            catch { }
 
             try
             {
@@ -84,6 +98,27 @@ namespace BManagedWeb.Pages.Owner
                     }
                 }
                 RecentInvoices = RecentInvoices.OrderByDescending(x => x.InvoiceNumber).Take(6).ToList();
+
+                // Smart insight #1: biggest expense category this month
+                var first = new DateTime(now.Year, now.Month, 1);
+                var last  = first.AddMonths(1).AddDays(-1);
+                var brk = _srv.GetExpenseBreakdown(id, first, last, Currency);
+                if (brk != null && brk.Length > 0)
+                {
+                    var top = brk.OrderByDescending(b => b.Total).First();
+                    TopExpenseCategory = top.CategoryName;
+                    TopExpenseAmount   = top.Total;
+                }
+
+                // Smart insight #2: revenue change vs previous month
+                var prevFirst = first.AddMonths(-1);
+                var prevLast  = first.AddDays(-1);
+                var thisPl = _srv.GetProfitLoss(id, first, last, Currency);
+                var prevPl = _srv.GetProfitLoss(id, prevFirst, prevLast, Currency);
+                if (thisPl != null && prevPl != null && prevPl.Income > 0)
+                    RevenueChangePct = Math.Round(((thisPl.Income - prevPl.Income) / prevPl.Income) * 100m, 1);
+
+                HasInsights = !string.IsNullOrEmpty(TopExpenseCategory) || RevenueChangePct != 0;
             }
             catch { }
             return Page();

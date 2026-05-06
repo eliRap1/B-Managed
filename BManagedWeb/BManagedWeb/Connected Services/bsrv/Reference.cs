@@ -29,6 +29,7 @@ namespace BManagedWeb.bsrv
         [DataMember] public bool IsActive { get; set; }
         [DataMember] public DateTime CreatedAt { get; set; }
         [DataMember] public string PreferredCurrency { get; set; }
+        [DataMember] public string BusinessType { get; set; }
     }
 
     [DataContract(Namespace = "http://schemas.datacontract.org/2004/07/Model")]
@@ -234,6 +235,7 @@ namespace BManagedWeb.bsrv
         [OperationContract] AllUsers GetAllUsers();
         [OperationContract] List<User> GetAllEmployees();
         [OperationContract] void UpdateUserProfile(int userId, string email, string phone, string preferredCurrency);
+        [OperationContract] void SetBusinessType(int userId, string businessType);
         [OperationContract] List<User> GetPendingUsers();
         [OperationContract] void SetUserActive(int userId, bool isActive);
         [OperationContract] void DeleteUser(int userId);
@@ -348,6 +350,7 @@ namespace BManagedWeb.bsrv
         public AllUsers GetAllUsers() => Channel.GetAllUsers();
         public List<User> GetAllEmployees() => Channel.GetAllEmployees();
         public void UpdateUserProfile(int id, string e, string p, string c) => Channel.UpdateUserProfile(id, e, p, c);
+        public void SetBusinessType(int id, string b) => Channel.SetBusinessType(id, b);
         public List<User> GetPendingUsers() => Channel.GetPendingUsers();
         public void SetUserActive(int id, bool a) => Channel.SetUserActive(id, a);
         public void DeleteUser(int id) => Channel.DeleteUser(id);

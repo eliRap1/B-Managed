@@ -34,6 +34,20 @@
                                class="w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-3 outline-none focus:border-accent transition" />
                     </div>
                     <div>
+                        <label class="pill text-ink/40 mb-2 block">@L.T(HttpContext,"Account type","סוג חשבון")</label>
+                        <select asp-for="BusinessType"
+                                class="w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-3 outline-none focus:border-accent transition">
+                            <option value="Individual">@L.T(HttpContext,"Individual / Client (no VAT filing)","יחיד / לקוח (ללא דיווח מע״מ)")</option>
+                            <option value="Patur">@L.T(HttpContext,"Osek Patur (VAT-exempt)","עוסק פטור")</option>
+                            <option value="Zair">@L.T(HttpContext,"Osek Zair (small new business)","עוסק זעיר")</option>
+                            <option value="Murshe">@L.T(HttpContext,"Osek Murshe (regular VAT)","עוסק מורשה")</option>
+                        </select>
+                        <p class="text-xs text-ink/40 mt-2">
+                            @L.T(HttpContext,"Patur / Zair invoices are issued without 17% VAT. Murshe collects VAT on every sale.",
+                                              "עוסק פטור / זעיר מנפיקים חשבונית ללא 17% מע״מ. עוסק מורשה גובה מע״מ על כל עסקה.")
+                        </p>
+                    </div>
+                    <div>
                         <label class="pill text-ink/40 mb-2 block">@L.T(HttpContext,"Preferred currency","מטבע מועדף")</label>
                         <select asp-for="Currency"
                                 class="w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-3 outline-none focus:border-accent transition">

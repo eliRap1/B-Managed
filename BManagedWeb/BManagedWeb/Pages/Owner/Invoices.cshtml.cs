@@ -81,6 +81,17 @@ namespace BManagedWeb.Pages.Owner
             var role = HttpContext.Session.GetString("Role");
             if (role != "Owner") return RedirectToPage("/Login");
             if (NewCustomerId <= 0) return RedirectToPage();
+            // VAT-exempt business types (Patur / Zair) issue invoices without VAT.
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            double vatRate = 0.17;
+            try
+            {
+                var owner = _srv.GetUserById(ownerId);
+                if (owner != null && (owner.BusinessType == "Patur" || owner.BusinessType == "Zair"))
+                    vatRate = 0;
+            }
+            catch { }
+
             int newId = _srv.CreateInvoice(new Invoice
             {
                 CustomerId = NewCustomerId,
@@ -88,7 +99,7 @@ namespace BManagedWeb.Pages.Owner
                 DueDate    = NewDueDate,
                 Currency   = NewCurrency ?? "ILS",
                 Status     = "Draft",
-                VatRate    = 0.17,
+                VatRate    = vatRate,
                 ContractId = ContractId,
             });
             // If a contract was linked and it has a Total, seed an initial line.

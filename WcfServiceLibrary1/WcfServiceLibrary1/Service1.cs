@@ -101,6 +101,9 @@ namespace WcfServiceLibrary1
         public void UpdateUserProfile(int userId, string email, string phone, string preferredCurrency)
             => userDB.UpdateProfile(userId, email, phone, preferredCurrency);
 
+        public void SetBusinessType(int userId, string businessType)
+            => userDB.SetBusinessType(userId, businessType);
+
         // ===================================================================
         // CUSTOMERS / CRM
         // ===================================================================

@@ -15,6 +15,35 @@ namespace ViewDB
     {
         protected override Base NewEntity() => new User();
 
+        public UserDB()
+        {
+            EnsureSchema();
+        }
+
+        /// <summary>
+        /// Adds the businessType column if missing. Lets older .accdb files
+        /// upgrade automatically without a manual migration.
+        /// </summary>
+        private void EnsureSchema()
+        {
+            using (var conn = GetConnection())
+            using (var cmd = new OleDbCommand("ALTER TABLE [Users] ADD COLUMN [businessType] TEXT(30)", conn))
+            {
+                try { conn.Open(); cmd.ExecuteNonQuery(); }
+                catch (OleDbException ex)
+                {
+                    if (!(ex.Message.IndexOf("already exists",       StringComparison.OrdinalIgnoreCase) >= 0 ||
+                          ex.Message.IndexOf("duplicate column",     StringComparison.OrdinalIgnoreCase) >= 0 ||
+                          ex.Message.IndexOf("already has a field",  StringComparison.OrdinalIgnoreCase) >= 0))
+                        System.Diagnostics.Debug.WriteLine("EnsureSchema(Users.businessType): " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("EnsureSchema(Users.businessType): " + ex.Message);
+                }
+            }
+        }
+
         protected override void CreateModel(Base entity)
         {
             base.CreateModel(entity);
@@ -27,6 +56,25 @@ namespace ViewDB
             try { u.IsActive       = bool.Parse(reader["isActive"].ToString()); } catch { }
             try { u.CreatedAt      = DateTime.Parse(reader["createdAt"].ToString()); } catch { }
             try { u.PreferredCurrency = reader["preferredCurrency"].ToString(); } catch { u.PreferredCurrency = "ILS"; }
+            try
+            {
+                var v = reader["businessType"];
+                u.BusinessType = v == DBNull.Value ? "Individual" : v.ToString();
+            }
+            catch { u.BusinessType = "Individual"; }
+        }
+
+        public void SetBusinessType(int userId, string businessType)
+        {
+            using (var conn = GetConnection())
+            using (var cmd = new OleDbCommand(
+                "UPDATE [Users] SET [businessType]=? WHERE [id]=?", conn))
+            {
+                cmd.Parameters.Add(new OleDbParameter("@b",  OleDbType.VarWChar, 30) { Value = businessType ?? "Individual" });
+                cmd.Parameters.Add(new OleDbParameter("@id", OleDbType.Integer)      { Value = userId });
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
         }
 
         public bool UserExists(string username)

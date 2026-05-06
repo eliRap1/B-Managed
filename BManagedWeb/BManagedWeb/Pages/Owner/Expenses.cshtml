@@ -77,7 +77,6 @@
 @section Scripts {
 <script>
   // Auto-VAT: gross × 17 ÷ 117 (Israeli standard rate, baked into gross).
-  // Also live-fills VAT while the user is typing the amount, but only if VAT is still empty/0.
   const amount = document.getElementById('exp-amount');
   const vat    = document.getElementById('exp-vat');
   const btn    = document.getElementById('exp-autovat');
@@ -90,6 +89,37 @@
   if (amount) amount.addEventListener('input', () => {
     if (!vat.value || parseFloat(vat.value) === 0) calc();
   });
+
+  // Smart classification: vendor keyword → category dropdown auto-pick.
+  const VENDOR_RULES = [
+    { rx: /(שופרסל|רמי לוי|אושר עד|יוחננוף|מגה|ויקטורי|טיב טעם|shufersal|rami\s*levy|carrefour|am-pm|coffee|cafe|מסעדה|פיצה|קפה)/i, cat: "Food" },
+    { rx: /(דלק|פז|סונול|דור אלון|delek|paz|sonol|חניון|parking)/i,                                                            cat: "Fuel" },
+    { rx: /(שכירות|נדל[״"׳]ן|rent)/i,                                                                                            cat: "Rent" },
+    { rx: /(חשמל|מים|בזק|hot|cellcom|partner|פלאפון|orange|electricity|water)/i,                                                cat: "Utilities" },
+    { rx: /(facebook|instagram|google\s*ads|tiktok|לינקדאין|מיתוג|פרסום|advertising|marketing)/i,                                cat: "Marketing" },
+    { rx: /(אל[־-]על|רכבת|מטוס|מלון|airbnb|booking|train|flight|נסיעה)/i,                                                       cat: "Travel" },
+    { rx: /(ציוד|לפטופ|מחשב|hp|dell|apple|equipment|hardware|כלים)/i,                                                            cat: "Equipment" },
+  ];
+  const vendorBox  = document.querySelector('input[name="NewVendor"]');
+  const descBox    = document.querySelector('input[name="NewDescription"]');
+  const catSelect  = document.querySelector('select[name="NewCategoryId"]');
+  function autoClassify() {
+    if (!catSelect || !catSelect.options) return;
+    if (catSelect.value && catSelect.value !== "0") return;          // user picked → don't override
+    const text = ((vendorBox && vendorBox.value) || "") + " " + ((descBox && descBox.value) || "");
+    if (!text.trim()) return;
+    for (const r of VENDOR_RULES) {
+      if (!r.rx.test(text)) continue;
+      for (const opt of catSelect.options) {
+        if ((opt.text || "").toLowerCase() === r.cat.toLowerCase()) {
+          catSelect.value = opt.value;
+          return;
+        }
+      }
+    }
+  }
+  if (vendorBox) vendorBox.addEventListener('input', autoClassify);
+  if (descBox)   descBox.addEventListener('input', autoClassify);
 </script>
 }
 

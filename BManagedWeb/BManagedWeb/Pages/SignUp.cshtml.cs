@@ -16,6 +16,7 @@ namespace BManagedWeb.Pages
         [BindProperty] public string Email { get; set; }
         [BindProperty] public string Phone { get; set; }
         [BindProperty] public string Currency { get; set; } = "ILS";
+        [BindProperty] public string BusinessType { get; set; } = "Individual";
         public string ErrorMessage { get; set; }
 
         public void OnGet() { }
@@ -33,8 +34,19 @@ namespace BManagedWeb.Pages
                 if (_srv.CheckUserExist(Username))
                 { ErrorMessage = "Username already taken."; return Page(); }
 
-                bool ok = _srv.AddUser(Username, Password, Email, Phone, "Client", Currency ?? "ILS");
+                // Account-as-business types map to Owner role (פטור / זעיר / מורשה).
+                // Plain "Individual" stays as Client so existing seed/demo flow keeps working.
+                bool isBusiness = BusinessType == "Patur" || BusinessType == "Zair" || BusinessType == "Murshe";
+                string role = isBusiness ? "Owner" : "Client";
+                bool ok = _srv.AddUser(Username, Password, Email, Phone, role, Currency ?? "ILS");
                 if (!ok) { ErrorMessage = "Server rejected the request."; return Page(); }
+
+                try
+                {
+                    int newId = _srv.GetUserId(Username);
+                    _srv.SetBusinessType(newId, BusinessType ?? "Individual");
+                }
+                catch { }
 
                 return RedirectToPage("/Login");
             }

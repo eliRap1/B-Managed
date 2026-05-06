@@ -19,5 +19,14 @@ namespace Model
         [DataMember] public bool IsActive { get; set; } = true;
         [DataMember] public DateTime CreatedAt { get; set; } = DateTime.Now;
         [DataMember] public string PreferredCurrency { get; set; } = "ILS";
+
+        /// <summary>
+        /// Israeli business classification — drives default VAT behaviour.
+        /// "Patur" = Osek Patur (exempt from VAT, < ~120k₪/yr).
+        /// "Zair"  = Osek Zair (small new business, also exempt).
+        /// "Murshe" = Osek Murshe (regular VAT-collecting business).
+        /// "Individual" = private user (no business filing).
+        /// </summary>
+        [DataMember] public string BusinessType { get; set; } = "Individual";
     }
 }

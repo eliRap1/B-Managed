@@ -59,6 +59,7 @@ namespace WcfServiceLibrary1
         /// <summary>Update non-credential profile fields.</summary>
         [OperationContract] void UpdateUserProfile(int userId, string email, string phone,
                                                    string preferredCurrency);
+        [OperationContract] void SetBusinessType(int userId, string businessType);
 
         // ==================== CUSTOMERS / CRM ====================
 

@@ -57,6 +57,42 @@
         </div>
     </div>
 
+    @if (Model.HasInsights)
+    {
+        <div class="reveal md:col-span-12 bg-amber/10 border border-amber/20 rounded-shell p-1.5">
+            <div class="bg-paper-50 rounded-core p-6 shadow-inset">
+                <span class="pill text-amber">@L.T(HttpContext,"Smart insights","תובנות חכמות")</span>
+                <ul class="mt-2 text-sm text-ink/70 space-y-1">
+                    @if (!string.IsNullOrEmpty(Model.TopExpenseCategory))
+                    {
+                        <li>💸
+                            @L.T(HttpContext,"Biggest expense this month","ההוצאה הגדולה החודש"):
+                            <span class="font-semibold">@Model.TopExpenseCategory</span> ·
+                            @Model.TopExpenseAmount.ToString("N0") @Model.Currency
+                        </li>
+                    }
+                    @if (Model.RevenueChangePct != 0)
+                    {
+                        var arrow = Model.RevenueChangePct > 0 ? "📈" : "📉";
+                        var color = Model.RevenueChangePct > 0 ? "text-mint" : "text-rose";
+                        <li>@arrow
+                            @L.T(HttpContext,"Revenue vs last month","הכנסות מול חודש קודם"):
+                            <span class="font-semibold @color">@(Model.RevenueChangePct > 0 ? "+" : "")@Model.RevenueChangePct%</span>
+                        </li>
+                    }
+                    @if (Model.BusinessType == "Patur" || Model.BusinessType == "Zair")
+                    {
+                        <li>ℹ️
+                            @L.T(HttpContext,"Account type:","סוג חשבון:")
+                            <span class="font-semibold">@(Model.BusinessType == "Patur" ? "עוסק פטור" : "עוסק זעיר")</span> —
+                            @L.T(HttpContext,"new invoices issued without VAT.","חשבוניות מונפקות ללא מע״מ.")
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+
     <!-- Recent invoices -->
     <div class="reveal md:col-span-12 bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5 shadow-soft">
         <div class="bg-paper-50 rounded-core p-8 shadow-inset">
