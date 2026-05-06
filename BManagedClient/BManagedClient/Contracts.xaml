@@ -61,15 +61,16 @@
                     </ComboBox>
 
                     <TextBlock Grid.Row="2" Grid.ColumnSpan="5" Text="SCOPE OF WORK" Style="{StaticResource InputLabel}" Margin="0,12,0,4"/>
-                    <TextBox  Grid.Row="3" Grid.ColumnSpan="5" x:Name="bodyBox"
+                    <TextBox  Grid.Row="3" Grid.ColumnSpan="4" x:Name="bodyBox"
                               Style="{StaticResource ModernTextBox}" Height="120"
                               AcceptsReturn="True" TextWrapping="Wrap"
-                              VerticalContentAlignment="Top"/>
+                              VerticalContentAlignment="Top" Margin="0,0,8,0"/>
+                    <Button   Grid.Row="3" Grid.Column="4" Content="➕ Create" Click="Create_Click"
+                              Style="{StaticResource MintButton}" Padding="14,10" Height="40"
+                              VerticalAlignment="Top"/>
                 </Grid>
             </Border>
         </Border>
-        <Button Grid.Row="1" Content="➕ Create contract" Click="Create_Click" Style="{StaticResource MintButton}"
-                HorizontalAlignment="Right" Margin="0,12,0,0"/>
 
         <!-- Contracts list -->
         <Border Grid.Row="2" Style="{StaticResource ShellCard}" Margin="0,16,0,0">
@@ -92,9 +93,16 @@
 
         <Border Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,12,12">
             <StackPanel Orientation="Horizontal">
-                <Button Content="📄 Save PDF"  Click="Pdf_Click"     Style="{StaticResource PrimaryButton}" Margin="0,0,6,0"/>
-                <Button Content="✓ Mark signed" Click="Sign_Click"  Style="{StaticResource MintButton}"   Margin="0,0,6,0"/>
-                <Button Content="🗑 Delete"    Click="Delete_Click" Style="{StaticResource RoseButton}"/>
+                <ComboBox x:Name="statusCombo" Width="140" Style="{StaticResource ModernCombo}" Margin="0,0,6,0"
+                          ToolTip="Pick a status, then click Update">
+                    <ComboBoxItem Content="Draft"/>
+                    <ComboBoxItem Content="Sent"/>
+                    <ComboBoxItem Content="Signed"/>
+                    <ComboBoxItem Content="Cancelled"/>
+                </ComboBox>
+                <Button Content="Update status" Click="Status_Click" Style="{StaticResource AmberButton}" Margin="0,0,6,0"/>
+                <Button Content="📄 PDF"        Click="Pdf_Click"    Style="{StaticResource PrimaryButton}" Margin="0,0,6,0"/>
+                <Button Content="🗑 Delete"     Click="Delete_Click" Style="{StaticResource RoseButton}"/>
             </StackPanel>
         </Border>
     </Grid>

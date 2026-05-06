@@ -83,15 +83,24 @@ namespace BManagedClient
             catch (Exception ex) { MessageBox.Show("Create failed: " + ex.Message); }
         }
 
-        private void Sign_Click(object s, RoutedEventArgs e)
+        private void Status_Click(object s, RoutedEventArgs e)
         {
             if (Selected == null) { MessageBox.Show("Pick a contract."); return; }
+            string newStatus = (statusCombo.SelectedItem as ComboBoxItem)?.Content?.ToString();
+            if (string.IsNullOrEmpty(newStatus)) { MessageBox.Show("Pick a status."); return; }
             try
             {
-                ServiceGateway.Use(c => c.MarkContractSigned(Selected.Id, DateTime.Today));
+                if (newStatus == "Signed")
+                    ServiceGateway.Use(c => c.MarkContractSigned(Selected.Id, DateTime.Today));
+                else
+                {
+                    var copy = Selected;
+                    copy.Status = newStatus;
+                    ServiceGateway.Use(c => c.UpdateContract(copy));
+                }
                 Refresh();
             }
-            catch (Exception ex) { MessageBox.Show("Failed: " + ex.Message); }
+            catch (Exception ex) { MessageBox.Show("Status failed: " + ex.Message); }
         }
 
         private void Delete_Click(object s, RoutedEventArgs e)
