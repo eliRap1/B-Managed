@@ -1901,7 +1901,25 @@ namespace BManagedClient.BMsrv {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetProjectById", ReplyAction="http://tempuri.org/IService1/GetProjectByIdResponse")]
         System.Threading.Tasks.Task<BManagedClient.BMsrv.Project> GetProjectByIdAsync(int id);
-        
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AddProjectAssignment", ReplyAction="http://tempuri.org/IService1/AddProjectAssignmentResponse")]
+        void AddProjectAssignment(int projectId, int employeeId);
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AddProjectAssignment", ReplyAction="http://tempuri.org/IService1/AddProjectAssignmentResponse")]
+        System.Threading.Tasks.Task AddProjectAssignmentAsync(int projectId, int employeeId);
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/RemoveProjectAssignment", ReplyAction="http://tempuri.org/IService1/RemoveProjectAssignmentResponse")]
+        void RemoveProjectAssignment(int projectId, int employeeId);
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/RemoveProjectAssignment", ReplyAction="http://tempuri.org/IService1/RemoveProjectAssignmentResponse")]
+        System.Threading.Tasks.Task RemoveProjectAssignmentAsync(int projectId, int employeeId);
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetProjectAssignees", ReplyAction="http://tempuri.org/IService1/GetProjectAssigneesResponse")]
+        BManagedClient.BMsrv.User[] GetProjectAssignees(int projectId);
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetProjectAssignees", ReplyAction="http://tempuri.org/IService1/GetProjectAssigneesResponse")]
+        System.Threading.Tasks.Task<BManagedClient.BMsrv.User[]> GetProjectAssigneesAsync(int projectId);
+
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/CreateInvoice", ReplyAction="http://tempuri.org/IService1/CreateInvoiceResponse")]
         int CreateInvoice(BManagedClient.BMsrv.Invoice inv);
         
@@ -2356,6 +2374,30 @@ namespace BManagedClient.BMsrv {
         
         public System.Threading.Tasks.Task<BManagedClient.BMsrv.Project> GetProjectByIdAsync(int id) {
             return base.Channel.GetProjectByIdAsync(id);
+        }
+
+        public void AddProjectAssignment(int projectId, int employeeId) {
+            base.Channel.AddProjectAssignment(projectId, employeeId);
+        }
+
+        public System.Threading.Tasks.Task AddProjectAssignmentAsync(int projectId, int employeeId) {
+            return base.Channel.AddProjectAssignmentAsync(projectId, employeeId);
+        }
+
+        public void RemoveProjectAssignment(int projectId, int employeeId) {
+            base.Channel.RemoveProjectAssignment(projectId, employeeId);
+        }
+
+        public System.Threading.Tasks.Task RemoveProjectAssignmentAsync(int projectId, int employeeId) {
+            return base.Channel.RemoveProjectAssignmentAsync(projectId, employeeId);
+        }
+
+        public BManagedClient.BMsrv.User[] GetProjectAssignees(int projectId) {
+            return base.Channel.GetProjectAssignees(projectId);
+        }
+
+        public System.Threading.Tasks.Task<BManagedClient.BMsrv.User[]> GetProjectAssigneesAsync(int projectId) {
+            return base.Channel.GetProjectAssigneesAsync(projectId);
         }
         
         public int CreateInvoice(BManagedClient.BMsrv.Invoice inv) {

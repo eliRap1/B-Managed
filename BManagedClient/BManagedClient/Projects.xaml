@@ -119,11 +119,36 @@
                         <TextBlock x:Name="selTitle" Style="{StaticResource Body}" FontWeight="SemiBold"
                                    Text="Select a project on the left." TextWrapping="Wrap" Margin="0,0,0,16"/>
 
-                        <TextBlock Text="ASSIGN EMPLOYEE" Style="{StaticResource InputLabel}"/>
-                        <ComboBox x:Name="employeeCombo" Style="{StaticResource ModernCombo}"
-                                  DisplayMemberPath="Username" SelectedValuePath="Id" Margin="0,0,0,8"/>
-                        <Button Content="Assign" Click="Assign_Click" Style="{StaticResource PrimaryButton}"
-                                IsEnabled="False" x:Name="assignBtn" HorizontalAlignment="Stretch" Margin="0,0,0,18"/>
+                        <TextBlock Text="ASSIGNED EMPLOYEES" Style="{StaticResource InputLabel}"/>
+                        <ListBox x:Name="assigneesList" Background="White" BorderBrush="#33000000"
+                                 BorderThickness="1" Height="100" Margin="0,0,0,6">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Username}" VerticalAlignment="Center"/>
+                                        <Button Grid.Column="1" Content="✕" Tag="{Binding Id}"
+                                                Click="Unassign_Click" Style="{StaticResource GhostButton}"
+                                                ToolTip="Remove this employee from the project"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <TextBlock Text="ADD EMPLOYEE" Style="{StaticResource InputLabel}"/>
+                        <Grid Margin="0,0,0,18">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <ComboBox Grid.Column="0" x:Name="employeeCombo" Style="{StaticResource ModernCombo}"
+                                      DisplayMemberPath="Username" SelectedValuePath="Id" Margin="0,0,6,0"/>
+                            <Button Grid.Column="1" Content="+ Add" Click="Assign_Click" Style="{StaticResource PrimaryButton}"
+                                    IsEnabled="False" x:Name="assignBtn"/>
+                        </Grid>
 
                         <TextBlock Text="STATUS" Style="{StaticResource InputLabel}"/>
                         <ComboBox x:Name="statusCombo" Style="{StaticResource ModernCombo}" Margin="0,0,0,8">

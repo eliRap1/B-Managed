@@ -80,6 +80,11 @@ namespace WcfServiceLibrary1
         [OperationContract] List<Project> GetProjectsByStatus(string status, int ownerId);
         [OperationContract] Project GetProjectById(int id);
 
+        // Many-to-many: a project can have multiple assigned employees.
+        [OperationContract] void AddProjectAssignment(int projectId, int employeeId);
+        [OperationContract] void RemoveProjectAssignment(int projectId, int employeeId);
+        [OperationContract] List<User> GetProjectAssignees(int projectId);
+
         // ==================== INVOICES ====================
 
         /// <summary>Creates a Draft invoice with auto-generated invoiceNumber.

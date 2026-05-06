@@ -36,6 +36,7 @@
     <Compile Include="InvoiceLineDB.cs" />
     <Compile Include="NotificationDB.cs" />
     <Compile Include="ProjectDB.cs" />
+    <Compile Include="ProjectAssignmentDB.cs" />
     <Compile Include="ReportsDB.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserDB.cs" />

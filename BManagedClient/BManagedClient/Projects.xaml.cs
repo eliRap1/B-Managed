@@ -86,17 +86,12 @@ namespace BManagedClient
                 selTitle.Text = "Select a project on the left.";
                 assignBtn.IsEnabled = false;
                 statusBtn.IsEnabled = false;
+                assigneesList.ItemsSource = null;
                 return;
             }
             selTitle.Text = _selected.Title + "  ·  " + _selected.Status;
             assignBtn.IsEnabled = true;
             statusBtn.IsEnabled = true;
-
-            // Pre-select current employee + status if known.
-            if (_selected.AssignedEmployeeId.HasValue)
-                employeeCombo.SelectedValue = _selected.AssignedEmployeeId.Value;
-            else
-                employeeCombo.SelectedIndex = -1;
 
             statusCombo.SelectedIndex = (_selected.Status ?? "Active") switch
             {
@@ -105,6 +100,22 @@ namespace BManagedClient
                 "Cancelled"       => 3,
                 _                 => 0,
             };
+
+            ReloadAssignees();
+        }
+
+        private void ReloadAssignees()
+        {
+            if (_selected == null) return;
+            try
+            {
+                var assigned = ServiceGateway.Use(c => c.GetProjectAssignees(_selected.Id)) ?? new User[0];
+                assigneesList.ItemsSource = assigned;
+                // Hide already-assigned from the dropdown.
+                var assignedIds = new HashSet<int>(assigned.Select(u => u.Id));
+                employeeCombo.ItemsSource = _employees.Where(u => !assignedIds.Contains(u.Id)).ToList();
+            }
+            catch { }
         }
 
         private void Add_Click(object s, RoutedEventArgs e)
@@ -135,11 +146,26 @@ namespace BManagedClient
             int empId = (int)employeeCombo.SelectedValue;
             try
             {
-                ServiceGateway.Use(c => c.AssignEmployee(_selected.Id, empId));
-                ShowOk("Employee assigned.");
-                Refresh();
+                ServiceGateway.Use(c => c.AddProjectAssignment(_selected.Id, empId));
+                ShowOk("Employee added.");
+                ReloadAssignees();
             }
             catch (Exception ex) { ShowErr("Assign failed: " + ex.Message); }
+        }
+
+        private void Unassign_Click(object s, RoutedEventArgs e)
+        {
+            if (_selected == null) return;
+            if (s is FrameworkElement fe && fe.Tag is int empId)
+            {
+                try
+                {
+                    ServiceGateway.Use(c => c.RemoveProjectAssignment(_selected.Id, empId));
+                    ShowOk("Employee removed.");
+                    ReloadAssignees();
+                }
+                catch (Exception ex) { ShowErr("Remove failed: " + ex.Message); }
+            }
         }
 
         private void UpdateStatus_Click(object s, RoutedEventArgs e)

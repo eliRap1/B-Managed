@@ -237,6 +237,10 @@ namespace BManagedWeb.bsrv
         [OperationContract] Project[] GetProjectsByStatus(string status, int ownerId);
         [OperationContract] Project GetProjectById(int id);
 
+        [OperationContract] void AddProjectAssignment(int projectId, int employeeId);
+        [OperationContract] void RemoveProjectAssignment(int projectId, int employeeId);
+        [OperationContract] User[] GetProjectAssignees(int projectId);
+
         [OperationContract] int  CreateInvoice(Invoice inv);
         [OperationContract] int  AddInvoiceLine(InvoiceLine line);
         [OperationContract] void UpdateInvoiceStatus(int invoiceId, string status);
@@ -335,6 +339,10 @@ namespace BManagedWeb.bsrv
         public Project[] GetProjectsForEmployee(int eId)   => Channel.GetProjectsForEmployee(eId);
         public Project[] GetProjectsByStatus(string s, int o) => Channel.GetProjectsByStatus(s, o);
         public Project   GetProjectById(int id)            => Channel.GetProjectById(id);
+
+        public void AddProjectAssignment(int p, int e)    => Channel.AddProjectAssignment(p, e);
+        public void RemoveProjectAssignment(int p, int e) => Channel.RemoveProjectAssignment(p, e);
+        public User[] GetProjectAssignees(int p)          => Channel.GetProjectAssignees(p);
 
         public int  CreateInvoice(Invoice inv)             => Channel.CreateInvoice(inv);
         public int  AddInvoiceLine(InvoiceLine l)          => Channel.AddInvoiceLine(l);

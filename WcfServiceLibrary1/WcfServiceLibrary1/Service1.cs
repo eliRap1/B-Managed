@@ -2,6 +2,7 @@ using Model;
 using Model.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.ServiceModel;
 using ViewDB;
 
@@ -24,6 +25,7 @@ namespace WcfServiceLibrary1
         private readonly NotificationDB notifDB    = new NotificationDB();
         private readonly ExchangeRateDB fxDB       = new ExchangeRateDB();
         private readonly ReportsDB      reportsDB  = new ReportsDB();
+        private readonly ProjectAssignmentDB assignDB = new ProjectAssignmentDB();
 
         // ===================================================================
         // AUTH & USERS
@@ -119,10 +121,41 @@ namespace WcfServiceLibrary1
         public void SetProjectStatus(int id, string s)  => projDB.SetStatus(id, s);
         public void AssignEmployee(int id, int empId)   => projDB.AssignEmployee(id, empId);
         public List<Project> GetProjectsByCustomer(int customerId) => projDB.GetByCustomer(customerId);
-        public List<Project> GetProjectsForEmployee(int empId)     => projDB.GetByEmployee(empId);
+        // Returns every project the employee is on — both legacy single-assign
+        // (Projects.assignedEmployeeId) and new multi-assign (ProjectAssignments).
+        public List<Project> GetProjectsForEmployee(int empId)
+        {
+            var result = new Dictionary<int, Project>();
+            foreach (var p in projDB.GetByEmployee(empId))
+                if (p != null) result[p.Id] = p;
+            foreach (var pid in assignDB.GetProjectsByEmployee(empId))
+            {
+                if (result.ContainsKey(pid)) continue;
+                var pr = projDB.GetById(pid);
+                if (pr != null) result[pid] = pr;
+            }
+            return result.Values.ToList();
+        }
+
         public List<Project> GetProjectsByStatus(string status, int ownerId)
             => projDB.GetByStatus(status, ownerId);
         public Project GetProjectById(int id)           => projDB.GetById(id);
+
+        public void AddProjectAssignment(int projectId, int employeeId)
+            => assignDB.Add(projectId, employeeId);
+        public void RemoveProjectAssignment(int projectId, int employeeId)
+            => assignDB.Remove(projectId, employeeId);
+        public List<User> GetProjectAssignees(int projectId)
+        {
+            var ids = assignDB.GetAssigneesByProject(projectId);
+            var users = new List<User>();
+            foreach (var id in ids)
+            {
+                var u = userDB.GetById(id);
+                if (u != null) users.Add(u);
+            }
+            return users;
+        }
 
         // ===================================================================
         // INVOICES
