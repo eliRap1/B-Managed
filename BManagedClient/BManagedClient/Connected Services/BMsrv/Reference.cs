@@ -19,6 +19,7 @@ namespace BManagedClient.BMsrv {
     [System.SerializableAttribute()]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(BManagedClient.BMsrv.Customer))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(BManagedClient.BMsrv.Project))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BManagedClient.BMsrv.Contract))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(BManagedClient.BMsrv.Invoice))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(BManagedClient.BMsrv.InvoiceLine))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(BManagedClient.BMsrv.Expense))]
@@ -370,9 +371,195 @@ namespace BManagedClient.BMsrv {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Contract", Namespace="http://schemas.datacontract.org/2004/07/Model")]
+    [System.SerializableAttribute()]
+    public partial class Contract : BManagedClient.BMsrv.Base {
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string BodyField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string ContractNumberField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.DateTime CreatedAtField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string CurrencyField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int CustomerIdField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string PdfPathField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int ProjectIdField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Nullable<System.DateTime> SignedDateField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string StatusField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string TitleField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private decimal TotalAmountField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Body {
+            get {
+                return this.BodyField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.BodyField, value) != true)) {
+                    this.BodyField = value;
+                    this.RaisePropertyChanged("Body");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string ContractNumber {
+            get {
+                return this.ContractNumberField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ContractNumberField, value) != true)) {
+                    this.ContractNumberField = value;
+                    this.RaisePropertyChanged("ContractNumber");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.DateTime CreatedAt {
+            get {
+                return this.CreatedAtField;
+            }
+            set {
+                if ((this.CreatedAtField.Equals(value) != true)) {
+                    this.CreatedAtField = value;
+                    this.RaisePropertyChanged("CreatedAt");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Currency {
+            get {
+                return this.CurrencyField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.CurrencyField, value) != true)) {
+                    this.CurrencyField = value;
+                    this.RaisePropertyChanged("Currency");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int CustomerId {
+            get {
+                return this.CustomerIdField;
+            }
+            set {
+                if ((this.CustomerIdField.Equals(value) != true)) {
+                    this.CustomerIdField = value;
+                    this.RaisePropertyChanged("CustomerId");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string PdfPath {
+            get {
+                return this.PdfPathField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.PdfPathField, value) != true)) {
+                    this.PdfPathField = value;
+                    this.RaisePropertyChanged("PdfPath");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ProjectId {
+            get {
+                return this.ProjectIdField;
+            }
+            set {
+                if ((this.ProjectIdField.Equals(value) != true)) {
+                    this.ProjectIdField = value;
+                    this.RaisePropertyChanged("ProjectId");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Nullable<System.DateTime> SignedDate {
+            get {
+                return this.SignedDateField;
+            }
+            set {
+                if ((this.SignedDateField.Equals(value) != true)) {
+                    this.SignedDateField = value;
+                    this.RaisePropertyChanged("SignedDate");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Status {
+            get {
+                return this.StatusField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.StatusField, value) != true)) {
+                    this.StatusField = value;
+                    this.RaisePropertyChanged("Status");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Title {
+            get {
+                return this.TitleField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TitleField, value) != true)) {
+                    this.TitleField = value;
+                    this.RaisePropertyChanged("Title");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public decimal TotalAmount {
+            get {
+                return this.TotalAmountField;
+            }
+            set {
+                if ((this.TotalAmountField.Equals(value) != true)) {
+                    this.TotalAmountField = value;
+                    this.RaisePropertyChanged("TotalAmount");
+                }
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="Invoice", Namespace="http://schemas.datacontract.org/2004/07/Model")]
     [System.SerializableAttribute()]
     public partial class Invoice : BManagedClient.BMsrv.Base {
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Nullable<int> ContractIdField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string CurrencyField;
@@ -412,6 +599,19 @@ namespace BManagedClient.BMsrv {
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private double VatRateField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Nullable<int> ContractId {
+            get {
+                return this.ContractIdField;
+            }
+            set {
+                if ((this.ContractIdField.Equals(value) != true)) {
+                    this.ContractIdField = value;
+                    this.RaisePropertyChanged("ContractId");
+                }
+            }
+        }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
         public string Currency {
@@ -1901,25 +2101,79 @@ namespace BManagedClient.BMsrv {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetProjectById", ReplyAction="http://tempuri.org/IService1/GetProjectByIdResponse")]
         System.Threading.Tasks.Task<BManagedClient.BMsrv.Project> GetProjectByIdAsync(int id);
-
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AddProjectAssignment", ReplyAction="http://tempuri.org/IService1/AddProjectAssignmentResponse")]
         void AddProjectAssignment(int projectId, int employeeId);
-
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AddProjectAssignment", ReplyAction="http://tempuri.org/IService1/AddProjectAssignmentResponse")]
         System.Threading.Tasks.Task AddProjectAssignmentAsync(int projectId, int employeeId);
-
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/RemoveProjectAssignment", ReplyAction="http://tempuri.org/IService1/RemoveProjectAssignmentResponse")]
         void RemoveProjectAssignment(int projectId, int employeeId);
-
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/RemoveProjectAssignment", ReplyAction="http://tempuri.org/IService1/RemoveProjectAssignmentResponse")]
         System.Threading.Tasks.Task RemoveProjectAssignmentAsync(int projectId, int employeeId);
-
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetProjectAssignees", ReplyAction="http://tempuri.org/IService1/GetProjectAssigneesResponse")]
         BManagedClient.BMsrv.User[] GetProjectAssignees(int projectId);
-
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetProjectAssignees", ReplyAction="http://tempuri.org/IService1/GetProjectAssigneesResponse")]
         System.Threading.Tasks.Task<BManagedClient.BMsrv.User[]> GetProjectAssigneesAsync(int projectId);
-
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/CreateContract", ReplyAction="http://tempuri.org/IService1/CreateContractResponse")]
+        int CreateContract(BManagedClient.BMsrv.Contract c);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/CreateContract", ReplyAction="http://tempuri.org/IService1/CreateContractResponse")]
+        System.Threading.Tasks.Task<int> CreateContractAsync(BManagedClient.BMsrv.Contract c);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/UpdateContract", ReplyAction="http://tempuri.org/IService1/UpdateContractResponse")]
+        void UpdateContract(BManagedClient.BMsrv.Contract c);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/UpdateContract", ReplyAction="http://tempuri.org/IService1/UpdateContractResponse")]
+        System.Threading.Tasks.Task UpdateContractAsync(BManagedClient.BMsrv.Contract c);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/DeleteContract", ReplyAction="http://tempuri.org/IService1/DeleteContractResponse")]
+        void DeleteContract(int id);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/DeleteContract", ReplyAction="http://tempuri.org/IService1/DeleteContractResponse")]
+        System.Threading.Tasks.Task DeleteContractAsync(int id);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/MarkContractSigned", ReplyAction="http://tempuri.org/IService1/MarkContractSignedResponse")]
+        void MarkContractSigned(int id, System.DateTime signedDate);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/MarkContractSigned", ReplyAction="http://tempuri.org/IService1/MarkContractSignedResponse")]
+        System.Threading.Tasks.Task MarkContractSignedAsync(int id, System.DateTime signedDate);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetContractById", ReplyAction="http://tempuri.org/IService1/GetContractByIdResponse")]
+        BManagedClient.BMsrv.Contract GetContractById(int id);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetContractById", ReplyAction="http://tempuri.org/IService1/GetContractByIdResponse")]
+        System.Threading.Tasks.Task<BManagedClient.BMsrv.Contract> GetContractByIdAsync(int id);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetContractsForOwner", ReplyAction="http://tempuri.org/IService1/GetContractsForOwnerResponse")]
+        BManagedClient.BMsrv.Contract[] GetContractsForOwner(int ownerId);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetContractsForOwner", ReplyAction="http://tempuri.org/IService1/GetContractsForOwnerResponse")]
+        System.Threading.Tasks.Task<BManagedClient.BMsrv.Contract[]> GetContractsForOwnerAsync(int ownerId);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetContractsByProject", ReplyAction="http://tempuri.org/IService1/GetContractsByProjectResponse")]
+        BManagedClient.BMsrv.Contract[] GetContractsByProject(int projectId);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetContractsByProject", ReplyAction="http://tempuri.org/IService1/GetContractsByProjectResponse")]
+        System.Threading.Tasks.Task<BManagedClient.BMsrv.Contract[]> GetContractsByProjectAsync(int projectId);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetContractsByCustomer", ReplyAction="http://tempuri.org/IService1/GetContractsByCustomerResponse")]
+        BManagedClient.BMsrv.Contract[] GetContractsByCustomer(int customerId);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetContractsByCustomer", ReplyAction="http://tempuri.org/IService1/GetContractsByCustomerResponse")]
+        System.Threading.Tasks.Task<BManagedClient.BMsrv.Contract[]> GetContractsByCustomerAsync(int customerId);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GenerateContractPdf", ReplyAction="http://tempuri.org/IService1/GenerateContractPdfResponse")]
+        byte[] GenerateContractPdf(int contractId);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GenerateContractPdf", ReplyAction="http://tempuri.org/IService1/GenerateContractPdfResponse")]
+        System.Threading.Tasks.Task<byte[]> GenerateContractPdfAsync(int contractId);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/CreateInvoice", ReplyAction="http://tempuri.org/IService1/CreateInvoiceResponse")]
         int CreateInvoice(BManagedClient.BMsrv.Invoice inv);
         
@@ -1985,43 +2239,7 @@ namespace BManagedClient.BMsrv {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GenerateInvoicePdf", ReplyAction="http://tempuri.org/IService1/GenerateInvoicePdfResponse")]
         System.Threading.Tasks.Task<byte[]> GenerateInvoicePdfAsync(int invoiceId);
-
-        // Contracts
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/CreateContract", ReplyAction="http://tempuri.org/IService1/CreateContractResponse")]
-        int CreateContract(BManagedClient.BMsrv.Contract c);
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/CreateContract", ReplyAction="http://tempuri.org/IService1/CreateContractResponse")]
-        System.Threading.Tasks.Task<int> CreateContractAsync(BManagedClient.BMsrv.Contract c);
-
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/DeleteContract", ReplyAction="http://tempuri.org/IService1/DeleteContractResponse")]
-        void DeleteContract(int id);
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/DeleteContract", ReplyAction="http://tempuri.org/IService1/DeleteContractResponse")]
-        System.Threading.Tasks.Task DeleteContractAsync(int id);
-
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/MarkContractSigned", ReplyAction="http://tempuri.org/IService1/MarkContractSignedResponse")]
-        void MarkContractSigned(int id, System.DateTime signedDate);
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/MarkContractSigned", ReplyAction="http://tempuri.org/IService1/MarkContractSignedResponse")]
-        System.Threading.Tasks.Task MarkContractSignedAsync(int id, System.DateTime signedDate);
-
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetContractById", ReplyAction="http://tempuri.org/IService1/GetContractByIdResponse")]
-        BManagedClient.BMsrv.Contract GetContractById(int id);
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetContractById", ReplyAction="http://tempuri.org/IService1/GetContractByIdResponse")]
-        System.Threading.Tasks.Task<BManagedClient.BMsrv.Contract> GetContractByIdAsync(int id);
-
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetContractsForOwner", ReplyAction="http://tempuri.org/IService1/GetContractsForOwnerResponse")]
-        BManagedClient.BMsrv.Contract[] GetContractsForOwner(int ownerId);
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetContractsForOwner", ReplyAction="http://tempuri.org/IService1/GetContractsForOwnerResponse")]
-        System.Threading.Tasks.Task<BManagedClient.BMsrv.Contract[]> GetContractsForOwnerAsync(int ownerId);
-
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetContractsByProject", ReplyAction="http://tempuri.org/IService1/GetContractsByProjectResponse")]
-        BManagedClient.BMsrv.Contract[] GetContractsByProject(int projectId);
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetContractsByProject", ReplyAction="http://tempuri.org/IService1/GetContractsByProjectResponse")]
-        System.Threading.Tasks.Task<BManagedClient.BMsrv.Contract[]> GetContractsByProjectAsync(int projectId);
-
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GenerateContractPdf", ReplyAction="http://tempuri.org/IService1/GenerateContractPdfResponse")]
-        byte[] GenerateContractPdf(int contractId);
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GenerateContractPdf", ReplyAction="http://tempuri.org/IService1/GenerateContractPdfResponse")]
-        System.Threading.Tasks.Task<byte[]> GenerateContractPdfAsync(int contractId);
-
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AddExpense", ReplyAction="http://tempuri.org/IService1/AddExpenseResponse")]
         int AddExpense(BManagedClient.BMsrv.Expense e);
         
@@ -2411,29 +2629,101 @@ namespace BManagedClient.BMsrv {
         public System.Threading.Tasks.Task<BManagedClient.BMsrv.Project> GetProjectByIdAsync(int id) {
             return base.Channel.GetProjectByIdAsync(id);
         }
-
+        
         public void AddProjectAssignment(int projectId, int employeeId) {
             base.Channel.AddProjectAssignment(projectId, employeeId);
         }
-
+        
         public System.Threading.Tasks.Task AddProjectAssignmentAsync(int projectId, int employeeId) {
             return base.Channel.AddProjectAssignmentAsync(projectId, employeeId);
         }
-
+        
         public void RemoveProjectAssignment(int projectId, int employeeId) {
             base.Channel.RemoveProjectAssignment(projectId, employeeId);
         }
-
+        
         public System.Threading.Tasks.Task RemoveProjectAssignmentAsync(int projectId, int employeeId) {
             return base.Channel.RemoveProjectAssignmentAsync(projectId, employeeId);
         }
-
+        
         public BManagedClient.BMsrv.User[] GetProjectAssignees(int projectId) {
             return base.Channel.GetProjectAssignees(projectId);
         }
-
+        
         public System.Threading.Tasks.Task<BManagedClient.BMsrv.User[]> GetProjectAssigneesAsync(int projectId) {
             return base.Channel.GetProjectAssigneesAsync(projectId);
+        }
+        
+        public int CreateContract(BManagedClient.BMsrv.Contract c) {
+            return base.Channel.CreateContract(c);
+        }
+        
+        public System.Threading.Tasks.Task<int> CreateContractAsync(BManagedClient.BMsrv.Contract c) {
+            return base.Channel.CreateContractAsync(c);
+        }
+        
+        public void UpdateContract(BManagedClient.BMsrv.Contract c) {
+            base.Channel.UpdateContract(c);
+        }
+        
+        public System.Threading.Tasks.Task UpdateContractAsync(BManagedClient.BMsrv.Contract c) {
+            return base.Channel.UpdateContractAsync(c);
+        }
+        
+        public void DeleteContract(int id) {
+            base.Channel.DeleteContract(id);
+        }
+        
+        public System.Threading.Tasks.Task DeleteContractAsync(int id) {
+            return base.Channel.DeleteContractAsync(id);
+        }
+        
+        public void MarkContractSigned(int id, System.DateTime signedDate) {
+            base.Channel.MarkContractSigned(id, signedDate);
+        }
+        
+        public System.Threading.Tasks.Task MarkContractSignedAsync(int id, System.DateTime signedDate) {
+            return base.Channel.MarkContractSignedAsync(id, signedDate);
+        }
+        
+        public BManagedClient.BMsrv.Contract GetContractById(int id) {
+            return base.Channel.GetContractById(id);
+        }
+        
+        public System.Threading.Tasks.Task<BManagedClient.BMsrv.Contract> GetContractByIdAsync(int id) {
+            return base.Channel.GetContractByIdAsync(id);
+        }
+        
+        public BManagedClient.BMsrv.Contract[] GetContractsForOwner(int ownerId) {
+            return base.Channel.GetContractsForOwner(ownerId);
+        }
+        
+        public System.Threading.Tasks.Task<BManagedClient.BMsrv.Contract[]> GetContractsForOwnerAsync(int ownerId) {
+            return base.Channel.GetContractsForOwnerAsync(ownerId);
+        }
+        
+        public BManagedClient.BMsrv.Contract[] GetContractsByProject(int projectId) {
+            return base.Channel.GetContractsByProject(projectId);
+        }
+        
+        public System.Threading.Tasks.Task<BManagedClient.BMsrv.Contract[]> GetContractsByProjectAsync(int projectId) {
+            return base.Channel.GetContractsByProjectAsync(projectId);
+        }
+        
+        public BManagedClient.BMsrv.Contract[] GetContractsByCustomer(int customerId) {
+            return base.Channel.GetContractsByCustomer(customerId);
+        }
+        
+        public System.Threading.Tasks.Task<BManagedClient.BMsrv.Contract[]> GetContractsByCustomerAsync(int customerId) {
+            return base.Channel.GetContractsByCustomerAsync(customerId);
+        }
+        
+        public byte[] GenerateContractPdf(int contractId) {
+            return base.Channel.GenerateContractPdf(contractId);
+        }
+        
+        public System.Threading.Tasks.Task<byte[]> GenerateContractPdfAsync(int contractId) {
+            return base.Channel.GenerateContractPdfAsync(contractId);
         }
         
         public int CreateInvoice(BManagedClient.BMsrv.Invoice inv) {
@@ -2523,21 +2813,6 @@ namespace BManagedClient.BMsrv {
         public System.Threading.Tasks.Task<byte[]> GenerateInvoicePdfAsync(int invoiceId) {
             return base.Channel.GenerateInvoicePdfAsync(invoiceId);
         }
-
-        public int CreateContract(BManagedClient.BMsrv.Contract c)
-            => base.Channel.CreateContract(c);
-        public void DeleteContract(int id)
-            => base.Channel.DeleteContract(id);
-        public void MarkContractSigned(int id, System.DateTime d)
-            => base.Channel.MarkContractSigned(id, d);
-        public BManagedClient.BMsrv.Contract GetContractById(int id)
-            => base.Channel.GetContractById(id);
-        public BManagedClient.BMsrv.Contract[] GetContractsForOwner(int ownerId)
-            => base.Channel.GetContractsForOwner(ownerId);
-        public BManagedClient.BMsrv.Contract[] GetContractsByProject(int projectId)
-            => base.Channel.GetContractsByProject(projectId);
-        public byte[] GenerateContractPdf(int contractId)
-            => base.Channel.GenerateContractPdf(contractId);
         
         public int AddExpense(BManagedClient.BMsrv.Expense e) {
             return base.Channel.AddExpense(e);

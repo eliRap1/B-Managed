@@ -83,10 +83,37 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ArrayOfProject" nillable="true" type="tns:ArrayOfProject" />
+  <xs:complexType name="Contract">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:Base">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="Body" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="ContractNumber" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="CreatedAt" type="xs:dateTime" />
+          <xs:element minOccurs="0" name="Currency" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="CustomerId" type="xs:int" />
+          <xs:element minOccurs="0" name="PdfPath" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="ProjectId" type="xs:int" />
+          <xs:element minOccurs="0" name="SignedDate" nillable="true" type="xs:dateTime" />
+          <xs:element minOccurs="0" name="Status" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="Title" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="TotalAmount" type="xs:decimal" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Contract" nillable="true" type="tns:Contract" />
+  <xs:complexType name="ArrayOfContract">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Contract" nillable="true" type="tns:Contract" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfContract" nillable="true" type="tns:ArrayOfContract" />
   <xs:complexType name="Invoice">
     <xs:complexContent mixed="false">
       <xs:extension base="tns:Base">
         <xs:sequence>
+          <xs:element minOccurs="0" name="ContractId" nillable="true" type="xs:int" />
           <xs:element minOccurs="0" name="Currency" nillable="true" type="xs:string" />
           <xs:element minOccurs="0" name="CustomerId" type="xs:int" />
           <xs:element minOccurs="0" name="DueDate" type="xs:dateTime" />

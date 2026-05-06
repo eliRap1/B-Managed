@@ -176,6 +176,78 @@
   <wsdl:message name="IService1_GetProjectById_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetProjectByIdResponse" />
   </wsdl:message>
+  <wsdl:message name="IService1_AddProjectAssignment_InputMessage">
+    <wsdl:part name="parameters" element="tns:AddProjectAssignment" />
+  </wsdl:message>
+  <wsdl:message name="IService1_AddProjectAssignment_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AddProjectAssignmentResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_RemoveProjectAssignment_InputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveProjectAssignment" />
+  </wsdl:message>
+  <wsdl:message name="IService1_RemoveProjectAssignment_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveProjectAssignmentResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_GetProjectAssignees_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetProjectAssignees" />
+  </wsdl:message>
+  <wsdl:message name="IService1_GetProjectAssignees_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetProjectAssigneesResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_CreateContract_InputMessage">
+    <wsdl:part name="parameters" element="tns:CreateContract" />
+  </wsdl:message>
+  <wsdl:message name="IService1_CreateContract_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CreateContractResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_UpdateContract_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateContract" />
+  </wsdl:message>
+  <wsdl:message name="IService1_UpdateContract_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateContractResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_DeleteContract_InputMessage">
+    <wsdl:part name="parameters" element="tns:DeleteContract" />
+  </wsdl:message>
+  <wsdl:message name="IService1_DeleteContract_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DeleteContractResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_MarkContractSigned_InputMessage">
+    <wsdl:part name="parameters" element="tns:MarkContractSigned" />
+  </wsdl:message>
+  <wsdl:message name="IService1_MarkContractSigned_OutputMessage">
+    <wsdl:part name="parameters" element="tns:MarkContractSignedResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_GetContractById_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetContractById" />
+  </wsdl:message>
+  <wsdl:message name="IService1_GetContractById_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetContractByIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_GetContractsForOwner_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetContractsForOwner" />
+  </wsdl:message>
+  <wsdl:message name="IService1_GetContractsForOwner_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetContractsForOwnerResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_GetContractsByProject_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetContractsByProject" />
+  </wsdl:message>
+  <wsdl:message name="IService1_GetContractsByProject_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetContractsByProjectResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_GetContractsByCustomer_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetContractsByCustomer" />
+  </wsdl:message>
+  <wsdl:message name="IService1_GetContractsByCustomer_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetContractsByCustomerResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_GenerateContractPdf_InputMessage">
+    <wsdl:part name="parameters" element="tns:GenerateContractPdf" />
+  </wsdl:message>
+  <wsdl:message name="IService1_GenerateContractPdf_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GenerateContractPdfResponse" />
+  </wsdl:message>
   <wsdl:message name="IService1_CreateInvoice_InputMessage">
     <wsdl:part name="parameters" element="tns:CreateInvoice" />
   </wsdl:message>
@@ -492,6 +564,54 @@
     <wsdl:operation name="GetProjectById">
       <wsdl:input wsaw:Action="http://tempuri.org/IService1/GetProjectById" message="tns:IService1_GetProjectById_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IService1/GetProjectByIdResponse" message="tns:IService1_GetProjectById_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AddProjectAssignment">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/AddProjectAssignment" message="tns:IService1_AddProjectAssignment_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/AddProjectAssignmentResponse" message="tns:IService1_AddProjectAssignment_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RemoveProjectAssignment">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/RemoveProjectAssignment" message="tns:IService1_RemoveProjectAssignment_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/RemoveProjectAssignmentResponse" message="tns:IService1_RemoveProjectAssignment_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetProjectAssignees">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/GetProjectAssignees" message="tns:IService1_GetProjectAssignees_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/GetProjectAssigneesResponse" message="tns:IService1_GetProjectAssignees_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="CreateContract">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/CreateContract" message="tns:IService1_CreateContract_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/CreateContractResponse" message="tns:IService1_CreateContract_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateContract">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/UpdateContract" message="tns:IService1_UpdateContract_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/UpdateContractResponse" message="tns:IService1_UpdateContract_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="DeleteContract">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/DeleteContract" message="tns:IService1_DeleteContract_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/DeleteContractResponse" message="tns:IService1_DeleteContract_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="MarkContractSigned">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/MarkContractSigned" message="tns:IService1_MarkContractSigned_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/MarkContractSignedResponse" message="tns:IService1_MarkContractSigned_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetContractById">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/GetContractById" message="tns:IService1_GetContractById_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/GetContractByIdResponse" message="tns:IService1_GetContractById_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetContractsForOwner">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/GetContractsForOwner" message="tns:IService1_GetContractsForOwner_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/GetContractsForOwnerResponse" message="tns:IService1_GetContractsForOwner_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetContractsByProject">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/GetContractsByProject" message="tns:IService1_GetContractsByProject_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/GetContractsByProjectResponse" message="tns:IService1_GetContractsByProject_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetContractsByCustomer">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/GetContractsByCustomer" message="tns:IService1_GetContractsByCustomer_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/GetContractsByCustomerResponse" message="tns:IService1_GetContractsByCustomer_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GenerateContractPdf">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/GenerateContractPdf" message="tns:IService1_GenerateContractPdf_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/GenerateContractPdfResponse" message="tns:IService1_GenerateContractPdf_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="CreateInvoice">
       <wsdl:input wsaw:Action="http://tempuri.org/IService1/CreateInvoice" message="tns:IService1_CreateInvoice_InputMessage" />
@@ -877,6 +997,114 @@
     </wsdl:operation>
     <wsdl:operation name="GetProjectById">
       <soap:operation soapAction="http://tempuri.org/IService1/GetProjectById" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddProjectAssignment">
+      <soap:operation soapAction="http://tempuri.org/IService1/AddProjectAssignment" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RemoveProjectAssignment">
+      <soap:operation soapAction="http://tempuri.org/IService1/RemoveProjectAssignment" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProjectAssignees">
+      <soap:operation soapAction="http://tempuri.org/IService1/GetProjectAssignees" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CreateContract">
+      <soap:operation soapAction="http://tempuri.org/IService1/CreateContract" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateContract">
+      <soap:operation soapAction="http://tempuri.org/IService1/UpdateContract" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteContract">
+      <soap:operation soapAction="http://tempuri.org/IService1/DeleteContract" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="MarkContractSigned">
+      <soap:operation soapAction="http://tempuri.org/IService1/MarkContractSigned" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetContractById">
+      <soap:operation soapAction="http://tempuri.org/IService1/GetContractById" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetContractsForOwner">
+      <soap:operation soapAction="http://tempuri.org/IService1/GetContractsForOwner" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetContractsByProject">
+      <soap:operation soapAction="http://tempuri.org/IService1/GetContractsByProject" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetContractsByCustomer">
+      <soap:operation soapAction="http://tempuri.org/IService1/GetContractsByCustomer" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GenerateContractPdf">
+      <soap:operation soapAction="http://tempuri.org/IService1/GenerateContractPdf" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
