@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="bg-[#FAFAF7]">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Sign in — B-Managed</title>
+
+<!-- Premium typography (Fontshare CDN) -->
+<link rel="preconnect" href="https://api.fontshare.com" />
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=plus-jakarta-sans@400,500,600,700&display=swap" />
+
+<!-- Tailwind via CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans:    ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          display: ['"Clash Display"', '"Plus Jakarta Sans"', 'sans-serif'],
+        },
+        colors: {
+          ink:     { DEFAULT: '#0B0B0F', soft: '#1A1A22' },
+          paper:   { 50: '#FAFAF7', 100: '#F2F2EE', 200: '#E5E5DF' },
+          accent:  { DEFAULT: '#3B5BFF', deep: '#1E36C7' },
+          mint:    { DEFAULT: '#10B981' },
+          amber:   { DEFAULT: '#F59E0B' },
+          rose:    { DEFAULT: '#EF4444' },
+        },
+        boxShadow: {
+          soft:   '0 1px 1px rgba(15,15,15,0.04), 0 8px 32px -8px rgba(15,15,15,0.08)',
+          float:  '0 16px 64px -16px rgba(15,15,15,0.12)',
+          inset:  'inset 0 1px 1px rgba(255,255,255,0.6)',
+        },
+        borderRadius: {
+          'shell': '2rem',
+          'core':  'calc(2rem - 0.375rem)',
+        },
+        transitionTimingFunction: {
+          spring: 'cubic-bezier(0.32, 0.72, 0, 1)',
+        },
+      },
+    },
+  };
+</script>
+
+<style>
+  body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  .display { font-family: 'Clash Display', 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.02em; }
+  /* Subtle film-grain overlay */
+  .grain::after {
+    content: ''; position: fixed; inset: 0; z-index: 50; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+    opacity: 0.035;
+  }
+  .reveal { opacity: 0; transform: translateY(16px); filter: blur(6px); transition: all 0.8s cubic-bezier(0.32,0.72,0,1); }
+  .reveal.in { opacity: 1; transform: translateY(0); filter: blur(0); }
+  .pill { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500; }
+</style>
+</head>
+<body class="grain text-ink antialiased min-h-[100dvh]">
+
+  <!-- Floating glass nav (Fluid Island) -->
+  <header class="sticky top-0 z-40 pt-6 px-4">
+    <nav class="mx-auto w-max bg-white/70 backdrop-blur-xl border border-black/5 rounded-full shadow-soft px-2 py-2 flex items-center gap-1 text-sm">
+      <a class="display text-base font-bold px-4" href="/">B-Managed</a>
+
+      <a class="px-3 py-1.5 rounded-full hover:bg-black/5 transition text-xs" href="/Lang?target=he">&#x5E2;&#x5D1;</a>
+        <a class="bg-ink text-paper-50 rounded-full px-4 py-1.5 ml-1" href="/Login">Sign in</a>
+    </nav>
+  </header>
+
+  <main class="px-4 md:px-8 pt-16 pb-32 max-w-[1400px] mx-auto">
+    
+<section class="reveal min-h-[80dvh] grid place-items-center">
+    <div class="w-full max-w-md">
+
+        <!-- Eyebrow tag -->
+        <div class="flex justify-center mb-6">
+            <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">Workspace</span>
+        </div>
+
+        <h1 class="display text-5xl md:text-6xl font-bold text-center text-ink mb-2">Welcome back</h1>
+        <p class="text-center text-ink/50 mb-12">Run your business &#x2014; calmly.</p>
+
+        <!-- Double-bezel card -->
+        <div class="bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5 shadow-float">
+            <div class="bg-paper-50 rounded-core shadow-inset p-8">
+                <form method="post" class="space-y-5">
+                    <div>
+                        <label class="pill text-ink/40 mb-2 block">Username</label>
+                        <input autocomplete="username" autofocus class="w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-3 outline-none focus:border-accent transition" type="text" id="Username" name="Username" value="" />
+                    </div>
+                    <div>
+                        <label class="pill text-ink/40 mb-2 block">Password</label>
+                        <input type="password" autocomplete="current-password" class="w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-3 outline-none focus:border-accent transition" id="Password" name="Password" />
+                    </div>
+
+
+                    <button type="submit"
+                            class="group w-full inline-flex items-center justify-center gap-3 bg-ink text-paper-50 rounded-full px-6 py-3 mt-2 transition-all duration-500 ease-spring active:scale-[0.98] hover:opacity-95">
+                        <span class="font-semibold">Sign in</span>
+                        <span class="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center transition-all duration-500 ease-spring group-hover:translate-x-0.5 group-hover:-translate-y-px">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                        </span>
+                    </button>
+                <input name="__RequestVerificationToken" type="hidden" value="CfDJ8OvbP3zI0ApEq_m17qDBs7iGSq17F8YygQNQk-1T_Y79TOAUDxzN9KqjO9M6HPurd7cHSwcBqk0ukVny66EE5KcJ1xN3l_zqHfrKlmoOIyXM1cU4SSiynQEWcL5amrypV5UiANo9h7DIMc6XCaUmhUA" /></form>
+            </div>
+        </div>
+
+        <p class="text-xs text-ink/40 text-center mt-8">
+            <a class="text-accent hover:underline" href="/SignUp">Create an account</a>
+            ·
+            <a class="text-accent hover:underline" href="/ForgotPassword">Forgot password</a>
+            <br/>
+            Seeded admin: <span class="font-mono">admin</span> / <span class="font-mono">admin1234</span>
+        </p>
+    </div>
+</section>
+
+  </main>
+
+  <footer class="px-8 py-12 text-center text-xs text-ink/40">
+    © 2026 — B-Managed · built with WCF + ASP.NET Razor Pages
+  </footer>
+
+  <script>
+    // IntersectionObserver-based reveal — GPU-friendly.
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // Live notification badge — polls /Notifications?handler=Count every 30s.
+    const badge = document.getElementById('notif-badge');
+    async function refreshBadge() {
+      if (!badge) return;
+      try {
+        const r = await fetch('/Notifications?handler=Count', { headers: { 'Accept': 'application/json' } });
+        if (!r.ok) return;
+        const n = await r.json();
+        if (n > 0) {
+          badge.textContent = n > 99 ? '99+' : String(n);
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      } catch (e) {}
+    }
+    if (badge) { refreshBadge(); setInterval(refreshBadge, 30000); }
+  </script>
+  
+</body>
+</html>

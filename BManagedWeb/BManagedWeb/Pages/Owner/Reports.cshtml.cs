@@ -25,6 +25,9 @@ namespace BManagedWeb.Pages.Owner
         public ProfitLoss YearPl    { get; set; } = new ProfitLoss();
         public decimal    YearTax   { get; set; }
         public decimal    YearNet   { get; set; }
+        public string     BusinessType { get; set; } = "Individual";
+        public decimal    TaxableProfit { get; set; }
+        public string     TaxNote    { get; set; }
 
         public IEnumerable<SelectListItem> YearOptions =>
             Enumerable.Range(DateTime.Today.Year - 4, 5)
@@ -56,7 +59,33 @@ namespace BManagedWeb.Pages.Owner
                 var yearEnd   = new DateTime(Year, 12, 31);
                 YearPl = _srv.GetProfitLoss(id, yearStart, yearEnd, DisplayCurrency) ?? new ProfitLoss();
 
-                YearTax = ComputeIsraeliIncomeTax(YearPl.Profit);
+                // BusinessType-aware taxable profit:
+                //   Osek Zair / Patur: presumptive 30% of income treated as expenses for
+                //                       income-tax purposes (חישוב נורמטיבי). No VAT either way.
+                //   Osek Murshe / Individual: real expenses count.
+                try
+                {
+                    var u = _srv.GetUserById(id);
+                    if (u != null && !string.IsNullOrEmpty(u.BusinessType)) BusinessType = u.BusinessType;
+                }
+                catch { }
+
+                if (BusinessType == "Zair" || BusinessType == "Patur")
+                {
+                    TaxableProfit = YearPl.Income * 0.70m;
+                    TaxNote = "Osek " + (BusinessType == "Zair" ? "Zair" : "Patur") +
+                              " — 30 % presumptive expense deduction on income (independent of actual expenses). " +
+                              "Invoices issued without 17 % VAT. VAT on expenses cannot be deducted.";
+                }
+                else
+                {
+                    TaxableProfit = YearPl.Profit;
+                    TaxNote = BusinessType == "Murshe"
+                        ? "Osek Murshe — collects 17 % VAT on sales, deducts 17 % on qualifying expenses, taxable profit = real income − real expenses."
+                        : "Individual — taxable profit = income − expenses, no VAT filing.";
+                }
+
+                YearTax = ComputeIsraeliIncomeTax(TaxableProfit);
                 YearNet = YearPl.Profit - YearTax;
             }
             catch { }

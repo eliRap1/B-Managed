@@ -140,7 +140,9 @@
                 <div class="bg-amber/20 rounded-2xl px-5 py-4 border border-amber/30">
                     <div class="pill text-ink/50">@L.T(HttpContext,"Income tax (brackets)","מס הכנסה (מדרגות)")</div>
                     <div class="display text-2xl font-semibold mt-1 text-amber">−@Model.YearTax.ToString("N0") <span class="text-ink/40 text-xs">@Model.DisplayCurrency</span></div>
-                    <div class="text-xs text-ink/50 mt-1">@L.T(HttpContext,"Computed on year gross profit","מחושב על רווח ברוטו שנתי")</div>
+                    <div class="text-xs text-ink/50 mt-1">
+                        @L.T(HttpContext,"Taxable base","בסיס מס"): @Model.TaxableProfit.ToString("N0") @Model.DisplayCurrency
+                    </div>
                 </div>
                 <div class="bg-mint/15 rounded-2xl px-5 py-4 border border-mint/30">
                     <div class="pill text-ink/50">@L.T(HttpContext,"Net profit (year)","רווח נטו (שנתי)")</div>
@@ -148,6 +150,13 @@
                     <div class="text-xs text-ink/50 mt-1">= @L.T(HttpContext,"Gross","ברוטו") − @L.T(HttpContext,"Tax","מס")</div>
                 </div>
             </div>
+
+            @if (!string.IsNullOrEmpty(Model.TaxNote))
+            {
+                <div class="mt-4 text-xs text-ink/60 bg-paper-100 rounded-2xl px-4 py-3 border border-black/5">
+                    📌 @Model.TaxNote
+                </div>
+            }
 
             <!-- Bracket table -->
             <details class="mt-6 text-xs text-ink/60">
