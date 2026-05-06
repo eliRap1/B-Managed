@@ -109,7 +109,7 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
                             <Border x:Name="bd" Background="{TemplateBinding Background}"
-                                    CornerRadius="999" Padding="{TemplateBinding Padding}">
+                                    CornerRadius="14" Padding="{TemplateBinding Padding}">
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <ControlTemplate.Triggers>
@@ -227,7 +227,7 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
                             <Border x:Name="bd" Background="{TemplateBinding Background}"
-                                    CornerRadius="999" Padding="{TemplateBinding Padding}">
+                                    CornerRadius="14" Padding="{TemplateBinding Padding}">
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <ControlTemplate.Triggers>

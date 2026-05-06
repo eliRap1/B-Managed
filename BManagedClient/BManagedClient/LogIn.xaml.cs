@@ -40,9 +40,9 @@ namespace BManagedClient
                 sign.PreferredCurrency = user.PreferredCurrency;
                 sign.IsActive          = user.IsActive;
 
-                if (sign.IsOwner)         page.Navigate(new OwnerHome());
-                else if (sign.IsEmployee) page.Navigate(new EmployeeHome());
-                else                      page.Navigate(new ClientHome());
+                if (sign.IsOwner)         NavigationService?.Navigate(new OwnerHome());
+                else if (sign.IsEmployee) NavigationService?.Navigate(new EmployeeHome());
+                else                      NavigationService?.Navigate(new ClientHome());
             }
             catch (Exception ex)
             {

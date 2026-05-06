@@ -61,7 +61,7 @@ namespace BManagedClient
                 }
                 try
                 {
-                    bsrv.Service1Client srv = new bsrv.Service1Client();
+                    BMsrv.Service1Client srv = new BMsrv.Service1Client();
                     var user = srv.GetUserById(int.Parse(id));
                     if (user != null)
                     {

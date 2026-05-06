@@ -4,8 +4,6 @@
       xmlns:local="clr-namespace:BManagedClient"
       Title="Sign in" Background="{StaticResource Bg}">
     <Grid>
-        <Frame x:Name="page" Panel.ZIndex="100" NavigationUIVisibility="Hidden"/>
-
         <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="420">
             <Border Style="{StaticResource ShellCard}">
                 <Border Style="{StaticResource CoreCard}" Padding="36,30">
