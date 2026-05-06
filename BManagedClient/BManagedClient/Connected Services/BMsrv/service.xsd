@@ -194,6 +194,19 @@
       <xs:sequence />
     </xs:complexType>
   </xs:element>
+  <xs:element name="SetBusinessType">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="userId" type="xs:int" />
+        <xs:element minOccurs="0" name="businessType" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetBusinessTypeResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
   <xs:element name="AddCustomer">
     <xs:complexType>
       <xs:sequence>
@@ -904,6 +917,36 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="GetCashFlowForecast">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ownerId" type="xs:int" />
+        <xs:element minOccurs="0" name="months" type="xs:int" />
+        <xs:element minOccurs="0" name="displayCurrency" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetCashFlowForecastResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q41="http://schemas.datacontract.org/2004/07/Model" minOccurs="0" name="GetCashFlowForecastResult" nillable="true" type="q41:ArrayOfProfitLoss" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="EnsureOverdueNotifications">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ownerId" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="EnsureOverdueNotificationsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="EnsureOverdueNotificationsResult" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="GetExchangeRate">
     <xs:complexType>
       <xs:sequence>
@@ -942,14 +985,14 @@
   <xs:element name="GetSupportedCurrenciesResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q41="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="GetSupportedCurrenciesResult" nillable="true" type="q41:ArrayOfstring" />
+        <xs:element xmlns:q42="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="GetSupportedCurrenciesResult" nillable="true" type="q42:ArrayOfstring" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="SendNotification">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q42="http://schemas.datacontract.org/2004/07/Model" minOccurs="0" name="n" nillable="true" type="q42:Notification" />
+        <xs:element xmlns:q43="http://schemas.datacontract.org/2004/07/Model" minOccurs="0" name="n" nillable="true" type="q43:Notification" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -970,7 +1013,7 @@
   <xs:element name="GetUserNotificationsResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q43="http://schemas.datacontract.org/2004/07/Model" minOccurs="0" name="GetUserNotificationsResult" nillable="true" type="q43:ArrayOfNotification" />
+        <xs:element xmlns:q44="http://schemas.datacontract.org/2004/07/Model" minOccurs="0" name="GetUserNotificationsResult" nillable="true" type="q44:ArrayOfNotification" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

@@ -92,6 +92,12 @@
   <wsdl:message name="IService1_UpdateUserProfile_OutputMessage">
     <wsdl:part name="parameters" element="tns:UpdateUserProfileResponse" />
   </wsdl:message>
+  <wsdl:message name="IService1_SetBusinessType_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetBusinessType" />
+  </wsdl:message>
+  <wsdl:message name="IService1_SetBusinessType_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SetBusinessTypeResponse" />
+  </wsdl:message>
   <wsdl:message name="IService1_AddCustomer_InputMessage">
     <wsdl:part name="parameters" element="tns:AddCustomer" />
   </wsdl:message>
@@ -398,6 +404,18 @@
   <wsdl:message name="IService1_GetEmployeeRevenueReport_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetEmployeeRevenueReportResponse" />
   </wsdl:message>
+  <wsdl:message name="IService1_GetCashFlowForecast_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCashFlowForecast" />
+  </wsdl:message>
+  <wsdl:message name="IService1_GetCashFlowForecast_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCashFlowForecastResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_EnsureOverdueNotifications_InputMessage">
+    <wsdl:part name="parameters" element="tns:EnsureOverdueNotifications" />
+  </wsdl:message>
+  <wsdl:message name="IService1_EnsureOverdueNotifications_OutputMessage">
+    <wsdl:part name="parameters" element="tns:EnsureOverdueNotificationsResponse" />
+  </wsdl:message>
   <wsdl:message name="IService1_GetExchangeRate_InputMessage">
     <wsdl:part name="parameters" element="tns:GetExchangeRate" />
   </wsdl:message>
@@ -508,6 +526,10 @@
     <wsdl:operation name="UpdateUserProfile">
       <wsdl:input wsaw:Action="http://tempuri.org/IService1/UpdateUserProfile" message="tns:IService1_UpdateUserProfile_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IService1/UpdateUserProfileResponse" message="tns:IService1_UpdateUserProfile_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SetBusinessType">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/SetBusinessType" message="tns:IService1_SetBusinessType_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/SetBusinessTypeResponse" message="tns:IService1_SetBusinessType_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="AddCustomer">
       <wsdl:input wsaw:Action="http://tempuri.org/IService1/AddCustomer" message="tns:IService1_AddCustomer_InputMessage" />
@@ -713,6 +735,14 @@
       <wsdl:input wsaw:Action="http://tempuri.org/IService1/GetEmployeeRevenueReport" message="tns:IService1_GetEmployeeRevenueReport_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IService1/GetEmployeeRevenueReportResponse" message="tns:IService1_GetEmployeeRevenueReport_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="GetCashFlowForecast">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/GetCashFlowForecast" message="tns:IService1_GetCashFlowForecast_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/GetCashFlowForecastResponse" message="tns:IService1_GetCashFlowForecast_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="EnsureOverdueNotifications">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/EnsureOverdueNotifications" message="tns:IService1_EnsureOverdueNotifications_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/EnsureOverdueNotificationsResponse" message="tns:IService1_EnsureOverdueNotifications_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="GetExchangeRate">
       <wsdl:input wsaw:Action="http://tempuri.org/IService1/GetExchangeRate" message="tns:IService1_GetExchangeRate_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IService1/GetExchangeRateResponse" message="tns:IService1_GetExchangeRate_OutputMessage" />
@@ -871,6 +901,15 @@
     </wsdl:operation>
     <wsdl:operation name="UpdateUserProfile">
       <soap:operation soapAction="http://tempuri.org/IService1/UpdateUserProfile" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SetBusinessType">
+      <soap:operation soapAction="http://tempuri.org/IService1/SetBusinessType" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -1330,6 +1369,24 @@
     </wsdl:operation>
     <wsdl:operation name="GetEmployeeRevenueReport">
       <soap:operation soapAction="http://tempuri.org/IService1/GetEmployeeRevenueReport" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCashFlowForecast">
+      <soap:operation soapAction="http://tempuri.org/IService1/GetCashFlowForecast" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="EnsureOverdueNotifications">
+      <soap:operation soapAction="http://tempuri.org/IService1/EnsureOverdueNotifications" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>

@@ -51,6 +51,9 @@ namespace BManagedClient
                 var projs = ServiceGateway.Use(c => c.GetProjectsByStatus("Active", LogIn.sign.Id));
                 activeProjects.Text = (projs?.Length ?? 0).ToString();
 
+                // Auto-create overdue notifications on the server side
+                try { ServiceGateway.Use(c => c.EnsureOverdueNotifications(LogIn.sign.Id)); } catch { }
+
                 int unread = ServiceGateway.Use(c => c.GetUnreadNotificationCount(LogIn.sign.Id));
                 if (unread > 0)
                 {
@@ -61,6 +64,59 @@ namespace BManagedClient
                 {
                     notifBadge.Visibility = Visibility.Collapsed;
                 }
+
+                // 3-month cashflow forecast
+                try
+                {
+                    string cur = LogIn.sign.PreferredCurrency ?? "ILS";
+                    var forecast = ServiceGateway.Use(c => c.GetCashFlowForecast(LogIn.sign.Id, 3, cur));
+                    if (forecast != null && forecast.Length > 0 && forecastPanel != null)
+                    {
+                        var anchor = DateTime.Today;
+                        forecastPanel.Children.Clear();
+                        for (int i = 0; i < forecast.Length; i++)
+                        {
+                            var f = forecast[i];
+                            var monthLabel = anchor.AddMonths(i + 1).ToString("MMM yyyy");
+                            var fg = f.Profit >= 0
+                                ? (System.Windows.Media.Brush)Application.Current.Resources["Mint"]
+                                : (System.Windows.Media.Brush)Application.Current.Resources["Rose"];
+                            var card = new Border
+                            {
+                                Background  = (System.Windows.Media.Brush)Application.Current.Resources["Paper100"],
+                                CornerRadius = new CornerRadius(14),
+                                Padding     = new Thickness(16),
+                                Margin      = new Thickness(0, 0, 8, 0),
+                            };
+                            var sp = new StackPanel();
+                            sp.Children.Add(new TextBlock
+                            {
+                                Text = monthLabel,
+                                FontSize = 11, FontWeight = FontWeights.SemiBold,
+                                Foreground = (System.Windows.Media.Brush)Application.Current.Resources["Ink40"],
+                            });
+                            sp.Children.Add(new TextBlock
+                            {
+                                Text = "Income: " + f.Income.ToString("N0") + " " + cur,
+                                FontSize = 12, Margin = new Thickness(0, 4, 0, 0),
+                            });
+                            sp.Children.Add(new TextBlock
+                            {
+                                Text = "Expenses: " + f.Expenses.ToString("N0") + " " + cur,
+                                FontSize = 12,
+                            });
+                            sp.Children.Add(new TextBlock
+                            {
+                                Text = f.Profit.ToString("N0") + " " + cur,
+                                FontSize = 22, FontWeight = FontWeights.Bold,
+                                Foreground = fg, Margin = new Thickness(0, 6, 0, 0),
+                            });
+                            card.Child = sp;
+                            forecastPanel.Children.Add(card);
+                        }
+                    }
+                }
+                catch { }
             }
             catch (Exception ex) { System.Diagnostics.Debug.WriteLine("RefreshStats: " + ex.Message); }
         }

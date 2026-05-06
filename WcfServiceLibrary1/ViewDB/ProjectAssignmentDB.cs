@@ -15,9 +15,18 @@ namespace ViewDB
     {
         protected override Base NewEntity() => null;
 
+        private static readonly object _schemaLock = new object();
+        private static bool _schemaEnsured;
+
         public ProjectAssignmentDB()
         {
-            EnsureSchema();
+            if (_schemaEnsured) return;
+            lock (_schemaLock)
+            {
+                if (_schemaEnsured) return;
+                EnsureSchema();
+                _schemaEnsured = true;
+            }
         }
 
         private void EnsureSchema()

@@ -4,6 +4,7 @@
     <xs:complexContent mixed="false">
       <xs:extension base="tns:Base">
         <xs:sequence>
+          <xs:element minOccurs="0" name="BusinessType" nillable="true" type="xs:string" />
           <xs:element minOccurs="0" name="CreatedAt" type="xs:dateTime" />
           <xs:element minOccurs="0" name="Email" nillable="true" type="xs:string" />
           <xs:element minOccurs="0" name="IsActive" type="xs:boolean" />
@@ -271,6 +272,12 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="EmployeeRevenueRow" nillable="true" type="tns:EmployeeRevenueRow" />
+  <xs:complexType name="ArrayOfProfitLoss">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ProfitLoss" nillable="true" type="tns:ProfitLoss" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfProfitLoss" nillable="true" type="tns:ArrayOfProfitLoss" />
   <xs:complexType name="Notification">
     <xs:complexContent mixed="false">
       <xs:extension base="tns:Base">

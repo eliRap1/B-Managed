@@ -15,9 +15,21 @@ namespace ViewDB
     {
         protected override Base NewEntity() => new User();
 
+        // Run EnsureSchema once per process, not on every WCF request — otherwise
+        // every Service1 instantiation pays for an ALTER TABLE round-trip and
+        // a fresh OleDb connection-pool entry, which exhausts under load.
+        private static readonly object _schemaLock = new object();
+        private static bool _schemaEnsured;
+
         public UserDB()
         {
-            EnsureSchema();
+            if (_schemaEnsured) return;
+            lock (_schemaLock)
+            {
+                if (_schemaEnsured) return;
+                EnsureSchema();
+                _schemaEnsured = true;
+            }
         }
 
         /// <summary>

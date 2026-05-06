@@ -97,6 +97,18 @@
                     </Border>
                 </Grid>
 
+                <!-- 3-month cashflow forecast -->
+                <Border Style="{StaticResource ShellCard}">
+                    <Border Style="{StaticResource CoreCard}" Padding="22">
+                        <StackPanel>
+                            <TextBlock Text="3-MONTH CASHFLOW FORECAST" Style="{StaticResource Eyebrow}" Margin="0,0,0,8"/>
+                            <TextBlock Text="Trailing-3-month average + outstanding invoices."
+                                       Style="{StaticResource Body}" Foreground="{StaticResource Ink40}" Margin="0,0,0,12"/>
+                            <StackPanel x:Name="forecastPanel" Orientation="Horizontal"/>
+                        </StackPanel>
+                    </Border>
+                </Border>
+
                 <!-- Quick actions grid -->
                 <Border Style="{StaticResource ShellCard}">
                     <Border Style="{StaticResource CoreCard}" Padding="22">

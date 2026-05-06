@@ -1218,6 +1218,9 @@ namespace BManagedClient.BMsrv {
     public partial class User : BManagedClient.BMsrv.Base {
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string BusinessTypeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.DateTime CreatedAtField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
@@ -1240,6 +1243,19 @@ namespace BManagedClient.BMsrv {
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string UsernameField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string BusinessType {
+            get {
+                return this.BusinessTypeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.BusinessTypeField, value) != true)) {
+                    this.BusinessTypeField = value;
+                    this.RaisePropertyChanged("BusinessType");
+                }
+            }
+        }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
         public System.DateTime CreatedAt {
@@ -2018,6 +2034,12 @@ namespace BManagedClient.BMsrv {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/UpdateUserProfile", ReplyAction="http://tempuri.org/IService1/UpdateUserProfileResponse")]
         System.Threading.Tasks.Task UpdateUserProfileAsync(int userId, string email, string phone, string preferredCurrency);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/SetBusinessType", ReplyAction="http://tempuri.org/IService1/SetBusinessTypeResponse")]
+        void SetBusinessType(int userId, string businessType);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/SetBusinessType", ReplyAction="http://tempuri.org/IService1/SetBusinessTypeResponse")]
+        System.Threading.Tasks.Task SetBusinessTypeAsync(int userId, string businessType);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AddCustomer", ReplyAction="http://tempuri.org/IService1/AddCustomerResponse")]
         int AddCustomer(BManagedClient.BMsrv.Customer c);
         
@@ -2324,6 +2346,18 @@ namespace BManagedClient.BMsrv {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetEmployeeRevenueReport", ReplyAction="http://tempuri.org/IService1/GetEmployeeRevenueReportResponse")]
         System.Threading.Tasks.Task<BManagedClient.BMsrv.EmployeeRevenueRow[]> GetEmployeeRevenueReportAsync(int ownerId, string displayCurrency);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetCashFlowForecast", ReplyAction="http://tempuri.org/IService1/GetCashFlowForecastResponse")]
+        BManagedClient.BMsrv.ProfitLoss[] GetCashFlowForecast(int ownerId, int months, string displayCurrency);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetCashFlowForecast", ReplyAction="http://tempuri.org/IService1/GetCashFlowForecastResponse")]
+        System.Threading.Tasks.Task<BManagedClient.BMsrv.ProfitLoss[]> GetCashFlowForecastAsync(int ownerId, int months, string displayCurrency);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/EnsureOverdueNotifications", ReplyAction="http://tempuri.org/IService1/EnsureOverdueNotificationsResponse")]
+        int EnsureOverdueNotifications(int ownerId);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/EnsureOverdueNotifications", ReplyAction="http://tempuri.org/IService1/EnsureOverdueNotificationsResponse")]
+        System.Threading.Tasks.Task<int> EnsureOverdueNotificationsAsync(int ownerId);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetExchangeRate", ReplyAction="http://tempuri.org/IService1/GetExchangeRateResponse")]
         double GetExchangeRate(string from, string to, System.DateTime asOfDate);
         
@@ -2516,6 +2550,14 @@ namespace BManagedClient.BMsrv {
         
         public System.Threading.Tasks.Task UpdateUserProfileAsync(int userId, string email, string phone, string preferredCurrency) {
             return base.Channel.UpdateUserProfileAsync(userId, email, phone, preferredCurrency);
+        }
+        
+        public void SetBusinessType(int userId, string businessType) {
+            base.Channel.SetBusinessType(userId, businessType);
+        }
+        
+        public System.Threading.Tasks.Task SetBusinessTypeAsync(int userId, string businessType) {
+            return base.Channel.SetBusinessTypeAsync(userId, businessType);
         }
         
         public int AddCustomer(BManagedClient.BMsrv.Customer c) {
@@ -2924,6 +2966,22 @@ namespace BManagedClient.BMsrv {
         
         public System.Threading.Tasks.Task<BManagedClient.BMsrv.EmployeeRevenueRow[]> GetEmployeeRevenueReportAsync(int ownerId, string displayCurrency) {
             return base.Channel.GetEmployeeRevenueReportAsync(ownerId, displayCurrency);
+        }
+        
+        public BManagedClient.BMsrv.ProfitLoss[] GetCashFlowForecast(int ownerId, int months, string displayCurrency) {
+            return base.Channel.GetCashFlowForecast(ownerId, months, displayCurrency);
+        }
+        
+        public System.Threading.Tasks.Task<BManagedClient.BMsrv.ProfitLoss[]> GetCashFlowForecastAsync(int ownerId, int months, string displayCurrency) {
+            return base.Channel.GetCashFlowForecastAsync(ownerId, months, displayCurrency);
+        }
+        
+        public int EnsureOverdueNotifications(int ownerId) {
+            return base.Channel.EnsureOverdueNotifications(ownerId);
+        }
+        
+        public System.Threading.Tasks.Task<int> EnsureOverdueNotificationsAsync(int ownerId) {
+            return base.Channel.EnsureOverdueNotificationsAsync(ownerId);
         }
         
         public double GetExchangeRate(string from, string to, System.DateTime asOfDate) {
