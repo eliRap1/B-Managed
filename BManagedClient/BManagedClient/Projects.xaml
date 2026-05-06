@@ -99,13 +99,8 @@
                                 <GridViewColumn Header="Due"      DisplayMemberBinding="{Binding DueDate, StringFormat=dd/MM/yyyy}" Width="100"/>
                                 <GridViewColumn Header="Budget"   DisplayMemberBinding="{Binding TotalBudget, StringFormat=N2}"     Width="100"/>
                                 <GridViewColumn Header="Currency" DisplayMemberBinding="{Binding Currency}" Width="70"/>
-                                <GridViewColumn Header="Employee" Width="120">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding AssignedEmployeeId, StringFormat='Emp #{0}', TargetNullValue='—'}"/>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
+                                <GridViewColumn Header="Employees" Width="220"
+                                                DisplayMemberBinding="{Binding AssigneesText}"/>
                             </GridView>
                         </ListView.View>
                     </ListView>

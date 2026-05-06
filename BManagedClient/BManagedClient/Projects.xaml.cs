@@ -8,6 +8,19 @@ using System.Windows.Media;
 
 namespace BManagedClient
 {
+    /// <summary>Wrapper that adds a comma-joined assignee column to the row.</summary>
+    public class ProjectRow
+    {
+        public Project Project { get; set; }
+        public int      Id            => Project.Id;
+        public string   Title         => Project.Title;
+        public string   Status        => Project.Status;
+        public DateTime? DueDate      => Project.DueDate;
+        public decimal  TotalBudget   => Project.TotalBudget;
+        public string   Currency      => Project.Currency;
+        public string   AssigneesText { get; set; } = "—";
+    }
+
     public partial class Projects : Page
     {
         private List<Customer> _customers = new();
@@ -71,7 +84,32 @@ namespace BManagedClient
                 {
                     arr = ServiceGateway.Use(s => s.GetProjectsByStatus(status, LogIn.sign.Id));
                 }
-                projectsList.ItemsSource = arr;
+
+                // Wrap each project with its assignees so the grid can show
+                // multiple employees per row (joined by comma).
+                var rows = new List<ProjectRow>();
+                foreach (var p in arr)
+                {
+                    var row = new ProjectRow { Project = p };
+                    try
+                    {
+                        var assignees = ServiceGateway.Use(c => c.GetProjectAssignees(p.Id));
+                        if (assignees != null && assignees.Length > 0)
+                        {
+                            row.AssigneesText = string.Join(", ",
+                                assignees.Select(u => u.Username));
+                        }
+                        else if (p.AssignedEmployeeId.HasValue)
+                        {
+                            // Legacy single-assign fallback
+                            var u = _employees.FirstOrDefault(x => x.Id == p.AssignedEmployeeId.Value);
+                            row.AssigneesText = u?.Username ?? ("#" + p.AssignedEmployeeId.Value);
+                        }
+                    }
+                    catch { }
+                    rows.Add(row);
+                }
+                projectsList.ItemsSource = rows;
             }
             catch (Exception ex) { MessageBox.Show("Load failed: " + ex.Message); }
         }
@@ -80,7 +118,8 @@ namespace BManagedClient
 
         private void Project_Selected(object s, SelectionChangedEventArgs e)
         {
-            _selected = projectsList.SelectedItem as Project;
+            // Items in the list are ProjectRow wrappers; unwrap to the inner Project.
+            _selected = (projectsList.SelectedItem as ProjectRow)?.Project;
             if (_selected == null)
             {
                 selTitle.Text = "Select a project on the left.";
@@ -149,6 +188,7 @@ namespace BManagedClient
                 ServiceGateway.Use(c => c.AddProjectAssignment(_selected.Id, empId));
                 ShowOk("Employee added.");
                 ReloadAssignees();
+                Refresh();   // refresh main table so the Employees column updates
             }
             catch (Exception ex) { ShowErr("Assign failed: " + ex.Message); }
         }
@@ -163,6 +203,7 @@ namespace BManagedClient
                     ServiceGateway.Use(c => c.RemoveProjectAssignment(_selected.Id, empId));
                     ShowOk("Employee removed.");
                     ReloadAssignees();
+                    Refresh();
                 }
                 catch (Exception ex) { ShowErr("Remove failed: " + ex.Message); }
             }
