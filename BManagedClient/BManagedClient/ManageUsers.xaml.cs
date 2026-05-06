@@ -1,4 +1,4 @@
-using BManagedClient.bsrv;
+using BManagedClient.BMsrv;
 using System;
 using System.Linq;
 using System.Windows;

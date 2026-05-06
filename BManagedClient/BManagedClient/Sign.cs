@@ -1,4 +1,4 @@
-using BManagedClient.bsrv;
+using BManagedClient.BMsrv;
 using System;
 
 namespace BManagedClient
