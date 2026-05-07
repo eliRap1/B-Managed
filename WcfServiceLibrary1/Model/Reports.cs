@@ -138,4 +138,20 @@ namespace Model
         [DataMember] public string Currency      { get; set; }
         [DataMember] public string Status        { get; set; }
     }
+
+    /// <summary>Bundles every read /Owner/Reports needs for one round-trip.</summary>
+    [DataContract]
+    public class ReportsSnapshot
+    {
+        [DataMember] public VatSummary Vat { get; set; }
+        [DataMember] public List<CustomerRevenueRow> TopCustomers { get; set; } = new List<CustomerRevenueRow>();
+        [DataMember] public List<ExpenseBreakdownRow> ExpenseBreakdown { get; set; } = new List<ExpenseBreakdownRow>();
+        [DataMember] public ProfitLoss MonthPl { get; set; }
+        [DataMember] public ProfitLoss YearPl  { get; set; }
+        [DataMember] public AnalyticsKpis Kpis { get; set; }
+        [DataMember] public LoanSummary LoanSummary { get; set; }
+        [DataMember] public string  BusinessType { get; set; }
+        [DataMember] public bool    IsZair { get; set; }
+        [DataMember] public string  DisplayCurrency { get; set; } = "ILS";
+    }
 }

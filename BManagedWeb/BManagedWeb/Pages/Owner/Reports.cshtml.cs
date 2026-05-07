@@ -80,54 +80,34 @@ namespace BManagedWeb.Pages.Owner
 
             try
             {
-                Vat = _srv.GetVatSummary(id, Year, Month, DisplayCurrency) ?? new VatSummary();
-                var tc = _srv.GetTopCustomersByRevenue(id, DisplayCurrency);
-                if (tc != null) TopCustomers = new List<CustomerRevenueRow>(tc);
-                var first = new DateTime(Year, Month, 1);
-                var last  = first.AddMonths(1).AddDays(-1);
-                var bd = _srv.GetExpenseBreakdown(id, first, last, DisplayCurrency);
-                if (bd != null) ExpenseBreakdown = new List<ExpenseBreakdownRow>(bd);
-
-                // P&L — month + full year (year is needed for progressive tax bracket calc)
-                MonthPl = _srv.GetProfitLoss(id, first, last, DisplayCurrency) ?? new ProfitLoss();
-                var yearStart = new DateTime(Year, 1, 1);
-                var yearEnd   = new DateTime(Year, 12, 31);
-                YearPl = _srv.GetProfitLoss(id, yearStart, yearEnd, DisplayCurrency) ?? new ProfitLoss();
-
-                // Israeli osek model (2026):
-                //   BusinessType drives VAT obligation:
-                //     "Patur"      — revenue ≤ ~120k ₪/yr, NO VAT collected, NO VAT deductible.
-                //     "Murshe"     — 18 % VAT both directions, filed on Form 836/874.
-                //     "Individual" — no VAT filing.
-                //
-                //   IsZair is a separate income-tax status (חישוב נורמטיבי) introduced
-                //   in 2024. It can apply to Patur OR Murshe whose annual revenue
-                //   ≤ ~122,833 ₪. When on, taxable profit = revenue × 70 % (flat 30 %
-                //   deemed-expenses, no receipts). Real expenses are ignored for
-                //   income-tax purposes while Zair is active.
-                try
+                // Single bundled call — replaces 7+ separate SOAP ops
+                // (GetVatSummary, GetTopCustomersByRevenue, GetExpenseBreakdown,
+                // 2× GetProfitLoss, GetAdvancedKpis, GetLoanSummary,
+                // GetUserById). The page used to take long enough that some
+                // browsers showed 'site can't be reached' on slow channels.
+                var snap = _srv.GetReportsSnapshot(id, Year, Month, DisplayCurrency);
+                if (snap != null)
                 {
-                    var u = _srv.GetUserById(id);
-                    if (u != null)
-                    {
-                        if (!string.IsNullOrEmpty(u.BusinessType)) BusinessType = u.BusinessType;
-                        IsZair = u.IsZair;
-                    }
+                    Vat              = snap.Vat ?? new VatSummary();
+                    TopCustomers     = (snap.TopCustomers     ?? new CustomerRevenueRow[0]).ToList();
+                    ExpenseBreakdown = (snap.ExpenseBreakdown ?? new ExpenseBreakdownRow[0]).ToList();
+                    MonthPl          = snap.MonthPl ?? new ProfitLoss();
+                    YearPl           = snap.YearPl  ?? new ProfitLoss();
+                    Kpis             = snap.Kpis        ?? new AnalyticsKpis();
+                    LoanSummary      = snap.LoanSummary ?? new LoanSummary();
+                    BusinessType     = string.IsNullOrEmpty(snap.BusinessType) ? "Individual" : snap.BusinessType;
+                    IsZair           = snap.IsZair;
                 }
-                catch { }
 
-                // Tax base
+                // Tax-base + tax-note logic stays page-side because it depends
+                // on the *displayed* values (the snapshot ships raw figures).
                 if (IsZair && YearPl.Income <= ZairThreshold)
-                    TaxableProfit = Math.Round(YearPl.Income * 0.70m, 2);   // 70 % of revenue
+                    TaxableProfit = Math.Round(YearPl.Income * 0.70m, 2);
                 else
-                    TaxableProfit = YearPl.Profit;                          // real income − real expenses
+                    TaxableProfit = YearPl.Profit;
 
-                // Patur revenue threshold warning (must re-register as Murshe if crossed)
                 PaturOverThreshold = BusinessType == "Patur" && YearPl.Income > PaturThreshold;
-
-                // Mark-VAT-paid only makes sense for Murshe — Patur / Individual have no
-                // periodic VAT settlement to record.
-                ShowMarkVatPaid = BusinessType == "Murshe";
+                ShowMarkVatPaid    = BusinessType == "Murshe";
 
                 TaxNote = BusinessType switch
                 {
@@ -135,7 +115,6 @@ namespace BManagedWeb.Pages.Owner
                     "Murshe" => "Osek Murshe — collects 18 % VAT on sales (Form 836/874) and deducts 18 % on qualifying expenses. Income tax is computed on net-of-VAT amounts both ways.",
                     _        => "Individual — no VAT filing.",
                 };
-
                 if (IsZair)
                 {
                     ZairNote = YearPl.Income <= ZairThreshold
@@ -145,10 +124,6 @@ namespace BManagedWeb.Pages.Owner
 
                 YearTax = ComputeIsraeliIncomeTax(TaxableProfit);
                 YearNet = YearPl.Profit - YearTax;
-
-                // Composite KPI scorecard + loan exposure
-                try { Kpis        = _srv.GetAdvancedKpis(id, DisplayCurrency) ?? new AnalyticsKpis(); } catch { }
-                try { LoanSummary = _srv.GetLoanSummary(id, DisplayCurrency) ?? new LoanSummary(); }    catch { }
             }
             catch { }
             return Page();

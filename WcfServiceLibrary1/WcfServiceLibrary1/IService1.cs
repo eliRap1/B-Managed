@@ -179,6 +179,8 @@ namespace WcfServiceLibrary1
         // concentration + trailing-3-month flow + runway. Used by Reports +
         // Owner Home dashboards.
         [OperationContract] AnalyticsKpis GetAdvancedKpis(int ownerId, string displayCurrency);
+        /// <summary>Single payload for /Owner/Reports — replaces ~7 calls.</summary>
+        [OperationContract] ReportsSnapshot GetReportsSnapshot(int ownerId, int year, int month, string displayCurrency);
         [OperationContract] OwnerDashboardSnapshot GetOwnerDashboardSnapshot(int ownerId, string displayCurrency);
 
         // ==================== LOANS (קרן / business loans) ====================

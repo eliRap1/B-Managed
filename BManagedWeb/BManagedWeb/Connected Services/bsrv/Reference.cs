@@ -276,6 +276,21 @@ namespace BManagedWeb.bsrv
     }
 
     [DataContract(Namespace = "http://schemas.datacontract.org/2004/07/Model")]
+    public class ReportsSnapshot
+    {
+        [DataMember] public VatSummary Vat { get; set; }
+        [DataMember] public CustomerRevenueRow[] TopCustomers { get; set; }
+        [DataMember] public ExpenseBreakdownRow[] ExpenseBreakdown { get; set; }
+        [DataMember] public ProfitLoss MonthPl { get; set; }
+        [DataMember] public ProfitLoss YearPl { get; set; }
+        [DataMember] public AnalyticsKpis Kpis { get; set; }
+        [DataMember] public LoanSummary LoanSummary { get; set; }
+        [DataMember] public string BusinessType { get; set; }
+        [DataMember] public bool IsZair { get; set; }
+        [DataMember] public string DisplayCurrency { get; set; }
+    }
+
+    [DataContract(Namespace = "http://schemas.datacontract.org/2004/07/Model")]
     public class Loan : Base
     {
         [DataMember] public int OwnerId { get; set; }
@@ -427,6 +442,7 @@ namespace BManagedWeb.bsrv
 
         [OperationContract] ProfitLoss[] GetCashFlowForecast(int ownerId, int months, string displayCurrency);
         [OperationContract] AnalyticsKpis GetAdvancedKpis(int ownerId, string displayCurrency);
+        [OperationContract] ReportsSnapshot GetReportsSnapshot(int ownerId, int year, int month, string displayCurrency);
         [OperationContract] OwnerDashboardSnapshot GetOwnerDashboardSnapshot(int ownerId, string displayCurrency);
 
         [OperationContract] int  AddLoan(Loan l);
@@ -589,6 +605,7 @@ namespace BManagedWeb.bsrv
         public ProfitLoss[] GetCashFlowForecast(int o, int m, string c)
             => Channel.GetCashFlowForecast(o, m, c);
         public AnalyticsKpis GetAdvancedKpis(int o, string c) => Channel.GetAdvancedKpis(o, c);
+        public ReportsSnapshot GetReportsSnapshot(int o, int y, int m, string c) => Channel.GetReportsSnapshot(o, y, m, c);
         public OwnerDashboardSnapshot GetOwnerDashboardSnapshot(int o, string c)
             => Channel.GetOwnerDashboardSnapshot(o, c);
 

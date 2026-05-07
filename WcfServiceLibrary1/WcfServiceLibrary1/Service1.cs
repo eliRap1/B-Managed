@@ -563,6 +563,35 @@ namespace WcfServiceLibrary1
         public AnalyticsKpis GetAdvancedKpis(int ownerId, string displayCurrency)
             => reportsDB.AdvancedKpis(ownerId, string.IsNullOrEmpty(displayCurrency) ? "ILS" : displayCurrency);
 
+        public ReportsSnapshot GetReportsSnapshot(int ownerId, int year, int month, string displayCurrency)
+        {
+            string cur = string.IsNullOrEmpty(displayCurrency) ? "ILS" : displayCurrency;
+            var first = new DateTime(year, month, 1);
+            var last  = first.AddMonths(1).AddDays(-1);
+            var yearStart = new DateTime(year, 1, 1);
+            var yearEnd   = new DateTime(year, 12, 31);
+
+            var snap = new ReportsSnapshot { DisplayCurrency = cur };
+            try { snap.Vat              = reportsDB.VatSummary(ownerId, year, month, cur); } catch { }
+            try { snap.TopCustomers     = reportsDB.TopCustomersByRevenue(ownerId, cur); } catch { }
+            try { snap.ExpenseBreakdown = reportsDB.ExpenseBreakdown(ownerId, first, last, cur); } catch { }
+            try { snap.MonthPl          = reportsDB.ProfitLoss(ownerId, first, last, cur); } catch { }
+            try { snap.YearPl           = reportsDB.ProfitLoss(ownerId, yearStart, yearEnd, cur); } catch { }
+            try { snap.Kpis             = reportsDB.AdvancedKpis(ownerId, cur); } catch { }
+            try { snap.LoanSummary      = GetLoanSummary(ownerId, cur); } catch { }
+            try
+            {
+                var u = userDB.GetById(ownerId);
+                if (u != null)
+                {
+                    snap.BusinessType = string.IsNullOrEmpty(u.BusinessType) ? "Individual" : u.BusinessType;
+                    snap.IsZair = u.IsZair;
+                }
+            }
+            catch { }
+            return snap;
+        }
+
         public OwnerDashboardSnapshot GetOwnerDashboardSnapshot(int ownerId, string displayCurrency)
         {
             string cur = string.IsNullOrEmpty(displayCurrency) ? "ILS" : displayCurrency;
