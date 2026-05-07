@@ -428,27 +428,36 @@ namespace ViewDB
                 }
 
                 // --- Trailing 3 months: avg income / expenses / profit
+                // Cash-basis: count an invoice when the money actually came in
+                // (paidDate). Fall back to issueDate for legacy rows that were
+                // marked paid before paidDate was wired up.
                 DateTime threeAgo = new DateTime(today.AddMonths(-3).Year, today.AddMonths(-3).Month, 1);
                 DateTime now      = today;
                 decimal totIncome = 0m, totExp = 0m;
                 using (var cmd = new OleDbCommand(
-                    @"SELECT I.[subtotal] AS sub, I.[currency] AS cur, I.[issueDate] AS dt
+                    @"SELECT I.[subtotal] AS sub, I.[currency] AS cur,
+                             I.[paidDate] AS pd, I.[issueDate] AS iss
                       FROM [Invoices] AS I
                       INNER JOIN [Customers] AS C ON I.[customerId] = C.[id]
                       WHERE C.[ownerId] = ?
                         AND I.[status] = 'Paid'
-                        AND I.[issueDate] >= ? AND I.[issueDate] <= ?", conn))
+                        AND ( (I.[paidDate] >= ? AND I.[paidDate] <= ?)
+                           OR (I.[paidDate] IS NULL AND I.[issueDate] >= ? AND I.[issueDate] <= ?) )", conn))
                 {
-                    cmd.Parameters.Add(new OleDbParameter("@o", ownerId));
-                    cmd.Parameters.Add(new OleDbParameter("@f", threeAgo));
-                    cmd.Parameters.Add(new OleDbParameter("@t", now));
+                    cmd.Parameters.Add(new OleDbParameter("@o",  ownerId));
+                    cmd.Parameters.Add(new OleDbParameter("@f1", threeAgo));
+                    cmd.Parameters.Add(new OleDbParameter("@t1", now));
+                    cmd.Parameters.Add(new OleDbParameter("@f2", threeAgo));
+                    cmd.Parameters.Add(new OleDbParameter("@t2", now));
                     using (var r = cmd.ExecuteReader())
                     {
                         while (r.Read())
                         {
                             decimal sub = r["sub"] == DBNull.Value ? 0m : Convert.ToDecimal(r["sub"]);
                             string cur  = r["cur"]?.ToString() ?? "ILS";
-                            DateTime dt = Convert.ToDateTime(r["dt"]);
+                            DateTime dt = r["pd"] != DBNull.Value
+                                ? Convert.ToDateTime(r["pd"])
+                                : Convert.ToDateTime(r["iss"]);
                             totIncome += _fx.Convert(sub, cur, displayCurrency, dt);
                         }
                     }

@@ -26,7 +26,29 @@ namespace BManagedWeb.Pages
             { ErrorMessage = "Invalid username or password"; return Page(); }
 
             bool ok = _srv.CheckUserPassword(Username, Password);
-            if (!ok) { ErrorMessage = "Invalid username or password"; return Page(); }
+            if (!ok)
+            {
+                // VerifyPassword filters by [isActive]=true, so an unapproved
+                // Employee/Client gets the same 'wrong password' result as a
+                // real wrong-password attempt. Look up the user once more to
+                // tell them the actual reason.
+                try
+                {
+                    int probeId = _srv.GetUserId(Username);
+                    if (probeId > 0)
+                    {
+                        var probe = _srv.GetUserById(probeId);
+                        if (probe != null && !probe.IsActive)
+                        {
+                            ErrorMessage = "Account awaiting Owner approval. Ask the Owner of your company to approve you in Manage Users.";
+                            return Page();
+                        }
+                    }
+                }
+                catch { }
+                ErrorMessage = "Invalid username or password";
+                return Page();
+            }
 
             int id = _srv.GetUserId(Username);
             var user = _srv.GetUserById(id);
