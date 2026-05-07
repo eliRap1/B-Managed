@@ -48,6 +48,9 @@
 29. ולידציה צבעונית — מסגרות אדומות בכל שדה ואיתור שגיאות בזמן אמת
 30. עמוד הגדרות עסק (Owner Settings) — שם עסק, מע״מ, זעיר, סיבוב קוד הצטרפות
 31. ביצועים — ערוץ WCF משותף ומיעוט פתיחות חיבור
+32. Snapshot DTOs — איגוד 12+ קריאות SOAP ל-1 בלבד (Dashboard + Reports)
+33. יציבות שרת — תיקון BaseDB ושימוש בחיבור OleDb לכל קריאה
+34. תיקוני UX אחרונים — Routing, Login, Cash-basis KPIs, ופעולות *ForOwner
 
 ---
 
@@ -2574,4 +2577,279 @@ var user = ServiceGateway.Use(c =>
 
 ---
 
-**סוף הספר.** סך הכל **78 פעולות WCF**, **15 טבלאות**, **37 דפי UI** (16 WPF + 21 Web), **5 דו״חות**, 2 לקוחות, 2 שפות, 2 מטבעות. עדכון מאי 2026 הוסיף: VAT 18%, מודל עוסק תקין (Patur/Murshe + IsZair), הלוואות עסקיות (כולל קרן בערבות מדינה), אנליטיקה מתקדמת (Aging/Payment Lag/Concentration/Runway), הרשמת בעלים-ועובד דו-שלבית עם קודי הצטרפות, רב-דיירות בטוחה (OwnerId scoping), ולידציה צבעונית בכל הטפסים, עמוד הגדרות לבעלים עם סיבוב קוד, ושיפורי ביצועים משמעותיים (ערוץ WCF משותף).
+---
+
+# 33. Snapshot DTOs — איגוד 12+ קריאות SOAP ל-1 בלבד
+
+לאחר שהוספנו KPIs, Loans, ו-Cashflow Forecast, עמוד Owner Home ב-Web ביצע ב-`OnGet` למעלה מ-12 קריאות SOAP עוקבות (`GetCustomersForOwner`, `GetUnpaidInvoices`, `GetVatSummary`, `GetMonthlyTaxSetAside`, לולאת ‎6×‎`GetInvoicesByCustomer`, `GetExpenseBreakdown`, `GetProfitLoss`×2, `GetAdvancedKpis`, `GetLoanSummary`). כל קריאה נשאה תקורת ערוץ WCF + פתיחת חיבור OleDb. במצב ערוץ קר זה הצטבר ל-0.5–2 שניות לטעינה אחת. לעמוד Reports היה אותו דפוס: 7 קריאות. דפדפנים התחילו להציג "this site can't be reached".
+
+הפתרון: שני DTO חדשים שמרכזים את כל הקריאות לקרובי-נתונים אחד.
+
+## 33.1 OwnerDashboardSnapshot
+
+`WcfServiceLibrary1/Model/Reports.cs:104-145`:
+
+```csharp
+public class OwnerDashboardSnapshot
+{
+    public int CustomersCount { get; set; }
+    public int UnpaidCount { get; set; }
+    public int OverdueCount { get; set; }
+    public int ActiveProjectsCount { get; set; }
+    public int UnreadNotificationsCount { get; set; }
+    public List<ProfitLoss> CashFlowForecast { get; set; }
+    public AnalyticsKpis Kpis { get; set; }
+    public LoanSummary LoanSummary { get; set; }
+
+    // Rolled in May 2026 to absorb 5 more SOAP ops:
+    public decimal UnpaidTotal { get; set; }
+    public decimal VatDue { get; set; }
+    public decimal MonthlyTaxSetAside { get; set; }
+    public string  TopExpenseCategory { get; set; }
+    public decimal TopExpenseAmount { get; set; }
+    public decimal RevenueChangePct { get; set; }
+    public List<RecentInvoice> RecentInvoices { get; set; }
+
+    public string DisplayCurrency { get; set; }
+}
+```
+
+`Service1.GetOwnerDashboardSnapshot` מבצע את כל השאילתות בצד-השרת, באותו תהליך, על אותו OleDbConnection (אחרי תיקון BaseDB — ראה פרק 34). הקוד ב-`HomeModel.OnGet` הצטמצם מ-~70 שורות לקריאה אחת:
+
+```csharp
+var snap = _srv.GetOwnerDashboardSnapshot(id, Currency);
+if (snap != null)
+{
+    CustomersCount = snap.CustomersCount;
+    UnpaidCount    = snap.UnpaidCount;
+    UnpaidTotal    = snap.UnpaidTotal;
+    VatDue         = snap.VatDue;
+    /* ... */
+    Kpis  = snap.Kpis  ?? new AnalyticsKpis();
+    Loans = snap.LoanSummary ?? new LoanSummary();
+}
+```
+
+## 33.2 ReportsSnapshot
+
+`WcfServiceLibrary1/Model/Reports.cs:147-160`:
+
+```csharp
+public class ReportsSnapshot
+{
+    public VatSummary Vat { get; set; }
+    public List<CustomerRevenueRow> TopCustomers { get; set; }
+    public List<ExpenseBreakdownRow> ExpenseBreakdown { get; set; }
+    public ProfitLoss MonthPl { get; set; }
+    public ProfitLoss YearPl  { get; set; }
+    public AnalyticsKpis Kpis { get; set; }
+    public LoanSummary LoanSummary { get; set; }
+    public string  BusinessType { get; set; }
+    public bool    IsZair { get; set; }
+    public string  DisplayCurrency { get; set; }
+}
+```
+
+`Service1.GetReportsSnapshot(ownerId, year, month, currency)` ממלא את כולו בקריאה אחת. ב-`Pages/Owner/Reports.cshtml.cs` 7 קריאות הוחלפו בקריאה אחת + הלוגיקה של מס הכנסה (TaxNote, Patur threshold, IsZair note) נשארת בצד הדף כי היא רק עיצוב טקסט מערכים שכבר חזרו.
+
+## 33.3 תוצאה
+
+| עמוד | לפני | אחרי |
+|------|------|------|
+| `/Owner/Home`    | 12+ SOAP ops | **1 SOAP op** |
+| `/Owner/Reports` | 7 SOAP ops   | **1 SOAP op** |
+| `WPF Reports`    | 6 SOAP ops (כבר אוגדו תחת `ServiceGateway.Use`) | אין שינוי — כבר מאוחד |
+
+נוסף לכך, גם פעולה כמו "Mark Invoice Paid" שהיא mutation אחת לא מושפעת — רק עמודי ה-Read-heavy.
+
+---
+
+# 34. יציבות שרת — תיקון BaseDB ושימוש בחיבור OleDb לכל קריאה
+
+## 34.1 הבעיה
+
+`BaseDB` החזיק שלושה שדות-מופע משותפים:
+
+```csharp
+protected OleDbConnection connection;
+protected OleDbCommand command;
+protected OleDbDataReader reader;
+```
+
+`Service1` בברירת מחדל הוא `PerSession`. כלומר אותו מופע של `Service1` (ובתוכו אותם מופעי `UserDB`, `InvoiceDB`, `ReportsDB` וכו') מטפל במספר קריאות SOAP מאותו לקוח. שתי קריאות עוקבות באותו session — או גרוע מזה, שתי שאילתות פנימיות בתוך אותה שיטת snapshot — נכנסו לאותם שדות:
+
+* קריאה A פתחה connection, ביצעה SELECT, התחילה לקרוא דרך `reader`.
+* קריאה B דרסה את `command.CommandText` ו-`command.Parameters`.
+* קריאה A קרסה כש-`reader` שלה כבר לא היה בתוקף.
+
+התוצאה ב-VS Output:
+
+```
+Exception thrown: 'System.Data.OleDb.OleDbException' in System.Data.dll
+Exception thrown: 'System.Data.OleDb.OleDbException' in System.Data.dll
+Exception thrown: 'System.Data.OleDb.OleDbException' in System.Data.dll
+...
+The thread XXXX has exited with code 0 (0x0).
+```
+
+ה-host (`WcfSvcHost.exe`) הצטבר חריגות ראשון-מקרה עד שהקרי dispatcher ביטל את ה-channel ופירק את עצמו. כל לחיצה ב-Web שהפעילה כמה פעולות פנימיות (Snapshot!) הרגה את השרת.
+
+## 34.2 התיקון
+
+`WcfServiceLibrary1/ViewDB/BaseDB.cs:82-130` — כל פעולה (`Select`, `SelectReview`, `SelectScalar`, `SaveChanges`) פותחת חיבור משלה בתוך בלוק `using`:
+
+```csharp
+protected virtual List<Base> Select(string sqlCommandTxt, params OleDbParameter[] parameters)
+{
+    List<Base> list = new List<Base>();
+    using (var conn = GetConnection())
+    using (var cmd  = new OleDbCommand(sqlCommandTxt, conn))
+    {
+        if (parameters != null && parameters.Length > 0)
+            cmd.Parameters.AddRange(parameters);
+        try
+        {
+            conn.Open();
+            using (var rd = cmd.ExecuteReader())
+            {
+                // Bind legacy fields so existing CreateModel(reader[...]) calls work.
+                connection = conn; command = cmd; reader = rd;
+                while (rd.Read())
+                {
+                    Base entity = NewEntity();
+                    CreateModel(entity);
+                    list.Add(entity);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                "Select failed: " + sqlCommandTxt + "  ::  " + ex.Message, ex);
+        }
+        finally { reader = null; command = null; connection = null; }
+    }
+    return list;
+}
+```
+
+נקודות חשובות:
+
+1. **`using` מבטיח Dispose גם בזריקת חריגה** — ה-channel תמיד נסגר ולא דולף.
+2. השדות הישנים `connection`/`command`/`reader` עדיין קיימים ומאוכלסים בזמן הקריאה הספציפית, כך שתת-מחלקות שכותבות `reader["fieldName"]` בתוך `CreateModel` ממשיכות לעבוד ללא שינוי.
+3. כל שאילתה מקבלת חיבור חדש מ-`GetConnection()` שיוצר `OleDbConnection` חדש — נבנה רק מסיגרת מחרוזת, ללא תקורה אמיתית.
+
+## 34.3 שיפור דיאגנוסטיקה
+
+החריגה כעת מקבלת גם את הודעת ה-OleDb הפנימית:
+
+```csharp
+throw new InvalidOperationException(
+    "Select failed: " + sqlCommandTxt + "  ::  " + ex.Message, ex);
+```
+
+לפני התיקון, `FaultException` חצה את ה-WCF wire וההודעה הפנימית הוסתרה. הלקוח ראה רק "Select failed: SELECT * FROM ..." בלי להבין למה. עכשיו הוא רואה את ההודעה האמיתית מ-Microsoft.ACE.OLEDB.12.0 (למשל "column not found", "file is locked").
+
+---
+
+# 35. תיקוני UX אחרונים — Routing, Login, Cash-basis KPIs, ופעולות *ForOwner
+
+## 35.1 ניתוב חשבוניות — `asp-route-id=""`
+
+עמוד `/Owner/Invoices/{id?}` בנוי על route עם פרמטר id אופציונלי. כשמשתמש יצר חשבונית והגיע ל-`/Owner/Invoices/123`, לחיצה על קישור Invoices ב-nav (עם `asp-page="/Owner/Invoices"` בלבד) נשארה ב-`/123` כי ASP.NET Core ממחזר את ערך-הסביבה (ambient route value).
+
+תיקון:
+
+`Pages/Shared/_Layout.cshtml`:
+
+```html
+<a asp-page="/Owner/Invoices" asp-route-id="" ...>
+```
+
+וכן הכפתור "Back to all invoices" בתוך עמוד Detail. הוספת `asp-route-id=""` מפורשת מורידה את ערך-הסביבה ומחזירה את ה-URL ל-`/Owner/Invoices` שמטעין את רשימת החשבוניות.
+
+## 35.2 הודעת שגיאה ברורה לעובד שלא אושר
+
+`VerifyPassword` ב-`UserDB` מסנן `[isActive]=true`. עובד שנרשם לפי קוד הצטרפות נשאר `IsActive=false` עד שבעלים מאשר אותו. הכניסה לעובד שלא אושר נכשלה עם ההודעה הגנרית "Invalid username or password" — בדיוק כמו סיסמה שגויה. המשתמש לא הבין למה הוא לא נכנס.
+
+`Pages/Login.cshtml.cs`:
+
+```csharp
+bool ok = _srv.CheckUserPassword(Username, Password);
+if (!ok)
+{
+    try
+    {
+        int probeId = _srv.GetUserId(Username);
+        if (probeId > 0)
+        {
+            var probe = _srv.GetUserById(probeId);
+            if (probe != null && !probe.IsActive)
+            {
+                ErrorMessage = "Account awaiting Owner approval. Ask the Owner of your company to approve you in Manage Users.";
+                return Page();
+            }
+        }
+    }
+    catch { }
+    ErrorMessage = "Invalid username or password";
+    return Page();
+}
+```
+
+ההודעה הספציפית מופיעה רק אם המשתמש קיים ולא פעיל — כדי לא לחשוף "המשתמש לא קיים" לתוקף. לסיסמה שגויה על חשבון פעיל, הודעה גנרית כרגיל.
+
+## 35.3 KPIs על בסיס מזומן — paidDate ולא issueDate
+
+המשתמש דיווח על בעיה: הכנסות שנתיות 6,180 ₪ והוצאות 722 ₪, אבל הטיילים של "ממוצע חודשי 3 חודשים אחרונים" הראו 0/0/0. הסיבה: `ReportsDB.AdvancedKpis` סינן את התקופה לפי `I.[issueDate] >= threeAgo`. חשבונית שהונפקה בינואר ושולמה רק במאי הוצאה החוצה — הכסף הגיע בתוך החלון, אבל ההנפקה לא.
+
+`ViewDB/ReportsDB.cs:430-465` — שינוי ל-cash basis:
+
+```sql
+WHERE C.[ownerId] = ?
+  AND I.[status] = 'Paid'
+  AND ( (I.[paidDate] >= ? AND I.[paidDate] <= ?)
+     OR (I.[paidDate] IS NULL AND I.[issueDate] >= ? AND I.[issueDate] <= ?) )
+```
+
+הסינון הראשי הוא `paidDate` (כשהכסף הגיע). חזרה ל-`issueDate` רק לרשומות ישנות שלא נשמרה להן `paidDate` (לפני שהשדה היה מחוּוַט). זה גם תיקון מתודולוגי: דו"ח תזרים מזומנים אמור לעקוב אחרי תאריכי תשלום בפועל, לא תאריך הנפקה.
+
+## 35.4 פעולות *ForOwner — שכבת tenancy מפורשת
+
+הוספנו זוג שכבות-tenancy לכל פעולת CRUD שמקבלת id של רשומה אחרת:
+
+```csharp
+private void RequireCustomerOwner(int customerId, int ownerId)
+{
+    if (!custDB.BelongsToOwner(customerId, ownerId))
+        throw new FaultException("Customer does not belong to this owner.");
+}
+private void RequireProjectOwner(int projectId, int ownerId)   { /* ... */ }
+private void RequireInvoiceOwner(int invoiceId, int ownerId)   { /* ... */ }
+private void RequireEmployeeOwner(int employeeId, int ownerId) { /* ... */ }
+```
+
+ולכל מתודה כמו `CreateInvoice` ו-`UpdateProject` נוספה גרסת `*ForOwner(...)` שמקבלת `ownerId` ובודקת שייכות לפני העדכון:
+
+| ישנה | חדשה (tenant-safe) |
+|--------|---------------------|
+| `CreateInvoice(Invoice)` | `CreateInvoiceForOwner(Invoice, int ownerId)` |
+| `AddInvoiceLine(InvoiceLine)` | `AddInvoiceLineForOwner(InvoiceLine, int ownerId)` |
+| `UpdateInvoiceStatus(int, string)` | `UpdateInvoiceStatusForOwner(int, int ownerId, string)` |
+| `MarkInvoicePaid(int, DateTime)` | `MarkInvoicePaidForOwner(int, int ownerId, DateTime)` |
+| `GetInvoiceById(int)` | `GetInvoiceByIdForOwner(int, int ownerId)` |
+| `GetInvoiceLines(int)` | `GetInvoiceLinesForOwner(int, int ownerId)` |
+| `GenerateInvoicePdf(int)` | `GenerateInvoicePdfForOwner(int, int ownerId)` |
+| `AddProject` | `AddProjectForOwner(Project, int ownerId)` |
+| `SetProjectStatus(int, string)` | `SetProjectStatusForOwner(int, int ownerId, string)` |
+| `GetProjectById(int)` | `GetProjectByIdForOwner(int, int ownerId)` |
+| `AddProjectAssignment(int, int)` | `AddProjectAssignmentForOwner(int, int ownerId, int)` |
+| `RemoveProjectAssignment` | `RemoveProjectAssignmentForOwner(...)` |
+| `GetCustomerById(int)` | `GetCustomerByIdForOwner(int, int ownerId)` |
+| `UpdateCustomer / DeleteCustomer` | `UpdateCustomerForOwner / DeleteCustomerForOwner` |
+
+ה-UI עברה לקרוא לגרסאות *ForOwner. הגרסאות הישנות נשארות ב-Contract לתאימות לאחור (seed admin, מיגרציה) אבל מתועדות "DEPRECATED — not tenant-safe".
+
+---
+
+**סוף הספר.** סך הכל **80+ פעולות WCF**, **15 טבלאות**, **37 דפי UI** (16 WPF + 21 Web), **5 דו״חות** (כולל KPIs ו-Loan Summary), 2 לקוחות, 2 שפות, 2 מטבעות. עדכון מאי 2026 הוסיף: VAT 18%, מודל עוסק תקין (Patur/Murshe + IsZair), הלוואות עסקיות (כולל קרן בערבות מדינה), אנליטיקה מתקדמת (Aging/Payment Lag/Concentration/Runway), הרשמת בעלים-ועובד דו-שלבית עם קודי הצטרפות, רב-דיירות בטוחה (OwnerId scoping + פעולות *ForOwner), ולידציה צבעונית בכל הטפסים, עמוד הגדרות לבעלים עם סיבוב קוד, שיפורי ביצועים משמעותיים (ערוץ WCF משותף, snapshot DTOs), ותיקון יציבות שרת בשכבת BaseDB.
