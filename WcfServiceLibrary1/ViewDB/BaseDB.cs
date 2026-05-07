@@ -37,6 +37,12 @@ namespace ViewDB
     public abstract class BaseDB
     {
         private static string connectionString = null;
+
+        // Shared instance fields kept ONLY for backwards-compat with subclasses
+        // that read `reader["col"]` inside CreateModel. Each Select() now binds
+        // them locally per call so concurrent SOAP calls don't trip over each
+        // other (pre-fix the WCF host would crash under load because two
+        // threads shared the same OleDbCommand + reader).
         protected OleDbConnection connection;
         protected OleDbCommand command;
         protected OleDbDataReader reader;
@@ -45,9 +51,8 @@ namespace ViewDB
 
         public BaseDB()
         {
-            connection = GetConnection();
-            command = new OleDbCommand();
-            command.Connection = connection;
+            // Don't pre-open anything. Each query method opens its own
+            // connection + command + reader and closes them in finally.
         }
 
         public static OleDbConnection GetConnection()
@@ -82,39 +87,42 @@ namespace ViewDB
         protected virtual List<Base> Select(string sqlCommandTxt, params OleDbParameter[] parameters)
         {
             List<Base> list = new List<Base>();
-            try
+            // Per-call connection + command + reader. The instance fields
+            // `connection`, `command`, `reader` are also bound here so that
+            // CreateModel(entity) inside subclasses (which reads reader[...])
+            // keeps working without per-subclass changes.
+            using (var conn = GetConnection())
+            using (var cmd  = new OleDbCommand(sqlCommandTxt, conn))
             {
-                connection.Open();
-                command.CommandText = sqlCommandTxt;
-                command.Parameters.Clear();
-
-                // Add parameters if provided
                 if (parameters != null && parameters.Length > 0)
+                    cmd.Parameters.AddRange(parameters);
+                try
                 {
-                    command.Parameters.AddRange(parameters);
+                    conn.Open();
+                    using (var rd = cmd.ExecuteReader())
+                    {
+                        // Wire the legacy fields so CreateModel(reader[...]) works.
+                        connection = conn;
+                        command    = cmd;
+                        reader     = rd;
+                        while (rd.Read())
+                        {
+                            Base entity = NewEntity();
+                            CreateModel(entity);
+                            list.Add(entity);
+                        }
+                    }
                 }
-
-                reader = command.ExecuteReader();
-
-                while (reader.Read())
+                catch (Exception ex)
                 {
-                    Base entity = NewEntity();
-                    CreateModel(entity);
-                    list.Add(entity);
+                    System.Diagnostics.Debug.WriteLine("Select Error: " + ex.Message);
+                    throw new InvalidOperationException(
+                        "Select failed: " + sqlCommandTxt + "  ::  " + ex.Message, ex);
                 }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Select Error: " + ex.Message);
-                throw new InvalidOperationException(
-                    "Select failed: " + sqlCommandTxt + "  ::  " + ex.Message, ex);
-            }
-            finally
-            {
-                if (reader != null)
-                    reader.Close();
-                if (connection.State == ConnectionState.Open)
-                    connection.Close();
+                finally
+                {
+                    reader = null; command = null; connection = null;
+                }
             }
             return list;
         }
@@ -125,35 +133,26 @@ namespace ViewDB
         protected virtual List<string> SelectReview(string sqlCommandTxt, params OleDbParameter[] parameters)
         {
             List<string> list = new List<string>();
-            try
+            using (var conn = GetConnection())
+            using (var cmd  = new OleDbCommand(sqlCommandTxt, conn))
             {
-                connection.Open();
-                command.CommandText = sqlCommandTxt;
-                command.Parameters.Clear();
-
                 if (parameters != null && parameters.Length > 0)
+                    cmd.Parameters.AddRange(parameters);
+                try
                 {
-                    command.Parameters.AddRange(parameters);
+                    conn.Open();
+                    using (var rd = cmd.ExecuteReader())
+                    {
+                        while (rd.Read())
+                            list.Add(rd["Rewiew"].ToString());
+                    }
                 }
-
-                reader = command.ExecuteReader();
-
-                while (reader.Read())
+                catch (Exception ex)
                 {
-                    list.Add(reader["Rewiew"].ToString());
+                    System.Diagnostics.Debug.WriteLine("SelectReview Error: " + ex.Message);
+                    throw new InvalidOperationException(
+                        "SelectReview failed: " + sqlCommandTxt + "  ::  " + ex.Message, ex);
                 }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("SelectReview Error: " + ex.Message);
-                throw new InvalidOperationException("SelectReview failed: " + sqlCommandTxt, ex);
-            }
-            finally
-            {
-                if (reader != null)
-                    reader.Close();
-                if (connection.State == ConnectionState.Open)
-                    connection.Close();
             }
             return list;
         }
@@ -164,40 +163,22 @@ namespace ViewDB
         protected int SaveChanges(string commandText, params OleDbParameter[] parameters)
         {
             int records = 0;
-            OleDbCommand cmd = new OleDbCommand();
-            try
+            using (var conn = GetConnection())
+            using (var cmd  = new OleDbCommand(commandText, conn))
             {
-                cmd.Connection = connection;
-                cmd.CommandText = commandText;
-                cmd.Parameters.Clear();
-
                 if (parameters != null && parameters.Length > 0)
-                {
                     cmd.Parameters.AddRange(parameters);
-                    // Log parameter values for debugging
-                    System.Diagnostics.Debug.WriteLine($"SaveChanges: Executing with {parameters.Length} parameters");
-                    for (int i = 0; i < parameters.Length; i++)
-                    {
-                        var p = parameters[i];
-                        System.Diagnostics.Debug.WriteLine($"  Param[{i}]: {p.ParameterName} = {p.Value} (Type: {p.OleDbType})");
-                    }
+                try
+                {
+                    conn.Open();
+                    records = cmd.ExecuteNonQuery();
                 }
-
-                connection.Open();
-                records = cmd.ExecuteNonQuery();
-                System.Diagnostics.Debug.WriteLine($"SaveChanges: Successfully affected {records} row(s)");
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine($"SaveChanges Error: {e.Message}");
-                System.Diagnostics.Debug.WriteLine($"SQL: {cmd.CommandText}");
-                System.Diagnostics.Debug.WriteLine($"Stack Trace: {e.StackTrace}");
-                throw new InvalidOperationException("SaveChanges failed: " + commandText, e);
-            }
-            finally
-            {
-                if (connection.State == ConnectionState.Open)
-                    connection.Close();
+                catch (Exception e)
+                {
+                    System.Diagnostics.Debug.WriteLine($"SaveChanges Error: {e.Message}");
+                    throw new InvalidOperationException(
+                        "SaveChanges failed: " + commandText + "  ::  " + e.Message, e);
+                }
             }
             return records;
         }
@@ -207,29 +188,22 @@ namespace ViewDB
         /// </summary>
         protected object SelectScalar(string query, params OleDbParameter[] parameters)
         {
-            try
+            using (var conn = GetConnection())
+            using (var cmd  = new OleDbCommand(query, conn))
             {
-                command.CommandText = query;
-                command.Parameters.Clear();
-
                 if (parameters != null && parameters.Length > 0)
+                    cmd.Parameters.AddRange(parameters);
+                try
                 {
-                    command.Parameters.AddRange(parameters);
+                    conn.Open();
+                    return cmd.ExecuteScalar();
                 }
-
-                connection.Open();
-                object result = command.ExecuteScalar();
-                return result;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("SelectScalar Error: " + ex.Message);
-                throw new InvalidOperationException("SelectScalar failed: " + query, ex);
-            }
-            finally
-            {
-                if (connection.State == ConnectionState.Open)
-                    connection.Close();
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("SelectScalar Error: " + ex.Message);
+                    throw new InvalidOperationException(
+                        "SelectScalar failed: " + query + "  ::  " + ex.Message, ex);
+                }
             }
         }
     }
