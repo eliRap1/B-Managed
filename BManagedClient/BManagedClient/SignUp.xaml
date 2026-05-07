@@ -47,34 +47,42 @@
                         <!-- Step 2: form -->
                         <StackPanel x:Name="formStep" Visibility="Collapsed">
                             <TextBlock Text="USERNAME" Style="{StaticResource InputLabel}"/>
-                            <TextBox x:Name="usernameBox" Style="{StaticResource ModernTextBox}" Margin="0,0,0,10">
+                            <TextBox x:Name="usernameBox" Style="{StaticResource ModernTextBox}" Margin="0,0,0,2"
+                                     TextChanged="LiveUser_Changed">
                                 <TextBox.Text>
                                     <Binding Path="Username" UpdateSourceTrigger="PropertyChanged">
                                         <Binding.ValidationRules><local:MinLenth/></Binding.ValidationRules>
                                     </Binding>
                                 </TextBox.Text>
                             </TextBox>
+                            <TextBlock x:Name="userErr" Style="{StaticResource Caption}" Foreground="{StaticResource Rose}" Margin="0,0,0,8"/>
 
                             <TextBlock Text="PASSWORD" Style="{StaticResource InputLabel}"/>
-                            <PasswordBox x:Name="passwordBox" Style="{StaticResource ModernPasswordBox}" Margin="0,0,0,10"/>
+                            <PasswordBox x:Name="passwordBox" Style="{StaticResource ModernPasswordBox}" Margin="0,0,0,2"
+                                         PasswordChanged="LivePass_Changed"/>
+                            <TextBlock x:Name="passErr" Style="{StaticResource Caption}" Foreground="{StaticResource Rose}" Margin="0,0,0,8"/>
 
                             <TextBlock Text="EMAIL" Style="{StaticResource InputLabel}"/>
-                            <TextBox x:Name="emailBox" Style="{StaticResource ModernTextBox}" Margin="0,0,0,10">
+                            <TextBox x:Name="emailBox" Style="{StaticResource ModernTextBox}" Margin="0,0,0,2"
+                                     TextChanged="LiveEmail_Changed">
                                 <TextBox.Text>
                                     <Binding Path="Email" UpdateSourceTrigger="PropertyChanged">
                                         <Binding.ValidationRules><local:EmailRule/></Binding.ValidationRules>
                                     </Binding>
                                 </TextBox.Text>
                             </TextBox>
+                            <TextBlock x:Name="emailErr" Style="{StaticResource Caption}" Foreground="{StaticResource Rose}" Margin="0,0,0,8"/>
 
                             <TextBlock Text="PHONE" Style="{StaticResource InputLabel}"/>
-                            <TextBox x:Name="phoneBox" Style="{StaticResource ModernTextBox}" Margin="0,0,0,10">
+                            <TextBox x:Name="phoneBox" Style="{StaticResource ModernTextBox}" Margin="0,0,0,2"
+                                     TextChanged="LivePhone_Changed">
                                 <TextBox.Text>
                                     <Binding Path="Phone" UpdateSourceTrigger="PropertyChanged">
                                         <Binding.ValidationRules><local:PhoneRule/></Binding.ValidationRules>
                                     </Binding>
                                 </TextBox.Text>
                             </TextBox>
+                            <TextBlock x:Name="phoneErr" Style="{StaticResource Caption}" Foreground="{StaticResource Rose}" Margin="0,0,0,8"/>
 
                             <TextBlock Text="PREFERRED CURRENCY" Style="{StaticResource InputLabel}"/>
                             <ComboBox x:Name="curBox" Style="{StaticResource ModernCombo}" Margin="0,0,0,10">
@@ -85,8 +93,10 @@
                             <!-- Owner-only: business name, VAT registration, Zair flag -->
                             <StackPanel x:Name="ownerExtras" Visibility="Collapsed">
                                 <TextBlock Text="BUSINESS / STUDIO NAME" Style="{StaticResource InputLabel}"/>
-                                <TextBox x:Name="bizNameBox" Style="{StaticResource ModernTextBox}" Margin="0,0,0,10"
+                                <TextBox x:Name="bizNameBox" Style="{StaticResource ModernTextBox}" Margin="0,0,0,2"
+                                         TextChanged="LiveBiz_Changed"
                                          ToolTip="Shown across the system instead of your username."/>
+                                <TextBlock x:Name="bizErr" Style="{StaticResource Caption}" Foreground="{StaticResource Rose}" Margin="0,0,0,8"/>
 
                                 <TextBlock Text="VAT REGISTRATION" Style="{StaticResource InputLabel}"/>
                                 <ComboBox x:Name="bizBox" Style="{StaticResource ModernCombo}" Margin="0,0,0,10"
@@ -102,9 +112,11 @@
                             <!-- Employee-only: company invite code (no public list) -->
                             <StackPanel x:Name="employeeExtras" Visibility="Collapsed">
                                 <TextBlock Text="COMPANY INVITE CODE" Style="{StaticResource InputLabel}"/>
-                                <TextBox x:Name="inviteBox" Style="{StaticResource ModernTextBox}" Margin="0,0,0,8"
+                                <TextBox x:Name="inviteBox" Style="{StaticResource ModernTextBox}" Margin="0,0,0,2"
                                          CharacterCasing="Upper" MaxLength="16"
+                                         TextChanged="LiveInvite_Changed"
                                          ToolTip="Ask the Owner of the company you're joining for their invite code."/>
+                                <TextBlock x:Name="inviteErr" Style="{StaticResource Caption}" Foreground="{StaticResource Rose}" Margin="0,0,0,8"/>
                                 <TextBlock Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,0,0,10"
                                            Text="We don't show a public list of companies for privacy reasons. Use the invite code from your Owner's settings."/>
                             </StackPanel>

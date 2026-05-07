@@ -53,6 +53,86 @@ namespace BManagedClient
             // Zair is allowed for either Patur or Murshe — leave checkbox enabled.
         }
 
+        // -------- Live per-field validation (TextChanged + PasswordChanged) --
+        // Each handler runs the matching regex and toggles a red BorderBrush +
+        // a small inline error text below the field. Empty value = neutral
+        // (don't shout at the user before they typed anything).
+
+        private static readonly System.Windows.Media.SolidColorBrush _transparentBrush =
+            System.Windows.Media.Brushes.Transparent;
+
+        private System.Windows.Media.Brush Rose
+            => (System.Windows.Media.Brush)System.Windows.Application.Current.Resources["Rose"];
+
+        private void Mark(System.Windows.Controls.Control ctrl, TextBlock label, bool ok, string msg)
+        {
+            if (ok)
+            {
+                ctrl.BorderBrush = _transparentBrush;
+                ctrl.BorderThickness = new Thickness(1);
+                if (label != null) label.Text = "";
+            }
+            else
+            {
+                ctrl.BorderBrush = Rose;
+                ctrl.BorderThickness = new Thickness(1.5);
+                if (label != null) label.Text = msg;
+            }
+        }
+
+        private void LiveUser_Changed(object s, TextChangedEventArgs e)
+        {
+            string v = usernameBox.Text ?? "";
+            if (v.Length == 0) { Mark(usernameBox, userErr, true, ""); return; }
+            Mark(usernameBox, userErr, UsernameRx.IsMatch(v),
+                "4–20 letters, digits, _ or . only.");
+        }
+
+        private void LivePass_Changed(object s, RoutedEventArgs e)
+        {
+            string v = passwordBox.Password ?? "";
+            if (v.Length == 0) { Mark(passwordBox, passErr, true, ""); return; }
+            bool ok = PasswordRx.IsMatch(v);
+            string u = usernameBox.Text ?? "";
+            if (ok && !string.IsNullOrEmpty(u) && string.Equals(u, v, StringComparison.OrdinalIgnoreCase))
+            { Mark(passwordBox, passErr, false, "Password cannot match the username."); return; }
+            Mark(passwordBox, passErr, ok,
+                "8+ chars, must include a letter and a digit.");
+        }
+
+        private void LiveEmail_Changed(object s, TextChangedEventArgs e)
+        {
+            string v = emailBox.Text ?? "";
+            if (v.Length == 0) { Mark(emailBox, emailErr, true, ""); return; }
+            Mark(emailBox, emailErr, EmailRx.IsMatch(v),
+                "Email looks invalid (e.g. name@example.com).");
+        }
+
+        private void LivePhone_Changed(object s, TextChangedEventArgs e)
+        {
+            string v = phoneBox.Text ?? "";
+            if (v.Length == 0) { Mark(phoneBox, phoneErr, true, ""); return; }
+            Mark(phoneBox, phoneErr, PhoneRx.IsMatch(v),
+                "7–15 digits, optionally + country code.");
+        }
+
+        private void LiveBiz_Changed(object s, TextChangedEventArgs e)
+        {
+            string v = (bizNameBox.Text ?? "").Trim();
+            if (v.Length == 0) { Mark(bizNameBox, bizErr, true, ""); return; }
+            Mark(bizNameBox, bizErr, v.Length >= 2 && v.Length <= 120,
+                "Business name: 2–120 characters.");
+        }
+
+        private void LiveInvite_Changed(object s, TextChangedEventArgs e)
+        {
+            string v = (inviteBox.Text ?? "").Trim();
+            if (v.Length == 0) { Mark(inviteBox, inviteErr, true, ""); return; }
+            Mark(inviteBox, inviteErr,
+                System.Text.RegularExpressions.Regex.IsMatch(v, @"^[A-Z0-9\-]{4,16}$"),
+                "Invite code looks like ACME-7K3D (4–16 chars, letters/digits/dash).");
+        }
+
         private void Create_Click(object s, RoutedEventArgs e)
         {
             if (_selectedRole != "Owner" && _selectedRole != "Employee")

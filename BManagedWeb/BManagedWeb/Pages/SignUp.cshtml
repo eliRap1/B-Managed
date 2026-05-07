@@ -106,10 +106,12 @@
                         <div id="ownerOnly" class="space-y-4 @ownerOnlyClass">
                             <div>
                                 <label class="pill text-ink/40 mb-2 block">@L.T(HttpContext,"Business / studio name","שם העסק / הסטודיו")</label>
-                                <input asp-for="BusinessName" maxlength="120"
+                                <input asp-for="BusinessName" maxlength="120" minlength="2"
+                                       data-validate="biz"
                                        placeholder="@L.T(HttpContext,"e.g. Acme Studio","למשל סטודיו אקמי")"
                                        class="signup-field w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-3 outline-none focus:border-accent transition" />
-                                <p class="text-xs text-ink/40 mt-1">@L.T(HttpContext,"Shown across the system instead of your username.","יוצג במערכת במקום שם המשתמש.")</p>
+                                <p class="text-xs text-ink/40 mt-1">@L.T(HttpContext,"2–120 characters. Shown across the system instead of your username.","2–120 תווים. יוצג במערכת במקום שם המשתמש.")</p>
+                                <p data-error="biz" class="text-xs text-rose mt-1 hidden"></p>
                             </div>
                             <div>
                                 <label class="pill text-ink/40 mb-2 block">@L.T(HttpContext,"VAT registration","רישום מע״מ")</label>
@@ -138,9 +140,11 @@
                         @* Employee-only field: company invite code (no public dropdown of every company) *@
                         <div id="employeeOnly" class="@employeeOnlyClass">
                             <label class="pill text-ink/40 mb-2 block">@L.T(HttpContext,"Company invite code","קוד הצטרפות לחברה")</label>
-                            <input asp-for="InviteCode" maxlength="16"
-                                   class="w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-3 outline-none focus:border-accent transition uppercase tracking-widest"
+                            <input asp-for="InviteCode" maxlength="16" pattern="[A-Z0-9\-]{4,16}"
+                                   data-validate="invite"
+                                   class="signup-field w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-3 outline-none focus:border-accent transition uppercase tracking-widest"
                                    placeholder="@L.T(HttpContext,"e.g. ACME-7K3D","למשל ACME-7K3D")" />
+                            <p data-error="invite" class="text-xs text-rose mt-1 hidden"></p>
                             <p class="text-xs text-ink/40 mt-2">
                                 @L.T(HttpContext,
                                     "Ask the Owner of the company you're joining for their invite code. We don't show a public list of companies for privacy reasons.",
@@ -186,7 +190,9 @@
         var iErrUser  = L.T(HttpContext,"4–20 letters, digits, _ or . only.","4–20 אותיות, ספרות, _ או . בלבד.");
         var iErrPw    = L.T(HttpContext,"8+ chars and must include a letter and a digit.","8+ תווים ולפחות אות אחת וספרה אחת.");
         var iErrEmail = L.T(HttpContext,"Looks invalid (e.g. name@@example.com).","לא תקין (למשל: name@@example.com).");
-        var iErrPhone = L.T(HttpContext,"7–15 digits, optional + country code.","7–15 ספרות, ניתן להוסיף + לקידומת מדינה.");
+        var iErrPhone  = L.T(HttpContext,"7–15 digits, optional + country code.","7–15 ספרות, ניתן להוסיף + לקידומת מדינה.");
+        var iErrBiz    = L.T(HttpContext,"Business name: 2–120 characters.","שם עסק: 2–120 תווים.");
+        var iErrInvite = L.T(HttpContext,"Invite code looks like ACME-7K3D (4–16 chars, letters / digits / dash).","קוד הצטרפות נראה כמו ACME-7K3D (4–16 תווים, אותיות / ספרות / מקף).");
     }
     <div id="i18n"
          data-subtitle-default="@iSubDef"
@@ -196,6 +202,8 @@
          data-err-password="@iErrPw"
          data-err-email="@iErrEmail"
          data-err-phone="@iErrPhone"
+         data-err-biz="@iErrBiz"
+         data-err-invite="@iErrInvite"
          class="hidden"></div>
 </section>
 
@@ -242,7 +250,11 @@
             username: { rx: /^[A-Za-z0-9_.]{4,20}$/,                 msg: I18N.getAttribute('data-err-username') },
             password: { test: function (v) { return /^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(v); }, msg: I18N.getAttribute('data-err-password') },
             email:    { rx: /^[\w.\-]+@@[\w\-]+\.[\w\-.]+$/,          msg: I18N.getAttribute('data-err-email') },
-            phone:    { rx: /^\+?\d{7,15}$/,                          msg: I18N.getAttribute('data-err-phone') }
+            phone:    { rx: /^\+?\d{7,15}$/,                          msg: I18N.getAttribute('data-err-phone') },
+            biz:      { test: function (v) { var t = (v||'').trim(); return t.length >= 2 && t.length <= 120; },
+                        msg: I18N.getAttribute('data-err-biz') },
+            invite:   { test: function (v) { var t = (v||'').trim(); return /^[A-Z0-9\-]{4,16}$/.test(t); },
+                        msg: I18N.getAttribute('data-err-invite') }
         };
         function showError(name, msg) {
             var el = document.querySelector('[data-error="' + name + '"]');
