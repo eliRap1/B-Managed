@@ -2946,6 +2946,15 @@ namespace BManagedClient.BMsrv {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetCustomerById", ReplyAction="http://tempuri.org/IService1/GetCustomerByIdResponse")]
         System.Threading.Tasks.Task<BManagedClient.BMsrv.Customer> GetCustomerByIdAsync(int id);
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetCustomerByIdForOwner", ReplyAction="http://tempuri.org/IService1/GetCustomerByIdForOwnerResponse")]
+        BManagedClient.BMsrv.Customer GetCustomerByIdForOwner(int id, int ownerId);
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/UpdateCustomerForOwner", ReplyAction="http://tempuri.org/IService1/UpdateCustomerForOwnerResponse")]
+        void UpdateCustomerForOwner(BManagedClient.BMsrv.Customer c, int ownerId);
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/DeleteCustomerForOwner", ReplyAction="http://tempuri.org/IService1/DeleteCustomerForOwnerResponse")]
+        void DeleteCustomerForOwner(int id, int ownerId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetCustomersForOwner", ReplyAction="http://tempuri.org/IService1/GetCustomersForOwnerResponse")]
         BManagedClient.BMsrv.Customer[] GetCustomersForOwner(int ownerId);
@@ -2964,6 +2973,9 @@ namespace BManagedClient.BMsrv {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AddProject", ReplyAction="http://tempuri.org/IService1/AddProjectResponse")]
         System.Threading.Tasks.Task<int> AddProjectAsync(BManagedClient.BMsrv.Project p);
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AddProjectForOwner", ReplyAction="http://tempuri.org/IService1/AddProjectForOwnerResponse")]
+        int AddProjectForOwner(BManagedClient.BMsrv.Project p, int ownerId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/UpdateProject", ReplyAction="http://tempuri.org/IService1/UpdateProjectResponse")]
         void UpdateProject(BManagedClient.BMsrv.Project p);
@@ -2976,6 +2988,9 @@ namespace BManagedClient.BMsrv {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/SetProjectStatus", ReplyAction="http://tempuri.org/IService1/SetProjectStatusResponse")]
         System.Threading.Tasks.Task SetProjectStatusAsync(int projectId, string status);
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/SetProjectStatusForOwner", ReplyAction="http://tempuri.org/IService1/SetProjectStatusForOwnerResponse")]
+        void SetProjectStatusForOwner(int projectId, int ownerId, string status);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AssignEmployee", ReplyAction="http://tempuri.org/IService1/AssignEmployeeResponse")]
         void AssignEmployee(int projectId, int employeeId);
@@ -3006,6 +3021,9 @@ namespace BManagedClient.BMsrv {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetProjectById", ReplyAction="http://tempuri.org/IService1/GetProjectByIdResponse")]
         System.Threading.Tasks.Task<BManagedClient.BMsrv.Project> GetProjectByIdAsync(int id);
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetProjectByIdForOwner", ReplyAction="http://tempuri.org/IService1/GetProjectByIdForOwnerResponse")]
+        BManagedClient.BMsrv.Project GetProjectByIdForOwner(int id, int ownerId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AddProjectAssignment", ReplyAction="http://tempuri.org/IService1/AddProjectAssignmentResponse")]
         void AddProjectAssignment(int projectId, int employeeId);
@@ -3018,6 +3036,12 @@ namespace BManagedClient.BMsrv {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/RemoveProjectAssignment", ReplyAction="http://tempuri.org/IService1/RemoveProjectAssignmentResponse")]
         System.Threading.Tasks.Task RemoveProjectAssignmentAsync(int projectId, int employeeId);
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AddProjectAssignmentForOwner", ReplyAction="http://tempuri.org/IService1/AddProjectAssignmentForOwnerResponse")]
+        void AddProjectAssignmentForOwner(int projectId, int ownerId, int employeeId);
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/RemoveProjectAssignmentForOwner", ReplyAction="http://tempuri.org/IService1/RemoveProjectAssignmentForOwnerResponse")]
+        void RemoveProjectAssignmentForOwner(int projectId, int ownerId, int employeeId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetProjectAssignees", ReplyAction="http://tempuri.org/IService1/GetProjectAssigneesResponse")]
         BManagedClient.BMsrv.User[] GetProjectAssignees(int projectId);
@@ -3084,24 +3108,36 @@ namespace BManagedClient.BMsrv {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/CreateInvoice", ReplyAction="http://tempuri.org/IService1/CreateInvoiceResponse")]
         System.Threading.Tasks.Task<int> CreateInvoiceAsync(BManagedClient.BMsrv.Invoice inv);
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/CreateInvoiceForOwner", ReplyAction="http://tempuri.org/IService1/CreateInvoiceForOwnerResponse")]
+        int CreateInvoiceForOwner(BManagedClient.BMsrv.Invoice inv, int ownerId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AddInvoiceLine", ReplyAction="http://tempuri.org/IService1/AddInvoiceLineResponse")]
         int AddInvoiceLine(BManagedClient.BMsrv.InvoiceLine line);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AddInvoiceLine", ReplyAction="http://tempuri.org/IService1/AddInvoiceLineResponse")]
         System.Threading.Tasks.Task<int> AddInvoiceLineAsync(BManagedClient.BMsrv.InvoiceLine line);
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AddInvoiceLineForOwner", ReplyAction="http://tempuri.org/IService1/AddInvoiceLineForOwnerResponse")]
+        int AddInvoiceLineForOwner(BManagedClient.BMsrv.InvoiceLine line, int ownerId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/UpdateInvoiceStatus", ReplyAction="http://tempuri.org/IService1/UpdateInvoiceStatusResponse")]
         void UpdateInvoiceStatus(int invoiceId, string status);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/UpdateInvoiceStatus", ReplyAction="http://tempuri.org/IService1/UpdateInvoiceStatusResponse")]
         System.Threading.Tasks.Task UpdateInvoiceStatusAsync(int invoiceId, string status);
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/UpdateInvoiceStatusForOwner", ReplyAction="http://tempuri.org/IService1/UpdateInvoiceStatusForOwnerResponse")]
+        void UpdateInvoiceStatusForOwner(int invoiceId, int ownerId, string status);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/MarkInvoicePaid", ReplyAction="http://tempuri.org/IService1/MarkInvoicePaidResponse")]
         void MarkInvoicePaid(int invoiceId, System.DateTime paidDate);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/MarkInvoicePaid", ReplyAction="http://tempuri.org/IService1/MarkInvoicePaidResponse")]
         System.Threading.Tasks.Task MarkInvoicePaidAsync(int invoiceId, System.DateTime paidDate);
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/MarkInvoicePaidForOwner", ReplyAction="http://tempuri.org/IService1/MarkInvoicePaidForOwnerResponse")]
+        void MarkInvoicePaidForOwner(int invoiceId, int ownerId, System.DateTime paidDate);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/RecalcInvoiceTotals", ReplyAction="http://tempuri.org/IService1/RecalcInvoiceTotalsResponse")]
         void RecalcInvoiceTotals(int invoiceId);
@@ -3114,12 +3150,18 @@ namespace BManagedClient.BMsrv {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetInvoiceById", ReplyAction="http://tempuri.org/IService1/GetInvoiceByIdResponse")]
         System.Threading.Tasks.Task<BManagedClient.BMsrv.Invoice> GetInvoiceByIdAsync(int id);
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetInvoiceByIdForOwner", ReplyAction="http://tempuri.org/IService1/GetInvoiceByIdForOwnerResponse")]
+        BManagedClient.BMsrv.Invoice GetInvoiceByIdForOwner(int id, int ownerId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetInvoiceLines", ReplyAction="http://tempuri.org/IService1/GetInvoiceLinesResponse")]
         BManagedClient.BMsrv.InvoiceLine[] GetInvoiceLines(int invoiceId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetInvoiceLines", ReplyAction="http://tempuri.org/IService1/GetInvoiceLinesResponse")]
         System.Threading.Tasks.Task<BManagedClient.BMsrv.InvoiceLine[]> GetInvoiceLinesAsync(int invoiceId);
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetInvoiceLinesForOwner", ReplyAction="http://tempuri.org/IService1/GetInvoiceLinesForOwnerResponse")]
+        BManagedClient.BMsrv.InvoiceLine[] GetInvoiceLinesForOwner(int invoiceId, int ownerId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetInvoicesByCustomer", ReplyAction="http://tempuri.org/IService1/GetInvoicesByCustomerResponse")]
         BManagedClient.BMsrv.Invoice[] GetInvoicesByCustomer(int customerId);
@@ -3147,6 +3189,9 @@ namespace BManagedClient.BMsrv {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GenerateInvoicePdf", ReplyAction="http://tempuri.org/IService1/GenerateInvoicePdfResponse")]
         System.Threading.Tasks.Task<byte[]> GenerateInvoicePdfAsync(int invoiceId);
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GenerateInvoicePdfForOwner", ReplyAction="http://tempuri.org/IService1/GenerateInvoicePdfForOwnerResponse")]
+        byte[] GenerateInvoicePdfForOwner(int invoiceId, int ownerId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AddExpense", ReplyAction="http://tempuri.org/IService1/AddExpenseResponse")]
         int AddExpense(BManagedClient.BMsrv.Expense e);
@@ -3548,6 +3593,18 @@ namespace BManagedClient.BMsrv {
         public System.Threading.Tasks.Task<BManagedClient.BMsrv.Customer> GetCustomerByIdAsync(int id) {
             return base.Channel.GetCustomerByIdAsync(id);
         }
+
+        public BManagedClient.BMsrv.Customer GetCustomerByIdForOwner(int id, int ownerId) {
+            return base.Channel.GetCustomerByIdForOwner(id, ownerId);
+        }
+
+        public void UpdateCustomerForOwner(BManagedClient.BMsrv.Customer c, int ownerId) {
+            base.Channel.UpdateCustomerForOwner(c, ownerId);
+        }
+
+        public void DeleteCustomerForOwner(int id, int ownerId) {
+            base.Channel.DeleteCustomerForOwner(id, ownerId);
+        }
         
         public BManagedClient.BMsrv.Customer[] GetCustomersForOwner(int ownerId) {
             return base.Channel.GetCustomersForOwner(ownerId);
@@ -3572,6 +3629,10 @@ namespace BManagedClient.BMsrv {
         public System.Threading.Tasks.Task<int> AddProjectAsync(BManagedClient.BMsrv.Project p) {
             return base.Channel.AddProjectAsync(p);
         }
+
+        public int AddProjectForOwner(BManagedClient.BMsrv.Project p, int ownerId) {
+            return base.Channel.AddProjectForOwner(p, ownerId);
+        }
         
         public void UpdateProject(BManagedClient.BMsrv.Project p) {
             base.Channel.UpdateProject(p);
@@ -3587,6 +3648,10 @@ namespace BManagedClient.BMsrv {
         
         public System.Threading.Tasks.Task SetProjectStatusAsync(int projectId, string status) {
             return base.Channel.SetProjectStatusAsync(projectId, status);
+        }
+
+        public void SetProjectStatusForOwner(int projectId, int ownerId, string status) {
+            base.Channel.SetProjectStatusForOwner(projectId, ownerId, status);
         }
         
         public void AssignEmployee(int projectId, int employeeId) {
@@ -3628,6 +3693,10 @@ namespace BManagedClient.BMsrv {
         public System.Threading.Tasks.Task<BManagedClient.BMsrv.Project> GetProjectByIdAsync(int id) {
             return base.Channel.GetProjectByIdAsync(id);
         }
+
+        public BManagedClient.BMsrv.Project GetProjectByIdForOwner(int id, int ownerId) {
+            return base.Channel.GetProjectByIdForOwner(id, ownerId);
+        }
         
         public void AddProjectAssignment(int projectId, int employeeId) {
             base.Channel.AddProjectAssignment(projectId, employeeId);
@@ -3643,6 +3712,14 @@ namespace BManagedClient.BMsrv {
         
         public System.Threading.Tasks.Task RemoveProjectAssignmentAsync(int projectId, int employeeId) {
             return base.Channel.RemoveProjectAssignmentAsync(projectId, employeeId);
+        }
+
+        public void AddProjectAssignmentForOwner(int projectId, int ownerId, int employeeId) {
+            base.Channel.AddProjectAssignmentForOwner(projectId, ownerId, employeeId);
+        }
+
+        public void RemoveProjectAssignmentForOwner(int projectId, int ownerId, int employeeId) {
+            base.Channel.RemoveProjectAssignmentForOwner(projectId, ownerId, employeeId);
         }
         
         public BManagedClient.BMsrv.User[] GetProjectAssignees(int projectId) {
@@ -3732,6 +3809,10 @@ namespace BManagedClient.BMsrv {
         public System.Threading.Tasks.Task<int> CreateInvoiceAsync(BManagedClient.BMsrv.Invoice inv) {
             return base.Channel.CreateInvoiceAsync(inv);
         }
+
+        public int CreateInvoiceForOwner(BManagedClient.BMsrv.Invoice inv, int ownerId) {
+            return base.Channel.CreateInvoiceForOwner(inv, ownerId);
+        }
         
         public int AddInvoiceLine(BManagedClient.BMsrv.InvoiceLine line) {
             return base.Channel.AddInvoiceLine(line);
@@ -3739,6 +3820,10 @@ namespace BManagedClient.BMsrv {
         
         public System.Threading.Tasks.Task<int> AddInvoiceLineAsync(BManagedClient.BMsrv.InvoiceLine line) {
             return base.Channel.AddInvoiceLineAsync(line);
+        }
+
+        public int AddInvoiceLineForOwner(BManagedClient.BMsrv.InvoiceLine line, int ownerId) {
+            return base.Channel.AddInvoiceLineForOwner(line, ownerId);
         }
         
         public void UpdateInvoiceStatus(int invoiceId, string status) {
@@ -3748,6 +3833,10 @@ namespace BManagedClient.BMsrv {
         public System.Threading.Tasks.Task UpdateInvoiceStatusAsync(int invoiceId, string status) {
             return base.Channel.UpdateInvoiceStatusAsync(invoiceId, status);
         }
+
+        public void UpdateInvoiceStatusForOwner(int invoiceId, int ownerId, string status) {
+            base.Channel.UpdateInvoiceStatusForOwner(invoiceId, ownerId, status);
+        }
         
         public void MarkInvoicePaid(int invoiceId, System.DateTime paidDate) {
             base.Channel.MarkInvoicePaid(invoiceId, paidDate);
@@ -3755,6 +3844,10 @@ namespace BManagedClient.BMsrv {
         
         public System.Threading.Tasks.Task MarkInvoicePaidAsync(int invoiceId, System.DateTime paidDate) {
             return base.Channel.MarkInvoicePaidAsync(invoiceId, paidDate);
+        }
+
+        public void MarkInvoicePaidForOwner(int invoiceId, int ownerId, System.DateTime paidDate) {
+            base.Channel.MarkInvoicePaidForOwner(invoiceId, ownerId, paidDate);
         }
         
         public void RecalcInvoiceTotals(int invoiceId) {
@@ -3772,6 +3865,10 @@ namespace BManagedClient.BMsrv {
         public System.Threading.Tasks.Task<BManagedClient.BMsrv.Invoice> GetInvoiceByIdAsync(int id) {
             return base.Channel.GetInvoiceByIdAsync(id);
         }
+
+        public BManagedClient.BMsrv.Invoice GetInvoiceByIdForOwner(int id, int ownerId) {
+            return base.Channel.GetInvoiceByIdForOwner(id, ownerId);
+        }
         
         public BManagedClient.BMsrv.InvoiceLine[] GetInvoiceLines(int invoiceId) {
             return base.Channel.GetInvoiceLines(invoiceId);
@@ -3779,6 +3876,10 @@ namespace BManagedClient.BMsrv {
         
         public System.Threading.Tasks.Task<BManagedClient.BMsrv.InvoiceLine[]> GetInvoiceLinesAsync(int invoiceId) {
             return base.Channel.GetInvoiceLinesAsync(invoiceId);
+        }
+
+        public BManagedClient.BMsrv.InvoiceLine[] GetInvoiceLinesForOwner(int invoiceId, int ownerId) {
+            return base.Channel.GetInvoiceLinesForOwner(invoiceId, ownerId);
         }
         
         public BManagedClient.BMsrv.Invoice[] GetInvoicesByCustomer(int customerId) {
@@ -3815,6 +3916,10 @@ namespace BManagedClient.BMsrv {
         
         public System.Threading.Tasks.Task<byte[]> GenerateInvoicePdfAsync(int invoiceId) {
             return base.Channel.GenerateInvoicePdfAsync(invoiceId);
+        }
+
+        public byte[] GenerateInvoicePdfForOwner(int invoiceId, int ownerId) {
+            return base.Channel.GenerateInvoicePdfForOwner(invoiceId, ownerId);
         }
         
         public int AddExpense(BManagedClient.BMsrv.Expense e) {

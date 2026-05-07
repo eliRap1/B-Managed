@@ -98,4 +98,44 @@ namespace Model
 
         [DataMember] public string  DisplayCurrency { get; set; } = "ILS";
     }
+
+    /// <summary>
+    /// Single payload for the Owner dashboard. Folds ~10 separate SOAP ops
+    /// into one round-trip so the dashboard renders fast even with a cold
+    /// WCF channel.
+    /// </summary>
+    [DataContract]
+    public class OwnerDashboardSnapshot
+    {
+        [DataMember] public int CustomersCount { get; set; }
+        [DataMember] public int UnpaidCount { get; set; }
+        [DataMember] public int OverdueCount { get; set; }
+        [DataMember] public int ActiveProjectsCount { get; set; }
+        [DataMember] public int UnreadNotificationsCount { get; set; }
+        [DataMember] public List<ProfitLoss> CashFlowForecast { get; set; } = new List<ProfitLoss>();
+        [DataMember] public AnalyticsKpis Kpis { get; set; }
+        [DataMember] public LoanSummary LoanSummary { get; set; }
+
+        // Rolled in May 2026 to absorb 5 more SOAP ops:
+        [DataMember] public decimal UnpaidTotal { get; set; }
+        [DataMember] public decimal VatDue { get; set; }
+        [DataMember] public decimal MonthlyTaxSetAside { get; set; }
+        [DataMember] public string  TopExpenseCategory { get; set; }
+        [DataMember] public decimal TopExpenseAmount { get; set; }
+        [DataMember] public decimal RevenueChangePct { get; set; }
+        [DataMember] public List<RecentInvoice> RecentInvoices { get; set; } = new List<RecentInvoice>();
+
+        [DataMember] public string DisplayCurrency { get; set; } = "ILS";
+    }
+
+    /// <summary>Compact recent-invoice row (already joined to customer name).</summary>
+    [DataContract]
+    public class RecentInvoice
+    {
+        [DataMember] public string InvoiceNumber { get; set; }
+        [DataMember] public string CustomerName  { get; set; }
+        [DataMember] public decimal Total        { get; set; }
+        [DataMember] public string Currency      { get; set; }
+        [DataMember] public string Status        { get; set; }
+    }
 }

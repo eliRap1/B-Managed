@@ -65,6 +65,29 @@ namespace ViewDB
             => Select("SELECT * FROM [Invoices] WHERE [id] = ?",
                 new OleDbParameter("@id", id)).OfType<Invoice>().FirstOrDefault();
 
+        public Invoice GetByIdForOwner(int id, int ownerId)
+        {
+            string sql = @"SELECT I.*
+                           FROM [Invoices] AS I
+                           INNER JOIN [Customers] AS C ON I.[customerId] = C.[id]
+                           WHERE I.[id] = ? AND C.[ownerId] = ?";
+            return Select(sql,
+                new OleDbParameter("@id", id),
+                new OleDbParameter("@o", ownerId)).OfType<Invoice>().FirstOrDefault();
+        }
+
+        public bool BelongsToOwner(int id, int ownerId)
+        {
+            object r = SelectScalar(
+                @"SELECT COUNT(*)
+                  FROM [Invoices] AS I
+                  INNER JOIN [Customers] AS C ON I.[customerId] = C.[id]
+                  WHERE I.[id] = ? AND C.[ownerId] = ?",
+                new OleDbParameter("@id", id),
+                new OleDbParameter("@o", ownerId));
+            return r != null && r != DBNull.Value && Convert.ToInt32(r) > 0;
+        }
+
         public List<Invoice> GetByCustomer(int customerId)
             => Select("SELECT * FROM [Invoices] WHERE [customerId] = ? ORDER BY [issueDate] DESC",
                 new OleDbParameter("@c", customerId)).OfType<Invoice>().ToList();

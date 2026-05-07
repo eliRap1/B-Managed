@@ -245,6 +245,37 @@ namespace BManagedWeb.bsrv
     }
 
     [DataContract(Namespace = "http://schemas.datacontract.org/2004/07/Model")]
+    public class OwnerDashboardSnapshot
+    {
+        [DataMember] public int CustomersCount { get; set; }
+        [DataMember] public int UnpaidCount { get; set; }
+        [DataMember] public int OverdueCount { get; set; }
+        [DataMember] public int ActiveProjectsCount { get; set; }
+        [DataMember] public int UnreadNotificationsCount { get; set; }
+        [DataMember] public ProfitLoss[] CashFlowForecast { get; set; }
+        [DataMember] public AnalyticsKpis Kpis { get; set; }
+        [DataMember] public LoanSummary LoanSummary { get; set; }
+        [DataMember] public decimal UnpaidTotal { get; set; }
+        [DataMember] public decimal VatDue { get; set; }
+        [DataMember] public decimal MonthlyTaxSetAside { get; set; }
+        [DataMember] public string  TopExpenseCategory { get; set; }
+        [DataMember] public decimal TopExpenseAmount { get; set; }
+        [DataMember] public decimal RevenueChangePct { get; set; }
+        [DataMember] public RecentInvoice[] RecentInvoices { get; set; }
+        [DataMember] public string DisplayCurrency { get; set; }
+    }
+
+    [DataContract(Namespace = "http://schemas.datacontract.org/2004/07/Model")]
+    public class RecentInvoice
+    {
+        [DataMember] public string InvoiceNumber { get; set; }
+        [DataMember] public string CustomerName  { get; set; }
+        [DataMember] public decimal Total        { get; set; }
+        [DataMember] public string Currency      { get; set; }
+        [DataMember] public string Status        { get; set; }
+    }
+
+    [DataContract(Namespace = "http://schemas.datacontract.org/2004/07/Model")]
     public class Loan : Base
     {
         [DataMember] public int OwnerId { get; set; }
@@ -323,34 +354,49 @@ namespace BManagedWeb.bsrv
         [OperationContract] void   UpdateCustomer(Customer c);
         [OperationContract] void   DeleteCustomer(int id);
         [OperationContract] Customer GetCustomerById(int id);
+        [OperationContract] Customer GetCustomerByIdForOwner(int id, int ownerId);
+        [OperationContract] void   UpdateCustomerForOwner(Customer c, int ownerId);
+        [OperationContract] void   DeleteCustomerForOwner(int id, int ownerId);
         [OperationContract] Customer[] GetCustomersForOwner(int ownerId);
         [OperationContract] Customer[] SearchCustomers(string keyword, int ownerId);
 
         [OperationContract] int  AddProject(Project p);
+        [OperationContract] int  AddProjectForOwner(Project p, int ownerId);
         [OperationContract] void UpdateProject(Project p);
         [OperationContract] void SetProjectStatus(int projectId, string status);
+        [OperationContract] void SetProjectStatusForOwner(int projectId, int ownerId, string status);
         [OperationContract] void AssignEmployee(int projectId, int employeeId);
         [OperationContract] Project[] GetProjectsByCustomer(int customerId);
         [OperationContract] Project[] GetProjectsForEmployee(int employeeId);
         [OperationContract] Project[] GetProjectsByStatus(string status, int ownerId);
         [OperationContract] Project GetProjectById(int id);
+        [OperationContract] Project GetProjectByIdForOwner(int id, int ownerId);
 
         [OperationContract] void AddProjectAssignment(int projectId, int employeeId);
         [OperationContract] void RemoveProjectAssignment(int projectId, int employeeId);
+        [OperationContract] void AddProjectAssignmentForOwner(int projectId, int ownerId, int employeeId);
+        [OperationContract] void RemoveProjectAssignmentForOwner(int projectId, int ownerId, int employeeId);
         [OperationContract] User[] GetProjectAssignees(int projectId);
 
         [OperationContract] int  CreateInvoice(Invoice inv);
+        [OperationContract] int  CreateInvoiceForOwner(Invoice inv, int ownerId);
         [OperationContract] int  AddInvoiceLine(InvoiceLine line);
+        [OperationContract] int  AddInvoiceLineForOwner(InvoiceLine line, int ownerId);
         [OperationContract] void UpdateInvoiceStatus(int invoiceId, string status);
+        [OperationContract] void UpdateInvoiceStatusForOwner(int invoiceId, int ownerId, string status);
         [OperationContract] void MarkInvoicePaid(int invoiceId, DateTime paidDate);
+        [OperationContract] void MarkInvoicePaidForOwner(int invoiceId, int ownerId, DateTime paidDate);
         [OperationContract] void RecalcInvoiceTotals(int invoiceId);
         [OperationContract] Invoice GetInvoiceById(int id);
+        [OperationContract] Invoice GetInvoiceByIdForOwner(int id, int ownerId);
         [OperationContract] InvoiceLine[] GetInvoiceLines(int invoiceId);
+        [OperationContract] InvoiceLine[] GetInvoiceLinesForOwner(int invoiceId, int ownerId);
         [OperationContract] Invoice[] GetInvoicesByCustomer(int customerId);
         [OperationContract] Invoice[] GetUnpaidInvoices(int ownerId);
         [OperationContract] Invoice[] GetOverdueInvoices(int ownerId);
         [OperationContract] Invoice[] GetInvoicesForOwner(int ownerId);
         [OperationContract] byte[] GenerateInvoicePdf(int invoiceId);
+        [OperationContract] byte[] GenerateInvoicePdfForOwner(int invoiceId, int ownerId);
 
         // Contracts
         [OperationContract] int       CreateContract(Contract c);
@@ -381,6 +427,7 @@ namespace BManagedWeb.bsrv
 
         [OperationContract] ProfitLoss[] GetCashFlowForecast(int ownerId, int months, string displayCurrency);
         [OperationContract] AnalyticsKpis GetAdvancedKpis(int ownerId, string displayCurrency);
+        [OperationContract] OwnerDashboardSnapshot GetOwnerDashboardSnapshot(int ownerId, string displayCurrency);
 
         [OperationContract] int  AddLoan(Loan l);
         [OperationContract] void UpdateLoan(Loan l);
@@ -461,34 +508,49 @@ namespace BManagedWeb.bsrv
         public void     UpdateCustomer(Customer c)          => Channel.UpdateCustomer(c);
         public void     DeleteCustomer(int id)              => Channel.DeleteCustomer(id);
         public Customer GetCustomerById(int id)             => Channel.GetCustomerById(id);
+        public Customer GetCustomerByIdForOwner(int id, int ownerId) => Channel.GetCustomerByIdForOwner(id, ownerId);
+        public void     UpdateCustomerForOwner(Customer c, int ownerId) => Channel.UpdateCustomerForOwner(c, ownerId);
+        public void     DeleteCustomerForOwner(int id, int ownerId) => Channel.DeleteCustomerForOwner(id, ownerId);
         public Customer[] GetCustomersForOwner(int ownerId) => Channel.GetCustomersForOwner(ownerId);
         public Customer[] SearchCustomers(string k, int o)  => Channel.SearchCustomers(k, o);
 
         public int  AddProject(Project p)                  => Channel.AddProject(p);
+        public int  AddProjectForOwner(Project p, int o)    => Channel.AddProjectForOwner(p, o);
         public void UpdateProject(Project p)               => Channel.UpdateProject(p);
         public void SetProjectStatus(int id, string s)     => Channel.SetProjectStatus(id, s);
+        public void SetProjectStatusForOwner(int id, int o, string s) => Channel.SetProjectStatusForOwner(id, o, s);
         public void AssignEmployee(int id, int e)          => Channel.AssignEmployee(id, e);
         public Project[] GetProjectsByCustomer(int cId)    => Channel.GetProjectsByCustomer(cId);
         public Project[] GetProjectsForEmployee(int eId)   => Channel.GetProjectsForEmployee(eId);
         public Project[] GetProjectsByStatus(string s, int o) => Channel.GetProjectsByStatus(s, o);
         public Project   GetProjectById(int id)            => Channel.GetProjectById(id);
+        public Project   GetProjectByIdForOwner(int id, int o) => Channel.GetProjectByIdForOwner(id, o);
 
         public void AddProjectAssignment(int p, int e)    => Channel.AddProjectAssignment(p, e);
         public void RemoveProjectAssignment(int p, int e) => Channel.RemoveProjectAssignment(p, e);
+        public void AddProjectAssignmentForOwner(int p, int o, int e) => Channel.AddProjectAssignmentForOwner(p, o, e);
+        public void RemoveProjectAssignmentForOwner(int p, int o, int e) => Channel.RemoveProjectAssignmentForOwner(p, o, e);
         public User[] GetProjectAssignees(int p)          => Channel.GetProjectAssignees(p);
 
         public int  CreateInvoice(Invoice inv)             => Channel.CreateInvoice(inv);
+        public int  CreateInvoiceForOwner(Invoice inv, int o) => Channel.CreateInvoiceForOwner(inv, o);
         public int  AddInvoiceLine(InvoiceLine l)          => Channel.AddInvoiceLine(l);
+        public int  AddInvoiceLineForOwner(InvoiceLine l, int o) => Channel.AddInvoiceLineForOwner(l, o);
         public void UpdateInvoiceStatus(int id, string s)  => Channel.UpdateInvoiceStatus(id, s);
+        public void UpdateInvoiceStatusForOwner(int id, int o, string s) => Channel.UpdateInvoiceStatusForOwner(id, o, s);
         public void MarkInvoicePaid(int id, DateTime d)    => Channel.MarkInvoicePaid(id, d);
+        public void MarkInvoicePaidForOwner(int id, int o, DateTime d) => Channel.MarkInvoicePaidForOwner(id, o, d);
         public void RecalcInvoiceTotals(int id)            => Channel.RecalcInvoiceTotals(id);
         public Invoice     GetInvoiceById(int id)          => Channel.GetInvoiceById(id);
+        public Invoice     GetInvoiceByIdForOwner(int id, int o) => Channel.GetInvoiceByIdForOwner(id, o);
         public InvoiceLine[] GetInvoiceLines(int id)       => Channel.GetInvoiceLines(id);
+        public InvoiceLine[] GetInvoiceLinesForOwner(int id, int o) => Channel.GetInvoiceLinesForOwner(id, o);
         public Invoice[] GetInvoicesByCustomer(int cId)    => Channel.GetInvoicesByCustomer(cId);
         public Invoice[] GetUnpaidInvoices(int oId)        => Channel.GetUnpaidInvoices(oId);
         public Invoice[] GetOverdueInvoices(int oId)       => Channel.GetOverdueInvoices(oId);
         public Invoice[] GetInvoicesForOwner(int oId)      => Channel.GetInvoicesForOwner(oId);
         public byte[]    GenerateInvoicePdf(int id)        => Channel.GenerateInvoicePdf(id);
+        public byte[]    GenerateInvoicePdfForOwner(int id, int o) => Channel.GenerateInvoicePdfForOwner(id, o);
 
         public int       CreateContract(Contract c)        => Channel.CreateContract(c);
         public void      UpdateContract(Contract c)        => Channel.UpdateContract(c);
@@ -527,6 +589,8 @@ namespace BManagedWeb.bsrv
         public ProfitLoss[] GetCashFlowForecast(int o, int m, string c)
             => Channel.GetCashFlowForecast(o, m, c);
         public AnalyticsKpis GetAdvancedKpis(int o, string c) => Channel.GetAdvancedKpis(o, c);
+        public OwnerDashboardSnapshot GetOwnerDashboardSnapshot(int o, string c)
+            => Channel.GetOwnerDashboardSnapshot(o, c);
 
         public int  AddLoan(Loan l)                              => Channel.AddLoan(l);
         public void UpdateLoan(Loan l)                           => Channel.UpdateLoan(l);

@@ -50,7 +50,8 @@ namespace BManagedWeb.Pages.Owner
             if (NewCustomerId <= 0 || string.IsNullOrWhiteSpace(NewTitle)) return OnGet();
             var currency = HttpContext.Session.GetString("Currency") ?? "ILS";
 
-            _srv.AddProject(new Project
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            _srv.AddProjectForOwner(new Project
             {
                 CustomerId = NewCustomerId,
                 Title = NewTitle,
@@ -59,7 +60,7 @@ namespace BManagedWeb.Pages.Owner
                 DueDate = System.DateTime.Today.AddDays(30),
                 TotalBudget = NewBudget,
                 Currency = currency
-            });
+            }, ownerId);
             return RedirectToPage();
         }
 
@@ -92,21 +93,24 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostAddAssignee(int projectId, int employeeId)
         {
             if (HttpContext.Session.GetString("Role") != "Owner") return Unauthorized();
-            try { _srv.AddProjectAssignment(projectId, employeeId); return new JsonResult(new { ok = true }); }
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            try { _srv.AddProjectAssignmentForOwner(projectId, ownerId, employeeId); return new JsonResult(new { ok = true }); }
             catch (System.Exception ex) { return new JsonResult(new { error = ex.Message }); }
         }
 
         public IActionResult OnPostRemoveAssignee(int projectId, int employeeId)
         {
             if (HttpContext.Session.GetString("Role") != "Owner") return Unauthorized();
-            try { _srv.RemoveProjectAssignment(projectId, employeeId); return new JsonResult(new { ok = true }); }
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            try { _srv.RemoveProjectAssignmentForOwner(projectId, ownerId, employeeId); return new JsonResult(new { ok = true }); }
             catch (System.Exception ex) { return new JsonResult(new { error = ex.Message }); }
         }
 
         public IActionResult OnPostStatus(int projectId, string newStatus)
         {
             if (HttpContext.Session.GetString("Role") != "Owner") return Unauthorized();
-            try { _srv.SetProjectStatus(projectId, newStatus); }
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            try { _srv.SetProjectStatusForOwner(projectId, ownerId, newStatus); }
             catch { }
             return RedirectToPage(new { Q, StatusFilter });
         }

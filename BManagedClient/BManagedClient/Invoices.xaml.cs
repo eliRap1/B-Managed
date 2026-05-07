@@ -71,10 +71,10 @@ namespace BManagedClient
         private void LoadLines()
         {
             if (_selected == null) return;
-            var lines = ServiceGateway.Use(s => s.GetInvoiceLines(_selected.Id)) ?? new InvoiceLine[0];
+            var lines = ServiceGateway.Use(s => s.GetInvoiceLinesForOwner(_selected.Id, LogIn.sign.Id)) ?? new InvoiceLine[0];
             lineList.ItemsSource = lines;
             // refresh totals
-            _selected = ServiceGateway.Use(s => s.GetInvoiceById(_selected.Id));
+            _selected = ServiceGateway.Use(s => s.GetInvoiceByIdForOwner(_selected.Id, LogIn.sign.Id));
             totalsText.Text = $"Subtotal {_selected.Subtotal:N2}  ·  VAT {_selected.VatAmount:N2}  ·  Total {_selected.Total:N2} {_selected.Currency}";
         }
 
@@ -86,7 +86,7 @@ namespace BManagedClient
             double vatRate = (LogIn.sign != null && LogIn.sign.IsPatur) ? 0.0 : 0.18;
             try
             {
-                int newId = ServiceGateway.Use(c => c.CreateInvoice(new Invoice
+                int newId = ServiceGateway.Use(c => c.CreateInvoiceForOwner(new Invoice
                 {
                     CustomerId = (int)newCustomer.SelectedValue,
                     IssueDate = DateTime.Today,
@@ -94,9 +94,9 @@ namespace BManagedClient
                     Currency = cur,
                     Status = "Draft",
                     VatRate = vatRate,
-                }));
+                }, LogIn.sign.Id));
                 RefreshInvoices();
-                _selected = ServiceGateway.Use(c => c.GetInvoiceById(newId));
+                _selected = ServiceGateway.Use(c => c.GetInvoiceByIdForOwner(newId, LogIn.sign.Id));
                 LoadLines();
             }
             catch (Exception ex) { MessageBox.Show("Create failed: " + ex.Message); }
@@ -109,7 +109,7 @@ namespace BManagedClient
             decimal.TryParse(lineUnit.Text, out decimal up);
             try
             {
-                ServiceGateway.Use(c => c.AddInvoiceLine(new InvoiceLine
+                ServiceGateway.Use(c => c.AddInvoiceLineForOwner(new InvoiceLine
                 {
                     InvoiceId = _selected.Id,
                     Description = lineDesc.Text ?? "",
@@ -117,7 +117,7 @@ namespace BManagedClient
                     UnitPrice = up,
                     LineTotal = (decimal)(q == 0 ? 1.0 : q) * up,
                     Currency = _selected.Currency
-                }));
+                }, LogIn.sign.Id));
                 lineDesc.Text = ""; lineQty.Text = "1"; lineUnit.Text = "0";
                 LoadLines();
             }
@@ -127,14 +127,14 @@ namespace BManagedClient
         private void Sent_Click(object s, RoutedEventArgs e)
         {
             if (_selected == null) return;
-            ServiceGateway.Use(c => c.UpdateInvoiceStatus(_selected.Id, "Sent"));
+            ServiceGateway.Use(c => c.UpdateInvoiceStatusForOwner(_selected.Id, LogIn.sign.Id, "Sent"));
             LoadLines();
         }
 
         private void Paid_Click(object s, RoutedEventArgs e)
         {
             if (_selected == null) return;
-            ServiceGateway.Use(c => c.MarkInvoicePaid(_selected.Id, DateTime.Today));
+            ServiceGateway.Use(c => c.MarkInvoicePaidForOwner(_selected.Id, LogIn.sign.Id, DateTime.Today));
             LoadLines();
             RefreshInvoices();
         }
@@ -144,7 +144,7 @@ namespace BManagedClient
             if (_selected == null) return;
             try
             {
-                var bytes = ServiceGateway.Use(c => c.GenerateInvoicePdf(_selected.Id));
+                var bytes = ServiceGateway.Use(c => c.GenerateInvoicePdfForOwner(_selected.Id, LogIn.sign.Id));
                 var path = Path.Combine(Path.GetTempPath(), $"INV-{_selected.Id}.pdf");
                 File.WriteAllBytes(path, bytes);
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(path) { UseShellExecute = true });

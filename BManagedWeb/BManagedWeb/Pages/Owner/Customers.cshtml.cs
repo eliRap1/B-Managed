@@ -95,14 +95,14 @@ namespace BManagedWeb.Pages.Owner
             int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
             try
             {
-                var c = _srv.GetCustomerById(id);
+                var c = _srv.GetCustomerByIdForOwner(id, ownerId);
                 if (c == null) { Message = "Customer not found"; IsSuccess = false; return OnGet(); }
                 c.BusinessName = businessName ?? c.BusinessName;
                 c.ContactName  = contactName;
                 c.Email        = email;
                 c.Phone        = phone;
                 c.TaxId        = taxId;
-                _srv.UpdateCustomer(c);
+                _srv.UpdateCustomerForOwner(c, ownerId);
                 Message = "Customer updated."; IsSuccess = true;
             }
             catch (System.Exception ex) { Message = "Update failed: " + ex.Message; IsSuccess = false; }
@@ -139,7 +139,8 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostDelete(int id)
         {
             if (HttpContext.Session.GetString("Role") != "Owner") return RedirectToPage("/Login");
-            try { _srv.DeleteCustomer(id); Message = "Customer removed."; IsSuccess = true; }
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            try { _srv.DeleteCustomerForOwner(id, ownerId); Message = "Customer removed."; IsSuccess = true; }
             catch (System.Exception ex) { Message = "Delete failed: " + ex.Message; IsSuccess = false; }
             return OnGet();
         }
@@ -149,9 +150,10 @@ namespace BManagedWeb.Pages.Owner
         {
             var role = HttpContext.Session.GetString("Role");
             if (role != "Owner") return new JsonResult(new { error = "unauthorized" });
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
             try
             {
-                var c = _srv.GetCustomerById(customerId);
+                var c = _srv.GetCustomerByIdForOwner(customerId, ownerId);
                 if (c == null) return new JsonResult(new { error = "not found" });
 
                 var projects = _srv.GetProjectsByCustomer(customerId) ?? new Project[0];

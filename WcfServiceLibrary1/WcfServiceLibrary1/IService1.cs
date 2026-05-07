@@ -85,23 +85,31 @@ namespace WcfServiceLibrary1
         [OperationContract] void   UpdateCustomer(Customer c);
         [OperationContract] void   DeleteCustomer(int id);
         [OperationContract] Customer GetCustomerById(int id);
+        [OperationContract] Customer GetCustomerByIdForOwner(int id, int ownerId);
+        [OperationContract] void   UpdateCustomerForOwner(Customer c, int ownerId);
+        [OperationContract] void   DeleteCustomerForOwner(int id, int ownerId);
         [OperationContract] List<Customer> GetCustomersForOwner(int ownerId);
         [OperationContract] List<Customer> SearchCustomers(string keyword, int ownerId);
 
         // ==================== PROJECTS ====================
 
         [OperationContract] int  AddProject(Project p);
+        [OperationContract] int  AddProjectForOwner(Project p, int ownerId);
         [OperationContract] void UpdateProject(Project p);
         [OperationContract] void SetProjectStatus(int projectId, string status);
+        [OperationContract] void SetProjectStatusForOwner(int projectId, int ownerId, string status);
         [OperationContract] void AssignEmployee(int projectId, int employeeId);
         [OperationContract] List<Project> GetProjectsByCustomer(int customerId);
         [OperationContract] List<Project> GetProjectsForEmployee(int employeeId);
         [OperationContract] List<Project> GetProjectsByStatus(string status, int ownerId);
         [OperationContract] Project GetProjectById(int id);
+        [OperationContract] Project GetProjectByIdForOwner(int id, int ownerId);
 
         // Many-to-many: a project can have multiple assigned employees.
         [OperationContract] void AddProjectAssignment(int projectId, int employeeId);
         [OperationContract] void RemoveProjectAssignment(int projectId, int employeeId);
+        [OperationContract] void AddProjectAssignmentForOwner(int projectId, int ownerId, int employeeId);
+        [OperationContract] void RemoveProjectAssignmentForOwner(int projectId, int ownerId, int employeeId);
         [OperationContract] List<User> GetProjectAssignees(int projectId);
 
         // ==================== CONTRACTS ====================
@@ -120,12 +128,18 @@ namespace WcfServiceLibrary1
         /// <summary>Creates a Draft invoice with auto-generated invoiceNumber.
         /// Lines must be added separately via <see cref="AddInvoiceLine"/>.</summary>
         [OperationContract] int  CreateInvoice(Invoice inv);
+        [OperationContract] int  CreateInvoiceForOwner(Invoice inv, int ownerId);
         [OperationContract] int  AddInvoiceLine(InvoiceLine line);
+        [OperationContract] int  AddInvoiceLineForOwner(InvoiceLine line, int ownerId);
         [OperationContract] void UpdateInvoiceStatus(int invoiceId, string status);
+        [OperationContract] void UpdateInvoiceStatusForOwner(int invoiceId, int ownerId, string status);
         [OperationContract] void MarkInvoicePaid(int invoiceId, DateTime paidDate);
+        [OperationContract] void MarkInvoicePaidForOwner(int invoiceId, int ownerId, DateTime paidDate);
         [OperationContract] void RecalcInvoiceTotals(int invoiceId);
         [OperationContract] Invoice GetInvoiceById(int id);
+        [OperationContract] Invoice GetInvoiceByIdForOwner(int id, int ownerId);
         [OperationContract] List<InvoiceLine> GetInvoiceLines(int invoiceId);
+        [OperationContract] List<InvoiceLine> GetInvoiceLinesForOwner(int invoiceId, int ownerId);
         [OperationContract] List<Invoice> GetInvoicesByCustomer(int customerId);
         [OperationContract] List<Invoice> GetUnpaidInvoices(int ownerId);
         [OperationContract] List<Invoice> GetOverdueInvoices(int ownerId);
@@ -134,6 +148,7 @@ namespace WcfServiceLibrary1
 
         /// <summary>Render invoice as a PDF byte array using QuestPDF.</summary>
         [OperationContract] byte[] GenerateInvoicePdf(int invoiceId);
+        [OperationContract] byte[] GenerateInvoicePdfForOwner(int invoiceId, int ownerId);
 
         // ==================== EXPENSES ====================
 
@@ -164,6 +179,7 @@ namespace WcfServiceLibrary1
         // concentration + trailing-3-month flow + runway. Used by Reports +
         // Owner Home dashboards.
         [OperationContract] AnalyticsKpis GetAdvancedKpis(int ownerId, string displayCurrency);
+        [OperationContract] OwnerDashboardSnapshot GetOwnerDashboardSnapshot(int ownerId, string displayCurrency);
 
         // ==================== LOANS (קרן / business loans) ====================
         [OperationContract] int  AddLoan(Loan l);

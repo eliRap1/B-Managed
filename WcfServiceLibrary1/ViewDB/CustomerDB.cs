@@ -30,6 +30,19 @@ namespace ViewDB
             => Select("SELECT * FROM [Customers] WHERE [id] = ?", new OleDbParameter("@id", id))
                .OfType<Customer>().FirstOrDefault();
 
+        public Customer GetByIdForOwner(int id, int ownerId)
+            => Select("SELECT * FROM [Customers] WHERE [id] = ? AND [ownerId] = ?",
+                new OleDbParameter("@id", id),
+                new OleDbParameter("@o", ownerId)).OfType<Customer>().FirstOrDefault();
+
+        public bool BelongsToOwner(int id, int ownerId)
+        {
+            object r = SelectScalar("SELECT COUNT(*) FROM [Customers] WHERE [id] = ? AND [ownerId] = ?",
+                new OleDbParameter("@id", id),
+                new OleDbParameter("@o", ownerId));
+            return r != null && r != DBNull.Value && Convert.ToInt32(r) > 0;
+        }
+
         public List<Customer> GetByOwner(int ownerId)
             => Select("SELECT * FROM [Customers] WHERE [ownerId] = ? ORDER BY [businessName]",
                 new OleDbParameter("@o", ownerId)).OfType<Customer>().ToList();

@@ -49,6 +49,31 @@ namespace WcfServiceLibrary1
         private readonly ContractDB contractDB = new ContractDB();
         private readonly LoanDB     loanDB     = new LoanDB();
 
+        private void RequireCustomerOwner(int customerId, int ownerId)
+        {
+            if (!custDB.BelongsToOwner(customerId, ownerId))
+                throw new FaultException("Customer does not belong to this owner.");
+        }
+
+        private void RequireProjectOwner(int projectId, int ownerId)
+        {
+            if (!projDB.BelongsToOwner(projectId, ownerId))
+                throw new FaultException("Project does not belong to this owner.");
+        }
+
+        private void RequireInvoiceOwner(int invoiceId, int ownerId)
+        {
+            if (!invDB.BelongsToOwner(invoiceId, ownerId))
+                throw new FaultException("Invoice does not belong to this owner.");
+        }
+
+        private void RequireEmployeeOwner(int employeeId, int ownerId)
+        {
+            var u = userDB.GetById(employeeId);
+            if (u == null || u.Role != "Employee" || u.OwnerId != ownerId || !u.IsActive)
+                throw new FaultException("Employee does not belong to this owner.");
+        }
+
         // ===================================================================
         // AUTH & USERS
         // ===================================================================
@@ -183,6 +208,20 @@ namespace WcfServiceLibrary1
         public void UpdateCustomer(Customer c)          => custDB.Update(c);
         public void DeleteCustomer(int id)              => custDB.Delete(id);
         public Customer GetCustomerById(int id)         => custDB.GetById(id);
+        public Customer GetCustomerByIdForOwner(int id, int ownerId)
+            => custDB.GetByIdForOwner(id, ownerId);
+        public void UpdateCustomerForOwner(Customer c, int ownerId)
+        {
+            if (c == null) throw new FaultException("Customer is required.");
+            RequireCustomerOwner(c.Id, ownerId);
+            c.OwnerId = ownerId;
+            custDB.Update(c);
+        }
+        public void DeleteCustomerForOwner(int id, int ownerId)
+        {
+            RequireCustomerOwner(id, ownerId);
+            custDB.Delete(id);
+        }
         public List<Customer> GetCustomersForOwner(int ownerId) => custDB.GetByOwner(ownerId);
         public List<Customer> SearchCustomers(string keyword, int ownerId)
             => custDB.Search(keyword, ownerId);
@@ -192,8 +231,19 @@ namespace WcfServiceLibrary1
         // ===================================================================
 
         public int  AddProject(Project p)               => projDB.Insert(p);
+        public int  AddProjectForOwner(Project p, int ownerId)
+        {
+            if (p == null) throw new FaultException("Project is required.");
+            RequireCustomerOwner(p.CustomerId, ownerId);
+            return projDB.Insert(p);
+        }
         public void UpdateProject(Project p)            => projDB.Update(p);
         public void SetProjectStatus(int id, string s)  => projDB.SetStatus(id, s);
+        public void SetProjectStatusForOwner(int id, int ownerId, string s)
+        {
+            RequireProjectOwner(id, ownerId);
+            projDB.SetStatus(id, s);
+        }
         public void AssignEmployee(int id, int empId)   => projDB.AssignEmployee(id, empId);
         public List<Project> GetProjectsByCustomer(int customerId) => projDB.GetByCustomer(customerId);
         // Returns every project the employee is on — both legacy single-assign
@@ -215,11 +265,25 @@ namespace WcfServiceLibrary1
         public List<Project> GetProjectsByStatus(string status, int ownerId)
             => projDB.GetByStatus(status, ownerId);
         public Project GetProjectById(int id)           => projDB.GetById(id);
+        public Project GetProjectByIdForOwner(int id, int ownerId)
+            => projDB.GetByIdForOwner(id, ownerId);
 
         public void AddProjectAssignment(int projectId, int employeeId)
             => assignDB.Add(projectId, employeeId);
         public void RemoveProjectAssignment(int projectId, int employeeId)
             => assignDB.Remove(projectId, employeeId);
+        public void AddProjectAssignmentForOwner(int projectId, int ownerId, int employeeId)
+        {
+            RequireProjectOwner(projectId, ownerId);
+            RequireEmployeeOwner(employeeId, ownerId);
+            assignDB.Add(projectId, employeeId);
+        }
+        public void RemoveProjectAssignmentForOwner(int projectId, int ownerId, int employeeId)
+        {
+            RequireProjectOwner(projectId, ownerId);
+            RequireEmployeeOwner(employeeId, ownerId);
+            assignDB.Remove(projectId, employeeId);
+        }
         public List<User> GetProjectAssignees(int projectId)
         {
             var ids = assignDB.GetAssigneesByProject(projectId);
@@ -277,6 +341,18 @@ namespace WcfServiceLibrary1
             return invDB.Insert(inv);
         }
 
+        public int CreateInvoiceForOwner(Invoice inv, int ownerId)
+        {
+            if (inv == null) throw new FaultException("Invoice is required.");
+            RequireCustomerOwner(inv.CustomerId, ownerId);
+            if (inv.ProjectId.HasValue && inv.ProjectId.Value > 0)
+                RequireProjectOwner(inv.ProjectId.Value, ownerId);
+            if (inv.ContractId.HasValue && inv.ContractId.Value > 0 &&
+                !contractDB.BelongsToOwner(inv.ContractId.Value, ownerId))
+                throw new FaultException("Contract does not belong to this owner.");
+            return CreateInvoice(inv);
+        }
+
         public int  AddInvoiceLine(InvoiceLine l)
         {
             l.LineTotal = (decimal)l.Quantity * l.UnitPrice;
@@ -285,7 +361,19 @@ namespace WcfServiceLibrary1
             return id;
         }
 
+        public int AddInvoiceLineForOwner(InvoiceLine l, int ownerId)
+        {
+            if (l == null) throw new FaultException("Invoice line is required.");
+            RequireInvoiceOwner(l.InvoiceId, ownerId);
+            return AddInvoiceLine(l);
+        }
+
         public void UpdateInvoiceStatus(int id, string s) => invDB.UpdateStatus(id, s);
+        public void UpdateInvoiceStatusForOwner(int id, int ownerId, string s)
+        {
+            RequireInvoiceOwner(id, ownerId);
+            invDB.UpdateStatus(id, s);
+        }
 
         public void MarkInvoicePaid(int id, DateTime paidDate)
         {
@@ -315,9 +403,22 @@ namespace WcfServiceLibrary1
             catch (Exception ex) { throw new FaultException("MarkInvoicePaid failed: " + ex.Message); }
         }
 
+        public void MarkInvoicePaidForOwner(int id, int ownerId, DateTime paidDate)
+        {
+            RequireInvoiceOwner(id, ownerId);
+            MarkInvoicePaid(id, paidDate);
+        }
+
         public void RecalcInvoiceTotals(int invoiceId) => invDB.RecalcTotals(invoiceId);
         public Invoice GetInvoiceById(int id)              => invDB.GetById(id);
+        public Invoice GetInvoiceByIdForOwner(int id, int ownerId)
+            => invDB.GetByIdForOwner(id, ownerId);
         public List<InvoiceLine> GetInvoiceLines(int id)   => lineDB.GetByInvoice(id);
+        public List<InvoiceLine> GetInvoiceLinesForOwner(int id, int ownerId)
+        {
+            RequireInvoiceOwner(id, ownerId);
+            return lineDB.GetByInvoice(id);
+        }
         public List<Invoice> GetInvoicesByCustomer(int cid) => invDB.GetByCustomer(cid);
         public List<Invoice> GetUnpaidInvoices(int ownerId) => invDB.GetUnpaidForOwner(ownerId);
         public List<Invoice> GetOverdueInvoices(int ownerId)=> invDB.GetOverdueForOwner(ownerId);
@@ -336,6 +437,12 @@ namespace WcfServiceLibrary1
             {
                 throw new FaultException("GenerateInvoicePdf failed: " + ex.Message);
             }
+        }
+
+        public byte[] GenerateInvoicePdfForOwner(int invoiceId, int ownerId)
+        {
+            RequireInvoiceOwner(invoiceId, ownerId);
+            return GenerateInvoicePdf(invoiceId);
         }
 
         // ===================================================================
@@ -455,6 +562,85 @@ namespace WcfServiceLibrary1
 
         public AnalyticsKpis GetAdvancedKpis(int ownerId, string displayCurrency)
             => reportsDB.AdvancedKpis(ownerId, string.IsNullOrEmpty(displayCurrency) ? "ILS" : displayCurrency);
+
+        public OwnerDashboardSnapshot GetOwnerDashboardSnapshot(int ownerId, string displayCurrency)
+        {
+            string cur = string.IsNullOrEmpty(displayCurrency) ? "ILS" : displayCurrency;
+            try { EnsureOverdueNotifications(ownerId); } catch { }
+
+            var now = DateTime.Today;
+            var monthFirst = new DateTime(now.Year, now.Month, 1);
+            var monthLast  = monthFirst.AddMonths(1).AddDays(-1);
+            var prevFirst  = monthFirst.AddMonths(-1);
+            var prevLast   = monthFirst.AddDays(-1);
+
+            // Pull invoices once via a single JOINed query, derive both the
+            // unpaid total and the recent-invoices preview from the same list.
+            var allInvoices = invDB.GetForOwner(ownerId) ?? new List<Invoice>();
+            decimal unpaidTotal = allInvoices
+                .Where(i => i.Status != "Paid")
+                .Sum(i => i.Total);
+            var customers = custDB.GetByOwner(ownerId) ?? new List<Customer>();
+            var custLookup = customers.ToDictionary(c => c.Id, c => c.BusinessName ?? "");
+            var recent = allInvoices
+                .OrderByDescending(i => i.IssueDate)
+                .Take(6)
+                .Select(i => new RecentInvoice
+                {
+                    InvoiceNumber = i.InvoiceNumber,
+                    CustomerName  = custLookup.TryGetValue(i.CustomerId, out var n) ? n : "",
+                    Total         = i.Total,
+                    Currency      = i.Currency,
+                    Status        = i.Status,
+                }).ToList();
+
+            // VAT + tax set-aside (current month).
+            var vat = reportsDB.VatSummary(ownerId, now.Year, now.Month, cur);
+            decimal taxSetAside = reportsDB.MonthlyTaxSetAside(ownerId, now.Year, now.Month, cur);
+
+            // Top expense category this month + revenue trend vs prior month.
+            string topCat = null; decimal topAmt = 0m;
+            try
+            {
+                var brk = reportsDB.ExpenseBreakdown(ownerId, monthFirst, monthLast, cur);
+                if (brk != null && brk.Count > 0)
+                {
+                    var top = brk.OrderByDescending(b => b.Total).First();
+                    topCat = top.CategoryName; topAmt = top.Total;
+                }
+            }
+            catch { }
+
+            decimal revPct = 0m;
+            try
+            {
+                var thisPl = reportsDB.ProfitLoss(ownerId, monthFirst, monthLast, cur);
+                var prevPl = reportsDB.ProfitLoss(ownerId, prevFirst, prevLast, cur);
+                if (thisPl != null && prevPl != null && prevPl.Income > 0)
+                    revPct = Math.Round(((thisPl.Income - prevPl.Income) / prevPl.Income) * 100m, 1);
+            }
+            catch { }
+
+            return new OwnerDashboardSnapshot
+            {
+                CustomersCount = customers.Count,
+                UnpaidCount = allInvoices.Count(i => i.Status != "Paid"),
+                OverdueCount = invDB.GetOverdueForOwner(ownerId)?.Count ?? 0,
+                ActiveProjectsCount = projDB.GetByStatus("Active", ownerId)?.Count ?? 0,
+                UnreadNotificationsCount = notifDB.UnreadCount(ownerId),
+                CashFlowForecast = GetCashFlowForecast(ownerId, 3, cur),
+                Kpis = reportsDB.AdvancedKpis(ownerId, cur),
+                LoanSummary = GetLoanSummary(ownerId, cur),
+                UnpaidTotal = unpaidTotal,
+                VatDue = vat?.VatDue ?? 0m,
+                MonthlyTaxSetAside = taxSetAside,
+                TopExpenseCategory = topCat,
+                TopExpenseAmount = topAmt,
+                RevenueChangePct = revPct,
+                RecentInvoices = recent,
+                DisplayCurrency = cur,
+            };
+        }
 
         // ==================== LOANS ====================
         public int  AddLoan(Loan l)

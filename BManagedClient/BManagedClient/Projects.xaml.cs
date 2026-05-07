@@ -166,7 +166,7 @@ namespace BManagedClient
             decimal.TryParse(budgetBox.Text, out var budget);
             try
             {
-                ServiceGateway.Use(c => c.AddProject(new Project
+                ServiceGateway.Use(c => c.AddProjectForOwner(new Project
                 {
                     CustomerId  = (int)customerCombo.SelectedValue,
                     Title       = titleBox.Text,
@@ -175,7 +175,7 @@ namespace BManagedClient
                     DueDate     = DateTime.Today.AddDays(30),
                     TotalBudget = budget,
                     Currency    = LogIn.sign.PreferredCurrency
-                }));
+                }, LogIn.sign.Id));
                 titleBox.Text = ""; budgetBox.Text = "0";
                 Refresh();
             }
@@ -188,7 +188,7 @@ namespace BManagedClient
             int empId = (int)employeeCombo.SelectedValue;
             try
             {
-                ServiceGateway.Use(c => c.AddProjectAssignment(_selected.Id, empId));
+                ServiceGateway.Use(c => c.AddProjectAssignmentForOwner(_selected.Id, LogIn.sign.Id, empId));
                 ShowOk("Employee added.");
                 ReloadAssignees();
                 Refresh();   // refresh main table so the Employees column updates
@@ -203,7 +203,7 @@ namespace BManagedClient
             {
                 try
                 {
-                    ServiceGateway.Use(c => c.RemoveProjectAssignment(_selected.Id, empId));
+                    ServiceGateway.Use(c => c.RemoveProjectAssignmentForOwner(_selected.Id, LogIn.sign.Id, empId));
                     ShowOk("Employee removed.");
                     ReloadAssignees();
                     Refresh();
@@ -219,7 +219,7 @@ namespace BManagedClient
             if (string.IsNullOrEmpty(newStatus)) return;
             try
             {
-                ServiceGateway.Use(c => c.SetProjectStatus(_selected.Id, newStatus));
+                ServiceGateway.Use(c => c.SetProjectStatusForOwner(_selected.Id, LogIn.sign.Id, newStatus));
                 ShowOk("Status set to " + newStatus + ".");
                 Refresh();
             }

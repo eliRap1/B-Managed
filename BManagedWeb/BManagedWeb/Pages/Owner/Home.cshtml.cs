@@ -53,20 +53,14 @@ namespace BManagedWeb.Pages.Owner
         public decimal TaxSetAside { get; set; }
         public string TaxSetAsideDisplay => TaxSetAside.ToString("N0");
 
-        public List<RecentInvoice> RecentInvoices { get; set; } = new();
+        public List<BManagedWeb.bsrv.RecentInvoice> RecentInvoices { get; set; } = new();
         public List<ProfitLoss> Forecast { get; set; } = new();
 
         public AnalyticsKpis Kpis  { get; set; } = new AnalyticsKpis();
         public LoanSummary  Loans  { get; set; } = new LoanSummary();
 
-        public class RecentInvoice
-        {
-            public string InvoiceNumber { get; set; }
-            public string CustomerName  { get; set; }
-            public decimal Total        { get; set; }
-            public string Currency      { get; set; }
-            public string Status        { get; set; }
-        }
+        // RecentInvoice is now a server-side DTO defined in bsrv.Reference.cs
+        // (DataContract round-tripped from Model.RecentInvoice).
 
         public string  TopExpenseCategory { get; set; }
         public decimal TopExpenseAmount   { get; set; }
@@ -92,74 +86,30 @@ namespace BManagedWeb.Pages.Owner
 
             try
             {
-                var customers = _srv.GetCustomersForOwner(id);
-                CustomersCount = customers?.Length ?? 0;
-
-                var unpaid = _srv.GetUnpaidInvoices(id);
-                UnpaidCount  = unpaid?.Length ?? 0;
-                UnpaidTotal  = unpaid?.Sum(i => i.Total) ?? 0m;
-
-                var overdue = _srv.GetOverdueInvoices(id);
-                OverdueCount = overdue?.Length ?? 0;
-
-                var active = _srv.GetProjectsByStatus("Active", id);
-                ActiveProjects = active?.Length ?? 0;
-
-                var now = DateTime.Today;
-                var vat = _srv.GetVatSummary(id, now.Year, now.Month, Currency);
-                if (vat != null) { VatDue = vat.VatDue; }
-                TaxSetAside = _srv.GetMonthlyTaxSetAside(id, now.Year, now.Month, Currency);
-
-                // recent 6 invoices across customers (cap)
-                var custLookup = customers.ToDictionary(c => c.Id, c => c.BusinessName);
-                foreach (var c in customers.Take(6))
+                // Single SOAP round-trip — server bundles every counter, KPI,
+                // P&L derivative, top-expense, recent-invoices preview into
+                // one OwnerDashboardSnapshot. Pre-May-2026 this OnGet ran
+                // 12+ separate SOAP ops and felt sluggish on every dashboard
+                // load.
+                var snap = _srv.GetOwnerDashboardSnapshot(id, Currency);
+                if (snap != null)
                 {
-                    var ix = _srv.GetInvoicesByCustomer(c.Id);
-                    foreach (var i in ix.Take(3))
-                    {
-                        RecentInvoices.Add(new RecentInvoice
-                        {
-                            InvoiceNumber = i.InvoiceNumber,
-                            CustomerName  = c.BusinessName,
-                            Total         = i.Total,
-                            Currency      = i.Currency,
-                            Status        = i.Status,
-                        });
-                    }
+                    CustomersCount     = snap.CustomersCount;
+                    UnpaidCount        = snap.UnpaidCount;
+                    OverdueCount       = snap.OverdueCount;
+                    ActiveProjects     = snap.ActiveProjectsCount;
+                    UnpaidTotal        = snap.UnpaidTotal;
+                    VatDue             = snap.VatDue;
+                    TaxSetAside        = snap.MonthlyTaxSetAside;
+                    TopExpenseCategory = snap.TopExpenseCategory;
+                    TopExpenseAmount   = snap.TopExpenseAmount;
+                    RevenueChangePct   = snap.RevenueChangePct;
+                    if (snap.CashFlowForecast != null) Forecast = snap.CashFlowForecast.ToList();
+                    if (snap.RecentInvoices  != null) RecentInvoices = snap.RecentInvoices.ToList();
+                    Kpis  = snap.Kpis  ?? new AnalyticsKpis();
+                    Loans = snap.LoanSummary ?? new LoanSummary();
                 }
-                RecentInvoices = RecentInvoices.OrderByDescending(x => x.InvoiceNumber).Take(6).ToList();
-
-                // Smart insight #1: biggest expense category this month
-                var first = new DateTime(now.Year, now.Month, 1);
-                var last  = first.AddMonths(1).AddDays(-1);
-                var brk = _srv.GetExpenseBreakdown(id, first, last, Currency);
-                if (brk != null && brk.Length > 0)
-                {
-                    var top = brk.OrderByDescending(b => b.Total).First();
-                    TopExpenseCategory = top.CategoryName;
-                    TopExpenseAmount   = top.Total;
-                }
-
-                // Smart insight #2: revenue change vs previous month
-                var prevFirst = first.AddMonths(-1);
-                var prevLast  = first.AddDays(-1);
-                var thisPl = _srv.GetProfitLoss(id, first, last, Currency);
-                var prevPl = _srv.GetProfitLoss(id, prevFirst, prevLast, Currency);
-                if (thisPl != null && prevPl != null && prevPl.Income > 0)
-                    RevenueChangePct = Math.Round(((thisPl.Income - prevPl.Income) / prevPl.Income) * 100m, 1);
-
                 HasInsights = !string.IsNullOrEmpty(TopExpenseCategory) || RevenueChangePct != 0;
-
-                // Auto-create overdue-invoice notifications (idempotent server-side)
-                try { _srv.EnsureOverdueNotifications(id); } catch { }
-
-                // 3-month cashflow forecast
-                var fcst = _srv.GetCashFlowForecast(id, 3, Currency);
-                if (fcst != null) Forecast = fcst.ToList();
-
-                // Quick-glance KPIs + loan exposure
-                try { Kpis  = _srv.GetAdvancedKpis(id, Currency) ?? new AnalyticsKpis(); } catch { }
-                try { Loans = _srv.GetLoanSummary(id, Currency) ?? new LoanSummary(); }    catch { }
             }
             catch { }
             return Page();
@@ -200,14 +150,13 @@ namespace BManagedWeb.Pages.Owner
             int id = HttpContext.Session.GetInt32("UserId") ?? 0;
             try
             {
-                var unpaid  = _srv.GetUnpaidInvoices(id);
-                var overdue = _srv.GetOverdueInvoices(id);
-                var active  = _srv.GetProjectsByStatus("Active", id);
+                var currency = HttpContext.Session.GetString("Currency") ?? "ILS";
+                var snapshot = _srv.GetOwnerDashboardSnapshot(id, currency);
                 return new JsonResult(new
                 {
-                    UnpaidCount    = unpaid?.Length    ?? 0,
-                    OverdueCount   = overdue?.Length   ?? 0,
-                    ActiveProjects = active?.Length    ?? 0,
+                    UnpaidCount    = snapshot?.UnpaidCount ?? 0,
+                    OverdueCount   = snapshot?.OverdueCount ?? 0,
+                    ActiveProjects = snapshot?.ActiveProjectsCount ?? 0,
                 });
             }
             catch { return new JsonResult(new { }); }

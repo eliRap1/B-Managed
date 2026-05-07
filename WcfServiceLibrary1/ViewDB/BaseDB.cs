@@ -106,6 +106,7 @@ namespace ViewDB
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Select Error: " + ex.Message);
+                throw new InvalidOperationException("Select failed: " + sqlCommandTxt, ex);
             }
             finally
             {
@@ -144,6 +145,7 @@ namespace ViewDB
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("SelectReview Error: " + ex.Message);
+                throw new InvalidOperationException("SelectReview failed: " + sqlCommandTxt, ex);
             }
             finally
             {
@@ -189,6 +191,7 @@ namespace ViewDB
                 System.Diagnostics.Debug.WriteLine($"SaveChanges Error: {e.Message}");
                 System.Diagnostics.Debug.WriteLine($"SQL: {cmd.CommandText}");
                 System.Diagnostics.Debug.WriteLine($"Stack Trace: {e.StackTrace}");
+                throw new InvalidOperationException("SaveChanges failed: " + commandText, e);
             }
             finally
             {
@@ -220,7 +223,7 @@ namespace ViewDB
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("SelectScalar Error: " + ex.Message);
-                return null;
+                throw new InvalidOperationException("SelectScalar failed: " + query, ex);
             }
             finally
             {

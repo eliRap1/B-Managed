@@ -154,6 +154,18 @@ namespace ViewDB
             => Select("SELECT * FROM [Contracts] WHERE [id]=?",
                 new OleDbParameter("@id", id)).OfType<Contract>().FirstOrDefault();
 
+        public bool BelongsToOwner(int id, int ownerId)
+        {
+            object r = SelectScalar(
+                @"SELECT COUNT(*)
+                  FROM [Contracts] AS C
+                  INNER JOIN [Customers] AS Cu ON C.[customerId] = Cu.[id]
+                  WHERE C.[id] = ? AND Cu.[ownerId] = ?",
+                new OleDbParameter("@id", id),
+                new OleDbParameter("@o", ownerId));
+            return r != null && r != DBNull.Value && Convert.ToInt32(r) > 0;
+        }
+
         public List<Contract> GetByProject(int projectId)
             => Select("SELECT * FROM [Contracts] WHERE [projectId]=? ORDER BY [createdAt] DESC",
                 new OleDbParameter("@p", projectId)).OfType<Contract>().ToList();

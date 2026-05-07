@@ -34,6 +34,29 @@ namespace ViewDB
             => Select("SELECT * FROM [Projects] WHERE [id] = ?",
                 new OleDbParameter("@id", id)).OfType<Project>().FirstOrDefault();
 
+        public Project GetByIdForOwner(int id, int ownerId)
+        {
+            string sql = @"SELECT P.*
+                           FROM [Projects] AS P
+                           INNER JOIN [Customers] AS C ON P.[customerId] = C.[id]
+                           WHERE P.[id] = ? AND C.[ownerId] = ?";
+            return Select(sql,
+                new OleDbParameter("@id", id),
+                new OleDbParameter("@o", ownerId)).OfType<Project>().FirstOrDefault();
+        }
+
+        public bool BelongsToOwner(int id, int ownerId)
+        {
+            object r = SelectScalar(
+                @"SELECT COUNT(*)
+                  FROM [Projects] AS P
+                  INNER JOIN [Customers] AS C ON P.[customerId] = C.[id]
+                  WHERE P.[id] = ? AND C.[ownerId] = ?",
+                new OleDbParameter("@id", id),
+                new OleDbParameter("@o", ownerId));
+            return r != null && r != DBNull.Value && Convert.ToInt32(r) > 0;
+        }
+
         public List<Project> GetByCustomer(int customerId)
             => Select("SELECT * FROM [Projects] WHERE [customerId] = ? ORDER BY [startDate] DESC",
                 new OleDbParameter("@c", customerId)).OfType<Project>().ToList();

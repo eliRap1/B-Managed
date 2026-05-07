@@ -74,8 +74,9 @@ namespace BManagedWeb.Pages.Owner
 
             if (id.HasValue && id.Value > 0)
             {
-                Selected = _srv.GetInvoiceById(id.Value);
-                Lines = (_srv.GetInvoiceLines(id.Value) ?? new InvoiceLine[0]).ToList();
+                Selected = _srv.GetInvoiceByIdForOwner(id.Value, ownerId);
+                if (Selected == null) return RedirectToPage();
+                Lines = (_srv.GetInvoiceLinesForOwner(id.Value, ownerId) ?? new InvoiceLine[0]).ToList();
             }
             else
             {
@@ -117,7 +118,7 @@ namespace BManagedWeb.Pages.Owner
             }
             catch { }
 
-            int newId = _srv.CreateInvoice(new Invoice
+            int newId = _srv.CreateInvoiceForOwner(new Invoice
             {
                 CustomerId = NewCustomerId,
                 IssueDate  = DateTime.Today,
@@ -126,7 +127,7 @@ namespace BManagedWeb.Pages.Owner
                 Status     = "Draft",
                 VatRate    = vatRate,
                 ContractId = ContractId,
-            });
+            }, ownerId);
             // If a contract was linked and it has a Total, seed an initial line.
             if (ContractId.HasValue && ContractId.Value > 0)
             {
@@ -135,7 +136,7 @@ namespace BManagedWeb.Pages.Owner
                     var ctr = _srv.GetContractById(ContractId.Value);
                     if (ctr != null && ctr.TotalAmount > 0)
                     {
-                        _srv.AddInvoiceLine(new InvoiceLine
+                        _srv.AddInvoiceLineForOwner(new InvoiceLine
                         {
                             InvoiceId   = newId,
                             Description = ctr.Title,
@@ -143,7 +144,7 @@ namespace BManagedWeb.Pages.Owner
                             UnitPrice   = ctr.TotalAmount,
                             LineTotal   = ctr.TotalAmount,
                             Currency    = ctr.Currency ?? "ILS",
-                        });
+                        }, ownerId);
                     }
                 }
                 catch { }
@@ -154,7 +155,8 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostAddLine(int id)
         {
             if (HttpContext.Session.GetString("Role") != "Owner") return RedirectToPage("/Login");
-            _srv.AddInvoiceLine(new InvoiceLine
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            _srv.AddInvoiceLineForOwner(new InvoiceLine
             {
                 InvoiceId = id,
                 Description = LineDescription ?? "",
@@ -162,25 +164,31 @@ namespace BManagedWeb.Pages.Owner
                 UnitPrice = LineUnitPrice,
                 LineTotal = (decimal)LineQuantity * LineUnitPrice,
                 Currency = "ILS"
-            });
+            }, ownerId);
             return RedirectToPage("/Owner/Invoices", new { id });
         }
 
         public IActionResult OnPostMarkSent(int id)
         {
-            _srv.UpdateInvoiceStatus(id, "Sent");
+            if (HttpContext.Session.GetString("Role") != "Owner") return RedirectToPage("/Login");
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            _srv.UpdateInvoiceStatusForOwner(id, ownerId, "Sent");
             return RedirectToPage("/Owner/Invoices", new { id });
         }
 
         public IActionResult OnPostMarkPaid(int id)
         {
-            _srv.MarkInvoicePaid(id, DateTime.Today);
+            if (HttpContext.Session.GetString("Role") != "Owner") return RedirectToPage("/Login");
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            _srv.MarkInvoicePaidForOwner(id, ownerId, DateTime.Today);
             return RedirectToPage("/Owner/Invoices", new { id });
         }
 
         public IActionResult OnGetPdf(int id)
         {
-            var bytes = _srv.GenerateInvoicePdf(id);
+            if (HttpContext.Session.GetString("Role") != "Owner") return RedirectToPage("/Login");
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            var bytes = _srv.GenerateInvoicePdfForOwner(id, ownerId);
             return File(bytes, "application/pdf", $"INV-{id}.pdf");
         }
     }
