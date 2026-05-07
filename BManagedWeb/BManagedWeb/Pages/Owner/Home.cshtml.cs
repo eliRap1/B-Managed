@@ -7,6 +7,32 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BManagedWeb.Pages.Owner
 {
+    // =========================================================================
+    // HomeModel — /Owner/Home (Owner dashboard).
+    // -------------------------------------------------------------------------
+    // First page after Owner login. Pulls a snapshot of every "is-the-business
+    // healthy?" signal in one OnGet pass, all in DisplayCurrency:
+    //   * CustomersCount / ActiveProjects / UnpaidCount / OverdueCount —
+    //     simple counters off the per-Owner queries.
+    //   * UnpaidTotal — sum of open invoices (status != Paid).
+    //   * VatDue + TaxSetAside — month-scoped via VatSummary +
+    //     MonthlyTaxSetAside.
+    //   * RecentInvoices — last 6 invoices across customers (capped).
+    //   * Forecast — 3-month cashflow projection.
+    //   * Smart insights:
+    //       - top expense category this month;
+    //       - revenue vs prior-month % change;
+    //       - account-type info pill (Patur/Zair).
+    //   * Auto-creates overdue notifications via EnsureOverdueNotifications
+    //     (idempotent server-side — checks for existing notif first).
+    //   * Kpis (AnalyticsKpis) — receivables aging + on-time rate +
+    //     concentration; rendered as bento tiles.
+    //   * Loans (LoanSummary) — outstanding principal + DSR; bento tile.
+    // JSON helpers:
+    //   OnGetSparkline — 6-month profit per month (used by Chart.js).
+    //   OnGetStats     — lightweight polling endpoint (Unpaid / Overdue /
+    //                    ActiveProjects) for the live counter refresh.
+    // =========================================================================
     public class HomeModel : PageModel
     {
         private readonly Service1Client _srv = new Service1Client();

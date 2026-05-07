@@ -8,6 +8,26 @@ using System.Windows.Controls;
 
 namespace BManagedClient
 {
+    // =========================================================================
+    // Invoices page (WPF) — Owner-only.
+    // -------------------------------------------------------------------------
+    // Two-pane layout:
+    //   Left  — list of every invoice (across every customer of this Owner)
+    //           sorted by IssueDate desc. Click selects → loads detail.
+    //   Right — selected invoice: Customer + Currency picker + Create button
+    //           (creates a Draft); Add-Line form (Description / Qty / Unit
+    //           Price → Line Total auto-computed); Mark Sent / Mark Paid /
+    //           Save PDF actions; live totals row.
+    // Performance note:
+    //   RefreshInvoices used to loop customers and call GetInvoicesByCustomer
+    //   per row — N round-trips, one channel-open each. Replaced with one
+    //   GetInvoicesForOwner SOAP call (server-side INNER JOIN). For 30
+    //   customers that's 30 → 1 round-trips.
+    // Israeli VAT default:
+    //   Create_Click sets VatRate = 0.0 for Patur Owners (LogIn.sign.IsPatur),
+    //   else 0.18. The header VatRate is what RecalcTotals applies on the
+    //   server; line items don't carry their own rate.
+    // =========================================================================
     public partial class Invoices : Page
     {
         private List<Customer> _customers = new();

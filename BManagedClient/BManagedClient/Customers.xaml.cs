@@ -7,6 +7,27 @@ using System.Windows.Controls;
 
 namespace BManagedClient
 {
+    // =========================================================================
+    // Customers page (WPF) — Owner-only CRM.
+    // -------------------------------------------------------------------------
+    // Layout (XAML):
+    //   Header → Search bar (with '+ New customer' toggle) → optional
+    //   inline add-form panel (collapsed by default) → ListView of
+    //   customers → status TextBlock at the bottom.
+    // SOAP ops:
+    //   GetCustomersForOwner / SearchCustomers — both pass LogIn.sign.Id
+    //   so company A can never see company B's customers.
+    //   AddCustomer.
+    // Validation (per-field):
+    //   Same regexes as the Web page — EmailRx and PhoneRx are matched in
+    //   SaveAdd_Click. Bad fields get a red BorderBrush (1.5px); the first
+    //   error message lands in the existing 'status' TextBlock.
+    // History:
+    //   Pre-May-2026 the '+ New customer' button used Microsoft.VisualBasic
+    //   InputBox to grab only the business name — every other column ended
+    //   up blank. Replaced with a real inline form to collect contact
+    //   details + tax id + email + phone + address + currency.
+    // =========================================================================
     public partial class Customers : Page
     {
         // Same lenient regexes as the SignUp page so customer details and user

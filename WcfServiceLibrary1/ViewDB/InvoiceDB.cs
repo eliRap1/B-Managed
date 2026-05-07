@@ -6,6 +6,29 @@ using System.Linq;
 
 namespace ViewDB
 {
+    // =========================================================================
+    // InvoiceDB — Invoices table data-access.
+    // -------------------------------------------------------------------------
+    // Schema:
+    //   id (COUNTER PK), invoiceNumber (auto-generated INV-YYYY-NNNNN),
+    //   projectId? (FK Projects), customerId (FK Customers),
+    //   issueDate, dueDate, paidDate?, status ('Draft'/'Sent'/'Paid'/'Overdue'),
+    //   subtotal CURRENCY, vatRate DOUBLE (default 0.18),
+    //   vatAmount CURRENCY, total CURRENCY, currency TEXT(3),
+    //   notes MEMO, contractId? (FK Contracts — drives Fulfilled flow).
+    // Lifecycle:
+    //   Draft → Sent → Paid (or Overdue). MarkPaid stamps paidDate + flips
+    //   status; Service1.MarkInvoicePaid then auto-flips the linked Contract
+    //   to 'Fulfilled' (May 2026 reform).
+    // Money:
+    //   Subtotal/VatAmount/Total are recomputed from line items via
+    //   RecalcTotals; called on every AddInvoiceLine to keep totals fresh.
+    //   VAT defaults to 18% (post-Jan-2025 rate); Patur signups force 0%.
+    // Tenant scoping:
+    //   GetByCustomer is per-customer (no JOIN to Customers).
+    //   GetForOwner / GetUnpaidForOwner / GetOverdueForOwner all JOIN
+    //   Customers ON ownerId so a logged-in Owner only sees their own data.
+    // =========================================================================
     /// <summary>Invoices header table. Lines stored in <see cref="InvoiceLineDB"/>.</summary>
     public class InvoiceDB : BaseDB
     {

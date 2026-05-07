@@ -6,6 +6,36 @@ using System.Linq;
 
 namespace ViewDB
 {
+    // =========================================================================
+    // LoanDB — Loans + LoanPayments tables (introduced May 2026).
+    // -------------------------------------------------------------------------
+    // Schema (auto-created on first run via EnsureSchema):
+    //   Loans:
+    //     id, ownerId (FK Users), lender, principal (קרן), remainingBalance,
+    //     interestRatePct, monthlyPayment, startDate, termMonths,
+    //     nextPaymentDate, currency, purpose, isKerenBacked (BIT —
+    //     state-backed business fund: קרן הלוואות בערבות מדינה / קרן שמש /
+    //     קרן קורת), isActive, notes, createdAt.
+    //   LoanPayments:
+    //     id, loanId (FK Loans), paidDate, amount, principalPortion,
+    //     interestPortion, notes.
+    // Why two tables:
+    //   Recording payments separately preserves history for the sparkline
+    //   on the Loans page (Web) and audit trail. The parent Loan row carries
+    //   the running RemainingBalance + NextPaymentDate so reports don't have
+    //   to re-aggregate every read.
+    // RecordPayment atomicity:
+    //   Access OleDb has weak multi-statement transaction support, so
+    //   InsertPayment runs INSERT then a follow-up UPDATE on Loans
+    //   (decrement RemainingBalance, advance NextPaymentDate, flip IsActive
+    //   to false when balance hits zero). Both calls share one connection
+    //   open inside the same scope; failures still leak the INSERT but the
+    //   subsequent reads will self-correct on the next payment.
+    // Used by:
+    //   Service1: AddLoan / UpdateLoan / DeleteLoan / RecordLoanPayment /
+    //             GetLoanSummary (joins to ReportsDB.AdvancedKpis for DSR).
+    //   Web /Owner/Loans + WPF Loans page.
+    // =========================================================================
     /// <summary>
     /// Loans + LoanPayments tables. Auto-creates schema on first use so
     /// existing .accdb files migrate automatically. Pairs with the LoanSummary

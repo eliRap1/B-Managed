@@ -7,6 +7,29 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BManagedWeb.Pages.Owner
 {
+    // =========================================================================
+    // InvoicesModel — /Owner/Invoices (Owner role only).
+    // -------------------------------------------------------------------------
+    // Two display modes (driven by route param {id:int?}):
+    //   * Index  (no id) — list of every invoice + create-draft form +
+    //                      filter by status (All/Draft/Sent/Paid/Overdue) +
+    //                      free-text search by # or customer name.
+    //   * Detail (with id) — selected invoice + line items + totals card +
+    //                       'Mark Sent / Paid' buttons + PDF download +
+    //                       contract banner if the invoice was raised from
+    //                       a Contract.
+    // Israeli VAT logic on Create:
+    //   Default VatRate = 0.18 (18%, current Israeli rate post-Jan-2025).
+    //   Owners with BusinessType == 'Patur' get VatRate = 0 — the page reads
+    //   the user record once before persisting so Patur invoices are issued
+    //   without VAT regardless of what the dropdown defaulted to.
+    // Contract → Invoice flow:
+    //   When ContractId query param is set (the 'Invoice this contract'
+    //   button on the Contracts page), Create prefills the customer +
+    //   currency from the contract, persists ContractId on the new invoice,
+    //   and seeds an initial line with the contract title + total.
+    //   MarkInvoicePaid (on the server) auto-flips the contract to Fulfilled.
+    // =========================================================================
     public class InvoicesModel : PageModel
     {
         private readonly Service1Client _srv = new Service1Client();

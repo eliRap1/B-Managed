@@ -6,6 +6,30 @@ using System.Linq;
 
 namespace ViewDB
 {
+    // =========================================================================
+    // ContractDB — Contracts table data-access.
+    // -------------------------------------------------------------------------
+    // Lifecycle (status field):
+    //   Draft → Sent → Signed → Fulfilled (paid)
+    //                    └──────→ Cancelled
+    //   * Draft     — Owner is still editing the body.
+    //   * Sent      — PDF given to customer for signature.
+    //   * Signed    — customer signed; eligible for invoicing.
+    //   * Fulfilled — auto-set by Service1.MarkInvoicePaid when an invoice
+    //                 with this ContractId is paid (May 2026 reform).
+    //   * Cancelled — manual close.
+    // Auto-numbering:
+    //   NextContractNumber returns 'CTR-YYYY-NNN' counting per-year.
+    // Connection back to Invoices:
+    //   Invoice.ContractId (nullable FK) — when an Owner clicks 'Invoice
+    //   this contract' (web Contracts page or WPF Contracts page),
+    //   CreateInvoice persists this id; MarkInvoicePaid then auto-flips
+    //   the contract to 'Fulfilled' via SetStatus(c.Id, "Fulfilled", ...).
+    // PDF:
+    //   GenerateContractPdf (in Service1, via PdfSharp) reads body + total
+    //   + customer + signed-date and writes a one-pager. PdfPath is stored
+    //   on the row so a regenerate uses the same filename.
+    // =========================================================================
     /// <summary>
     /// Service-engagement contract between Owner and Customer for a Project.
     /// Auto-creates the Contracts table on first use so existing .accdb files

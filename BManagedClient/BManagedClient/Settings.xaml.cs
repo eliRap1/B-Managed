@@ -6,6 +6,26 @@ using System.Windows.Controls;
 
 namespace BManagedClient
 {
+    // =========================================================================
+    // Settings page (WPF).
+    // -------------------------------------------------------------------------
+    // Single page used by every role; the Owner-only StackPanel
+    // (`ownerSection`) is hidden for Employee + Client logins.
+    // Sections:
+    //   * Account (everyone)   — email, phone, preferred currency.
+    //   * Company (Owner only) — business name, VAT registration
+    //     (Patur/Murshe), Osek-Zair flag, invite-code display + Copy +
+    //     Rotate buttons.
+    //   * Security             — password change with the same regex as
+    //     SignUp (8+ chars, must include letter + digit). Blocks downgrades.
+    // Invite-code rotation:
+    //   RotateInvite_Click prompts Yes/No before generating a new code.
+    //   Old code is invalidated immediately because GetOwnerByInviteCode
+    //   does an exact match — employees still in signup will get
+    //   'Invite code not recognised' until they're given the new value.
+    // Page is wrapped in a ScrollViewer (XAML) so the Owner section is
+    // reachable below the fold on small displays.
+    // =========================================================================
     public partial class Settings : Page
     {
         public Settings()

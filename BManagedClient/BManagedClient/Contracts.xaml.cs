@@ -9,6 +9,29 @@ using System.Windows.Controls;
 
 namespace BManagedClient
 {
+    // =========================================================================
+    // Contracts page (WPF) — Owner-only.
+    // -------------------------------------------------------------------------
+    // Lifecycle (server-side ContractDB tracks .status):
+    //   Draft → Sent → Signed → Fulfilled (paid)
+    //                    └──→ Cancelled
+    // UI:
+    //   Top: Customer + Project + title + amount + currency form, with a
+    //        SCOPE OF WORK MEMO box, Create button.
+    //   Middle: GridView of every contract for this Owner (via
+    //           GetContractsForOwner — tenant-scoped INNER JOIN).
+    //   Bottom-right action bar:
+    //     * Update status (Draft/Sent/Signed/Fulfilled/Cancelled).
+    //     * 🧾 Invoice this contract — only valid in Signed state. Creates
+    //       a Draft invoice with the customer + currency from the contract,
+    //       seeds an initial line for the contract total, and persists
+    //       Invoice.ContractId so MarkInvoicePaid can auto-flip the contract
+    //       to Fulfilled later.
+    //     * 📄 PDF — generate + save to disk via PdfSharp.
+    //     * 🗑 Delete — confirm prompt.
+    // Israeli VAT:
+    //   InvoiceContract_Click sets VatRate = 0 for Patur Owners, else 0.18.
+    // =========================================================================
     public partial class Contracts : Page
     {
         private List<Customer> _customers = new();

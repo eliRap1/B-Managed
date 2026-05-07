@@ -8,6 +8,24 @@ using Microsoft.Win32;
 
 namespace BManagedClient
 {
+    // =========================================================================
+    // Reports page (WPF) — Owner-only analytics dashboard.
+    // -------------------------------------------------------------------------
+    // Mirrors /Owner/Reports on the Web, including:
+    //   * VAT triple (collected / paid / due) — month + year + currency
+    //     selectable via three ComboBoxes at the top.
+    //   * Top customers + Expense breakdown lists.
+    //   * P&L year card with Israeli income-tax bracket calc; respects the
+    //     IsZair flag for חישוב נורמטיבי (taxable base = 70% of revenue).
+    //   * Operating KPIs strip: outstanding aging buckets, avg days to
+    //     payment, top-customer concentration, avg monthly profit, runway.
+    //   * Loan summary card (visible only when Loans.LoanCount > 0).
+    //   * CSV export (ExportCsv_Click) for top customers + expenses.
+    // Performance:
+    //   Reload() batches 6 SOAP ops into a single ServiceGateway.Use() call
+    //   so the shared WCF channel only opens once — pre-fix this page paid
+    //   six channel-opens per refresh.
+    // =========================================================================
     public partial class Reports : Page
     {
         private bool _ready;

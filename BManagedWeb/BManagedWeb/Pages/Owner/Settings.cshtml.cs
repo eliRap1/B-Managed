@@ -7,6 +7,30 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BManagedWeb.Pages.Owner
 {
+    // =========================================================================
+    // SettingsModel — /Owner/Settings (Owner role only).
+    // -------------------------------------------------------------------------
+    // Four POST handlers, each independent so a partial save (e.g. just the
+    // password) doesn't cascade into the others:
+    //   OnPostProfile     — email / phone / preferred currency
+    //                       (validates email regex + phone regex; defends
+    //                        even if HTML5 'required' was bypassed).
+    //   OnPostPassword    — password change. Same regex as SignUp so an
+    //                       existing account can't downgrade to a weak
+    //                       password from this page.
+    //   OnPostCompany     — business name (display), VAT registration
+    //                       (Patur / Murshe), Osek-Zair flag.
+    //                       Three SOAP ops on the same channel.
+    //   OnPostRotateInvite — generates a fresh PREFIX-XXXX code (4 chars
+    //                       from BusinessName + 4 random alphanumerics from
+    //                       a confusable-free alphabet). Old code stops
+    //                       working immediately because GetOwnerByInviteCode
+    //                       does an exact match.
+    // Guard():
+    //   Every handler short-circuits to /Login if the session role isn't
+    //   'Owner'. Defence-in-depth — the nav already hides the link, but
+    //   handlers must enforce it themselves (don't trust the client).
+    // =========================================================================
     public class SettingsModel : PageModel
     {
         private readonly Service1Client _srv = new Service1Client();

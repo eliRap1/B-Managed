@@ -6,6 +6,30 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BManagedWeb.Pages.Owner
 {
+    // =========================================================================
+    // CustomersModel — /Owner/Customers (Owner role only).
+    // -------------------------------------------------------------------------
+    // Surfaces the per-Owner CRM list. Two layers:
+    //   * Search bar + add-customer form (top of page).
+    //   * Quick-view modal (HTML <dialog>-style, hidden until clicked) with
+    //     outstanding balance, lifetime paid, recent invoices, projects, and
+    //     an inline edit / delete form.
+    // Handlers:
+    //   OnGet          — list + search via SearchCustomers / GetCustomersForOwner.
+    //   OnPostAdd      — server-side validation (HTML form validation already
+    //                    caught the obvious cases) + AddCustomer.
+    //   OnPostUpdate   — modal Save button → UpdateCustomer.
+    //   OnPostDelete   — modal Delete button → DeleteCustomer (linked
+    //                    invoices/projects keep their customerId but the row
+    //                    is gone, so they show as 'unlinked' until cleanup).
+    //   OnGetDetail    — JSON handler hit by the modal opener; returns
+    //                    customer + outstanding/lifetime + last invoices +
+    //                    projects in one round-trip so the modal renders fast.
+    //   OnGetCsv       — exports the current owner's customer book as CSV.
+    // Tenant scoping:
+    //   GetCustomersForOwner / SearchCustomers always pass the session
+    //   UserId so company A never sees company B's customers.
+    // =========================================================================
     public class CustomersModel : PageModel
     {
         private readonly Service1Client _srv = new Service1Client();

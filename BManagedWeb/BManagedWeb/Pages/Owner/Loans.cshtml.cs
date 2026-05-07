@@ -7,6 +7,22 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BManagedWeb.Pages.Owner
 {
+    // =========================================================================
+    // LoansModel — /Owner/Loans (Owner role only).
+    // -------------------------------------------------------------------------
+    // Owns three responsibilities:
+    //   1. Display: pulls every Loan + per-loan PaymentHistory + LoanSummary
+    //      KPI roll-up in OnGet, all converted to DisplayCurrency.
+    //   2. CRUD: add a loan, record a payment, delete a loan. Each is a
+    //      handler method (OnPostAdd / OnPostPay / OnPostDelete).
+    //   3. Domain logic: state-backed (Keren) loans get a flag, monthly
+    //      debt-service ratio drives a coloured warning banner at >=25%
+    //      and >=40% (industry thresholds for 'watch' and 'high').
+    // SOAP ops touched:
+    //   GetLoansForOwner, GetLoanSummary, GetLoanPayments,
+    //   AddLoan, RecordLoanPayment, DeleteLoan.
+    // Used by the Reports page (Loan summary card) and Owner home (tile).
+    // =========================================================================
     /// <summary>
     /// Loans page — track principal (קרן), monthly payment, debt-to-income.
     /// Highlights state-backed (Keren) loans separately.

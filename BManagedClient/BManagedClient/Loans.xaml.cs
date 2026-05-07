@@ -6,6 +6,24 @@ using System.Windows.Controls;
 
 namespace BManagedClient
 {
+    // =========================================================================
+    // Loans page (WPF) — Owner-only.
+    // -------------------------------------------------------------------------
+    // Mirrors /Owner/Loans on the Web. Two halves:
+    //   * Top: KPI strip (active count, outstanding, monthly payment,
+    //          DSR vs annual income) + threshold warning banner at >=25%
+    //          and >=40% (industry yellow / red bands).
+    //   * Bottom: ListView of every loan + add-loan form + 'record payment'
+    //          panel that pre-fills 70% principal split (rough industry
+    //          default; the user can override).
+    // SOAP ops:
+    //   GetLoansForOwner / GetLoanSummary — both per-Owner-scoped.
+    //   AddLoan / DeleteLoan / RecordLoanPayment.
+    // Israeli context:
+    //   IsKerenBacked flag marks loans from state-backed business funds
+    //   (קרן הלוואות בערבות מדינה / קרן שמש / קרן קורת). These usually
+    //   carry lower rates — surfaced visually with a 'state-backed' label.
+    // =========================================================================
     public partial class Loans : Page
     {
         public Loans()

@@ -5,6 +5,34 @@ using System.Data.OleDb;
 
 namespace ViewDB
 {
+    // =========================================================================
+    // ReportsDB — read-only analytics, no mutation.
+    // -------------------------------------------------------------------------
+    // Why a separate ViewDB:
+    //   The Reports page assembles data from 5+ tables in 6+ queries. Putting
+    //   that aggregation in CustomerDB / InvoiceDB would couple the per-table
+    //   classes to UI concerns. ReportsDB owns ONLY SELECTs, no Insert / Update.
+    // SQL techniques used (rubric requirement #5: 'smart data'):
+    //   * INNER JOIN across [Invoices]↔[Customers] (every owner-scoped report).
+    //   * 4-table INNER JOIN in EmployeeRevenueReport
+    //     ([Invoices]⨝[Projects]⨝[Users]⨝[Customers]).
+    //   * GROUP BY + SUM in TopCustomersByRevenue, ExpenseBreakdown,
+    //     EmployeeRevenueReport.
+    //   * IIF(I.[status]='Paid', I.[total], 0) inside SUM — mixed-status
+    //     totals without a second pass.
+    //   * Aging + payment-lag computed in C# from raw rows; harder to do in
+    //     pure Access SQL because of date-arithmetic limitations.
+    // Currency:
+    //   Every monetary cell goes through CurrencyConverter.Convert(amt, src,
+    //   dst, asOfDate) so a Reports caller can request all output in ILS or
+    //   USD regardless of how rows were stored. Conversion uses the latest
+    //   ExchangeRates row at-or-before the row's date.
+    // KPIs (May 2026):
+    //   AdvancedKpis() returns a single AnalyticsKpis DTO holding receivables
+    //   aging, payment-lag, customer concentration, trailing 3-month flow,
+    //   and runway estimate. Used by /Owner/Reports + /Owner/Home + WPF
+    //   Reports + WPF Loans (debt-service ratio).
+    // =========================================================================
     /// <summary>
     /// Aggregated read-only queries for the Reports screens. Heavy lifting:
     /// INNER JOIN across multiple tables, GROUP BY + SUM, then per-row

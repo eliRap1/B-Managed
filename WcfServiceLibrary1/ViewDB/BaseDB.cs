@@ -6,6 +6,34 @@ using System.Data.OleDb;
 
 namespace ViewDB
 {
+    // =========================================================================
+    // BaseDB — abstract base for every per-table data-access class.
+    // -------------------------------------------------------------------------
+    // Why a base class:
+    //   * Centralises the OleDb connection-string resolution (Microsoft ACE
+    //     provider, reads BManaged.accdb from AppDomain.BaseDirectory).
+    //   * Provides Select / SelectScalar templates so every subclass writes
+    //     SQL once and gets row-→ object materialisation for free.
+    //   * Forces parameterised queries — every subclass uses
+    //     OleDbParameter, never string concatenation, so SQL injection is
+    //     impossible at the data layer.
+    // Inheritance pattern (OOP requirement #6 of the matriculation rubric):
+    //   BaseDB
+    //    ├─ UserDB         (Users + multi-tenant scoping)
+    //    ├─ CustomerDB     (per-Owner CRM rows)
+    //    ├─ ProjectDB      (with multi-employee assignment)
+    //    ├─ ContractDB     (auto-creates Contracts table on first use)
+    //    ├─ InvoiceDB / InvoiceLineDB
+    //    ├─ ExpenseDB      (with category JOIN)
+    //    ├─ NotificationDB
+    //    ├─ ExchangeRateDB (currency conversion table)
+    //    ├─ ReportsDB      (read-only aggregations, no mutation)
+    //    ├─ LoanDB / LoanPayment helpers
+    //    └─ ProjectAssignmentDB (Project↔Employee link table)
+    // Each subclass overrides NewEntity() to tell BaseDB which Model class
+    // to instantiate when reading rows; CreateModel() then maps DataReader
+    // columns to the strongly-typed object.
+    // =========================================================================
     public abstract class BaseDB
     {
         private static string connectionString = null;
