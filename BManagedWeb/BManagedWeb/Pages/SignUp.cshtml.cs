@@ -76,7 +76,7 @@ namespace BManagedWeb.Pages
 
         public IActionResult OnPost()
         {
-            if (SelectedRole != "Owner" && SelectedRole != "Employee")
+            if (SelectedRole != "Owner" && SelectedRole != "Employee" && SelectedRole != "Client")
             { ErrorMessage = "Pick a role first."; return Page(); }
 
             if (string.IsNullOrEmpty(Username) || !UsernameRx.IsMatch(Username))
@@ -88,10 +88,10 @@ namespace BManagedWeb.Pages
             if (!EmailRx.IsMatch(Email ?? "")) { ErrorMessage = "Email looks invalid (e.g. name@example.com)."; return Page(); }
             if (!PhoneRx.IsMatch(Phone ?? "")) { ErrorMessage = "Phone must be 7–15 digits, optionally + country code."; return Page(); }
 
-            // Resolve Employee invite code BEFORE creating the user — no point
-            // creating an orphaned employee row.
+            // Resolve Employee/Client invite code BEFORE creating the user — no point
+            // creating an orphaned row.
             int? resolvedOwnerId = null;
-            if (SelectedRole == "Employee")
+            if (SelectedRole == "Employee" || SelectedRole == "Client")
             {
                 var code = (InviteCode ?? "").Trim().ToUpperInvariant();
                 if (string.IsNullOrEmpty(code))
@@ -131,10 +131,31 @@ namespace BManagedWeb.Pages
                     var code = NewInviteCode(BusinessName ?? Username);
                     try { _srv.SetInviteCode(newId, code); GeneratedInviteCode = code; } catch { }
                 }
-                else // Employee
+                else // Employee or Client
                 {
                     if (resolvedOwnerId.HasValue)
                     { try { _srv.SetOwnerId(newId, resolvedOwnerId.Value); } catch { } }
+
+                    // Auto-create a Customer row for the Owner so the new Client
+                    // shows up in their CRM immediately. Best-effort: failure
+                    // here doesn't roll back the user account.
+                    if (SelectedRole == "Client" && resolvedOwnerId.HasValue)
+                    {
+                        try
+                        {
+                            _srv.AddCustomer(new Customer
+                            {
+                                BusinessName      = string.IsNullOrWhiteSpace(BusinessName) ? Username : BusinessName.Trim(),
+                                ContactName       = Username,
+                                Email             = Email,
+                                Phone             = Phone,
+                                OwnerId           = resolvedOwnerId.Value,
+                                PreferredCurrency = Currency ?? "ILS",
+                                Notes             = "Auto-created from Client signup",
+                            });
+                        }
+                        catch { /* best-effort */ }
+                    }
                 }
 
                 if (SelectedRole == "Owner" && !string.IsNullOrEmpty(GeneratedInviteCode))

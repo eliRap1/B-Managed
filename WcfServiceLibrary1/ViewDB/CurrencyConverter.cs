@@ -14,10 +14,21 @@ namespace ViewDB
         public decimal Convert(decimal amount, string from, string to, DateTime asOfDate)
         {
             if (amount == 0m) return 0m;
+            from = from?.Trim();
+            to = to?.Trim();
             if (string.IsNullOrEmpty(from) || string.IsNullOrEmpty(to)) return amount;
             if (string.Equals(from, to, StringComparison.OrdinalIgnoreCase)) return amount;
 
-            double rate = _db.GetLatestRate(from, to, asOfDate);
+            double rate;
+            try
+            {
+                rate = _db.GetLatestRate(from, to, asOfDate);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Currency conversion fallback: " + ex.Message);
+                return amount;
+            }
             if (rate <= 0) rate = 1.0;
             return Math.Round(amount * (decimal)rate, 2);
         }

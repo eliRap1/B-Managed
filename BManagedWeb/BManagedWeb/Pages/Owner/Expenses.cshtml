@@ -66,6 +66,13 @@
         <select asp-for="NewCurrency" class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5">
             <option>ILS</option><option>USD</option>
         </select>
+        <select asp-for="NewRecurringKind"
+                title="@L.T(HttpContext,"Mark recurring (הוצאה קבועה / משתנה)","סימון הוצאה קבועה / משתנה")"
+                class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5">
+            <option value="">@L.T(HttpContext,"One-time","חד פעמית")</option>
+            <option value="Fixed">@L.T(HttpContext,"Recurring · Fixed (rent, insurance)","קבועה (שכ״ד, ביטוח)")</option>
+            <option value="Variable">@L.T(HttpContext,"Recurring · Variable (utilities)","משתנה (חשמל, מים)")</option>
+        </select>
         <label class="md:col-span-4 bg-paper-100 border border-dashed border-black/10 rounded-2xl px-4 py-3 text-sm text-ink/60 cursor-pointer hover:border-accent transition flex items-center gap-3">
             <span class="pill">@L.T(HttpContext,"Receipt (optional, ≤5 MB)","קבלה (אופציונלי, עד 5MB)")</span>
             <input asp-for="NewReceipt" type="file" accept="image/*,application/pdf" class="text-xs" />
@@ -130,6 +137,7 @@
                 <th class="text-left py-2">@L.T(HttpContext,"Date","תאריך")</th><th class="text-left">@L.T(HttpContext,"Category","קטגוריה")</th>
                 <th class="text-left">@L.T(HttpContext,"Vendor","ספק")</th><th class="text-right">@L.T(HttpContext,"Amount","סכום")</th>
                 <th class="text-right">@L.T(HttpContext,"VAT","מע״מ")</th><th class="text-right">@L.T(HttpContext,"Currency","מטבע")</th>
+                <th class="text-center">@L.T(HttpContext,"Recurring","קבועה")</th>
             </tr></thead>
             <tbody>
             @foreach (var e in Model.Expenses)
@@ -142,10 +150,22 @@
                     <td class="text-right font-medium">@e.Amount.ToString("N2")</td>
                     <td class="text-right text-ink/60">@e.VatPaid.ToString("N2")</td>
                     <td class="text-right text-ink/40 text-xs">@e.Currency</td>
+                    <td class="text-center">
+                        <form method="post" asp-page-handler="Mark" class="inline-flex items-center gap-1">
+                            <input type="hidden" name="id" value="@e.Id" />
+                            @{ var kind = e.RecurringKind ?? ""; }
+                            <select name="kind" onchange="this.form.requestSubmit()"
+                                    class="bg-paper-100 border border-black/5 rounded-full px-2 py-1 text-xs">
+                                <option value=""         selected="@(kind == ""         ? "selected" : null)">@L.T(HttpContext,"—","—")</option>
+                                <option value="Fixed"    selected="@(kind == "Fixed"    ? "selected" : null)">@L.T(HttpContext,"Fixed","קבועה")</option>
+                                <option value="Variable" selected="@(kind == "Variable" ? "selected" : null)">@L.T(HttpContext,"Variable","משתנה")</option>
+                            </select>
+                        </form>
+                    </td>
                 </tr>
             }
             @if (Model.Expenses.Count == 0)
-            { <tr><td colspan="6" class="text-center py-12 text-ink/40">@L.T(HttpContext,"No expenses yet.","אין הוצאות עדיין.")</td></tr> }
+            { <tr><td colspan="7" class="text-center py-12 text-ink/40">@L.T(HttpContext,"No expenses yet.","אין הוצאות עדיין.")</td></tr> }
             </tbody>
         </table>
     </div>

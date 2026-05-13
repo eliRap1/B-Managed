@@ -104,23 +104,23 @@ else if (Model.Summary.MonthlyDebtServiceRatioPct >= 25)
             </div>
             <div>
                 <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Principal (קרן)","קרן ההלוואה")</label>
-                <input asp-for="NewPrincipal" type="number" step="0.01" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5"
+                <input asp-for="NewPrincipal" id="loan-principal" type="number" step="0.01" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5"
                        placeholder="@L.T(HttpContext,"Original borrowed amount","סכום מקורי שלוויתי")"/>
             </div>
             <div>
                 <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Interest rate %","ריבית שנתית %")</label>
-                <input asp-for="NewInterestRate" type="number" step="0.01" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5"
+                <input asp-for="NewInterestRate" id="loan-rate" type="number" step="0.01" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5"
                        placeholder="6.5"/>
             </div>
 
             <div>
                 <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Monthly payment","תשלום חודשי")</label>
-                <input asp-for="NewMonthlyPayment" type="number" step="0.01" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5"
+                <input asp-for="NewMonthlyPayment" id="loan-monthly" type="number" step="0.01" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5"
                        placeholder="@L.T(HttpContext,"What you pay every month","הסכום שאתה משלם כל חודש")"/>
             </div>
             <div>
                 <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Term (months)","משך (בחודשים)")</label>
-                <input asp-for="NewTermMonths" type="number" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5"
+                <input asp-for="NewTermMonths" id="loan-months" type="number" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5"
                        placeholder="60"/>
             </div>
             <div>
@@ -139,6 +139,27 @@ else if (Model.Summary.MonthlyDebtServiceRatioPct >= 25)
                 <input asp-for="NewPurpose" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5"
                        placeholder="@L.T(HttpContext,"e.g. equipment, working capital","למשל ציוד, הון חוזר")"/>
             </div>
+
+            <div class="md:col-span-3 flex flex-wrap items-center gap-3 text-xs">
+                <button type="button" id="loan-autocalc"
+                        class="bg-ink text-paper-50 rounded-full px-4 py-2"
+                        title="@L.T(HttpContext,"Fill the missing field from the other two","חשב אוטומטית את השדה החסר משני האחרים")">
+                    @L.T(HttpContext,"Auto-calc missing field","חשב אוטומטית שדה חסר") ⚡
+                </button>
+                <span id="loan-autocalc-msg" class="text-ink/50"></span>
+                <span class="text-ink/40">@L.T(HttpContext,"Fill any 2 of: principal, monthly, term — the 3rd is computed.",
+                    "מלא 2 מתוך: קרן, תשלום חודשי, חודשים — השלישי יחושב.")</span>
+            </div>
+
+            <label class="md:col-span-3 flex items-start gap-3 bg-amber/10 border border-amber/30 rounded-2xl px-4 py-3 cursor-pointer">
+                <input asp-for="NewHasStandingOrder" type="checkbox" class="mt-1 accent-amber"/>
+                <span>
+                    <span class="block font-semibold text-ink">@L.T(HttpContext,"Standing order (הוראת קבע)","הוראת קבע בבנק")</span>
+                    <span class="block text-xs text-ink/60 mt-0.5">@L.T(HttpContext,
+                        "Bank auto-charges the monthly payment — used to highlight which loans deduct automatically vs. need manual transfer.",
+                        "הבנק מחייב את התשלום החודשי באופן אוטומטי — מסמן הלוואות שמתחייבות לבד לעומת אלה שדורשות העברה ידנית.")</span>
+                </span>
+            </label>
 
             <label class="md:col-span-3 flex items-start gap-3 bg-mint/10 border border-mint/30 rounded-2xl px-4 py-3 cursor-pointer">
                 <input asp-for="NewIsKerenBacked" type="checkbox" class="mt-1 accent-mint"/>
@@ -174,6 +195,8 @@ else if (Model.Summary.MonthlyDebtServiceRatioPct >= 25)
                     <div class="text-right">
                         @if (l.IsKerenBacked)
                         { <span class="pill bg-mint/15 text-mint border border-mint/30 rounded-full px-2 py-0.5 text-xs">קרן ⓘ</span> }
+                        @if (l.HasStandingOrder)
+                        { <span class="pill bg-amber/15 text-amber border border-amber/30 rounded-full px-2 py-0.5 text-xs ml-1" title="@L.T(HttpContext,"Bank auto-charges","הוראת קבע")">⏱ @L.T(HttpContext,"Auto","קבע")</span> }
                         @if (!l.IsActive)
                         { <span class="pill bg-black/5 text-ink/50 border border-black/10 rounded-full px-2 py-0.5 text-xs ml-1">@L.T(HttpContext,"Closed","נסגרה")</span> }
                     </div>
@@ -283,3 +306,64 @@ else if (Model.Summary.MonthlyDebtServiceRatioPct >= 25)
         </div>
     }
 </section>
+
+@section Scripts {
+<script>
+  // Loan auto-calc:
+  //   With annual interest > 0 we use the standard amortization formula
+  //     M = P * r / (1 - (1+r)^-n),       r = annual / 12 / 100
+  //   With interest = 0 it collapses to M = P/n (no time-value cost).
+  // Direction depends on which two of {principal, monthly, months} are filled.
+  (function () {
+    const P  = document.getElementById('loan-principal');
+    const M  = document.getElementById('loan-monthly');
+    const N  = document.getElementById('loan-months');
+    const R  = document.getElementById('loan-rate');
+    const btn = document.getElementById('loan-autocalc');
+    const msg = document.getElementById('loan-autocalc-msg');
+    if (!P || !M || !N || !btn) return;
+
+    function num(el) { const v = parseFloat(el.value); return isFinite(v) ? v : NaN; }
+    function show(text, ok) {
+      msg.textContent = text || '';
+      msg.classList.toggle('text-rose', !ok);
+      msg.classList.toggle('text-mint', !!ok);
+    }
+
+    btn.addEventListener('click', function () {
+      const p = num(P), m = num(M), n = num(N);
+      const rAnnual = num(R);
+      const r = (isFinite(rAnnual) && rAnnual > 0) ? (rAnnual / 12 / 100) : 0;
+      const have = [isFinite(p) && p > 0, isFinite(m) && m > 0, isFinite(n) && n > 0];
+      const filled = have.filter(Boolean).length;
+      if (filled < 2) { show('Fill any 2 of: principal, monthly, term.', false); return; }
+
+      try {
+        if (!have[1]) {
+          // Solve monthly given principal + months
+          const monthly = r === 0 ? (p / n) : (p * r / (1 - Math.pow(1 + r, -n)));
+          M.value = monthly.toFixed(2);
+          show('Monthly payment computed.', true);
+        } else if (!have[2]) {
+          // Solve months given principal + monthly
+          if (r === 0) { N.value = Math.ceil(p / m); }
+          else {
+            const ratio = (m - p * r) / m;
+            if (ratio <= 0) { show('Monthly payment too low to ever clear principal at this interest rate.', false); return; }
+            const months = -Math.log(ratio) / Math.log(1 + r);
+            N.value = Math.max(1, Math.ceil(months));
+          }
+          show('Term (months) computed.', true);
+        } else if (!have[0]) {
+          // Solve principal given monthly + months
+          const principal = r === 0 ? (m * n) : (m * (1 - Math.pow(1 + r, -n)) / r);
+          P.value = principal.toFixed(2);
+          show('Principal computed.', true);
+        } else {
+          show('All three already filled — clear one to recompute.', false);
+        }
+      } catch (e) { show('Calculation failed.', false); }
+    });
+  })();
+</script>
+}
