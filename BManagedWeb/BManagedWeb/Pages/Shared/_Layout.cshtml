@@ -1,15 +1,12 @@
 @{
     var role     = Context.Session.GetString("Role") ?? "";
     var username = Context.Session.GetString("Username") ?? "";
-    var lang     = Context.Session.GetString("Lang") ?? "en"; // "en" | "he"
-    var dir      = lang == "he" ? "rtl" : "ltr";
     var isOwner    = role == "Owner";
     var isEmployee = role == "Employee";
     var isClient   = role == "Client";
-    string T(string en, string he) => lang == "he" ? he : en;
 }
 <!DOCTYPE html>
-<html lang="@lang" dir="@dir" class="bg-[#FAFAF7]">
+<html lang="en" class="bg-[#FAFAF7]">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -76,17 +73,17 @@
       <a asp-page="/Index" class="display text-base font-bold px-4">B-Managed</a>
       @if (isOwner)
       {
-        <a asp-page="/Owner/Home"      class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">@T("Dashboard","דשבורד")</a>
-        <a asp-page="/Owner/Customers" class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">@T("Customers","לקוחות")</a>
-        <a asp-page="/Owner/Projects"  class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">@T("Projects","פרויקטים")</a>
-        <a asp-page="/Owner/Contracts" class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">@T("Contracts","חוזים")</a>
-        <a asp-page="/Owner/Invoices" asp-route-id="" class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">@T("Invoices","חשבוניות")</a>
-        <a asp-page="/Owner/Expenses"  class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">@T("Expenses","הוצאות")</a>
-        <a asp-page="/Owner/Reports"   class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">@T("Reports","דוחות")</a>
-        <a asp-page="/Owner/Loans"     class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">@T("Loans","הלוואות")</a>
-        <a asp-page="/Owner/Import"    class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">@T("Import","ייבוא")</a>
-        <a asp-page="/Owner/Users"     class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">@T("Users","משתמשים")</a>
-        <a asp-page="/Owner/Settings"  class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">@T("Settings","הגדרות")</a>
+        <a asp-page="/Owner/Home"      class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">Dashboard</a>
+        <a asp-page="/Owner/Customers" class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">Customers</a>
+        <a asp-page="/Owner/Projects"  class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">Projects</a>
+        <a asp-page="/Owner/Contracts" class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">Contracts</a>
+        <a asp-page="/Owner/Invoices" asp-route-id="" class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">Invoices</a>
+        <a asp-page="/Owner/Expenses"  class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">Expenses</a>
+        <a asp-page="/Owner/Reports"   class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">Reports</a>
+        <a asp-page="/Owner/Loans"     class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">Loans</a>
+        <a asp-page="/Owner/Import"    class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">Import</a>
+        <a asp-page="/Owner/Users"     class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">Users</a>
+        <a asp-page="/Owner/Settings"  class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">Settings</a>
       }
       else if (isEmployee)
       {
@@ -99,8 +96,6 @@
         <a asp-page="/Client/Portal" class="px-3 py-1.5 rounded-full hover:bg-black/5 transition">My Portal</a>
       }
 
-      <a asp-page="/Lang" asp-route-target="@(lang == "he" ? "en" : "he")"
-         class="px-3 py-1.5 rounded-full hover:bg-black/5 transition text-xs">@(lang == "he" ? "EN" : "עב")</a>
       @if (!string.IsNullOrEmpty(username))
       {
         <a asp-page="/Notifications" class="relative px-3 py-1.5 rounded-full hover:bg-black/5 transition" title="Notifications">
@@ -109,7 +104,7 @@
         </a>
         <span class="px-3 py-1.5 text-ink/60">@username</span>
         <a asp-page="/Logout" class="group inline-flex items-center gap-2 bg-ink text-paper-50 rounded-full px-3 py-1.5 ml-1 hover:opacity-90 transition active:scale-[0.98]">
-          @T("Logout","יציאה")
+          Logout
           <span class="w-6 h-6 rounded-full bg-white/15 flex items-center justify-center transition-all duration-500 ease-spring group-hover:translate-x-0.5">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
           </span>

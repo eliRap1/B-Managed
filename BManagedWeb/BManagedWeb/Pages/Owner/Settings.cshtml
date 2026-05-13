@@ -5,8 +5,8 @@
 }
 
 <div class="reveal mb-10 max-w-2xl">
-    <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">@L.T(HttpContext,"Account","חשבון")</span>
-    <h1 class="display text-5xl md:text-6xl font-bold mt-4 leading-[0.95]">@L.T(HttpContext,"Settings.","הגדרות.")</h1>
+    <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">Account</span>
+    <h1 class="display text-5xl md:text-6xl font-bold mt-4 leading-[0.95]">Settings.</h1>
 </div>
 
 @if (TempData["SetMsg"] is string sm)
@@ -18,38 +18,38 @@
     <!-- Profile -->
     <form method="post" asp-page-handler="Profile" class="bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
         <div class="bg-paper-50 rounded-core p-6 shadow-inset">
-            <span class="pill text-ink/40">@L.T(HttpContext,"Profile","פרופיל")</span>
-            <h2 class="display text-2xl font-semibold mt-1 mb-4">@L.T(HttpContext,"You","אתה")</h2>
+            <span class="pill text-ink/40">Profile</span>
+            <h2 class="display text-2xl font-semibold mt-1 mb-4">You</h2>
 
-            <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Email","אימייל")</label>
+            <label class="pill text-ink/40 mb-1 block">Email</label>
             <input asp-for="Email" type="email" required
                    class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5 mb-3 outline-none focus:border-accent transition" />
 
-            <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Phone","טלפון")</label>
+            <label class="pill text-ink/40 mb-1 block">Phone</label>
             <input asp-for="Phone" type="tel" required pattern="\+?\d{7,15}"
                    class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5 mb-3 outline-none focus:border-accent transition" />
 
-            <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Preferred currency","מטבע מועדף")</label>
+            <label class="pill text-ink/40 mb-1 block">Preferred currency</label>
             <select asp-for="Currency" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5 mb-4">
                 <option>ILS</option><option>USD</option>
             </select>
 
-            <button class="bg-ink text-paper-50 rounded-full px-6 py-2.5 text-sm">@L.T(HttpContext,"Save profile","שמור פרופיל")</button>
+            <button class="bg-ink text-paper-50 rounded-full px-6 py-2.5 text-sm">Save profile</button>
         </div>
     </form>
 
     <!-- Password -->
     <form method="post" asp-page-handler="Password" class="bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
         <div class="bg-paper-50 rounded-core p-6 shadow-inset">
-            <span class="pill text-ink/40">@L.T(HttpContext,"Security","אבטחה")</span>
-            <h2 class="display text-2xl font-semibold mt-1 mb-4">@L.T(HttpContext,"Change password","שינוי סיסמה")</h2>
+            <span class="pill text-ink/40">Security</span>
+            <h2 class="display text-2xl font-semibold mt-1 mb-4">Change password</h2>
 
-            <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"New password","סיסמה חדשה")</label>
+            <label class="pill text-ink/40 mb-1 block">New password</label>
             <input asp-for="NewPassword" type="password" minlength="8" required
                    class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5 mb-2 outline-none focus:border-accent transition" />
-            <p class="text-xs text-ink/40 mb-4">@L.T(HttpContext,"8+ chars, must include a letter and a digit.","8+ תווים, לפחות אות אחת וספרה אחת.")</p>
+            <p class="text-xs text-ink/40 mb-4">8+ chars, must include a letter and a digit.</p>
 
-            <button class="bg-amber text-white rounded-full px-6 py-2.5 text-sm">@L.T(HttpContext,"Update password","עדכן סיסמה")</button>
+            <button class="bg-amber text-white rounded-full px-6 py-2.5 text-sm">Update password</button>
         </div>
     </form>
 
@@ -58,34 +58,34 @@
         <div class="bg-paper-50 rounded-core p-6 shadow-inset">
             <div class="flex items-end justify-between gap-4 flex-wrap">
                 <div>
-                    <span class="pill text-ink/40">@L.T(HttpContext,"Company (Owner)","חברה (בעלים)")</span>
-                    <h2 class="display text-2xl font-semibold mt-1">@L.T(HttpContext,"Business profile + VAT","פרופיל עסקי + מע״מ")</h2>
+                    <span class="pill text-ink/40">Company (Owner)</span>
+                    <h2 class="display text-2xl font-semibold mt-1">Business profile + VAT</h2>
                 </div>
             </div>
 
             <div class="grid md:grid-cols-3 gap-3 mt-4">
                 <div>
-                    <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Business name","שם העסק")</label>
+                    <label class="pill text-ink/40 mb-1 block">Business name</label>
                     <input asp-for="BusinessName" maxlength="120"
                            class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5" />
                 </div>
                 <div>
-                    <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"VAT registration","רישום מע״מ")</label>
+                    <label class="pill text-ink/40 mb-1 block">VAT registration</label>
                     <select asp-for="BusinessType" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5">
-                        <option value="Patur">@L.T(HttpContext,"Osek Patur (≤120k ₪/yr)","עוסק פטור (עד 120k ₪/שנה)")</option>
-                        <option value="Murshe">@L.T(HttpContext,"Osek Murshe (18% VAT)","עוסק מורשה (מע״מ 18%)")</option>
+                        <option value="Patur">Osek Patur (≤120k ₪/yr)</option>
+                        <option value="Murshe">Osek Murshe (18% VAT)</option>
                     </select>
                 </div>
                 <label class="md:col-span-1 flex items-start gap-3 bg-paper-100 border border-black/5 rounded-2xl px-4 py-3 cursor-pointer">
                     <input asp-for="IsZair" type="checkbox" class="mt-1 accent-ink"/>
                     <span>
-                        <span class="block font-semibold text-ink">@L.T(HttpContext,"Osek Zair","עוסק זעיר")</span>
-                        <span class="block text-xs text-ink/50 mt-0.5">@L.T(HttpContext,"Income tax on 70% of revenue.","מס הכנסה על 70% מהמחזור.")</span>
+                        <span class="block font-semibold text-ink">Osek Zair</span>
+                        <span class="block text-xs text-ink/50 mt-0.5">Income tax on 70% of revenue.</span>
                     </span>
                 </label>
             </div>
 
-            <button class="mt-4 bg-mint text-white rounded-full px-6 py-2.5 text-sm">@L.T(HttpContext,"Save company settings","שמור הגדרות חברה")</button>
+            <button class="mt-4 bg-mint text-white rounded-full px-6 py-2.5 text-sm">Save company settings</button>
         </div>
     </form>
 
@@ -94,21 +94,19 @@
         <div class="bg-paper-50 rounded-core p-6 shadow-inset">
             <div class="flex items-start justify-between gap-4 flex-wrap">
                 <div>
-                    <span class="pill text-ink/40">@L.T(HttpContext,"Company invite code","קוד הצטרפות לחברה")</span>
-                    <h2 class="display text-2xl font-semibold mt-1">@L.T(HttpContext,"Share with employees","שתף עם עובדים")</h2>
+                    <span class="pill text-ink/40">Company invite code</span>
+                    <h2 class="display text-2xl font-semibold mt-1">Share with employees</h2>
                     <p class="text-sm text-ink/60 mt-1 max-w-xl">
-                        @L.T(HttpContext,
-                            "Employees enter this code on the signup page to join your company. Rotate any time — old codes stop working immediately.",
-                            "עובדים מזינים את הקוד הזה בעמוד ההרשמה כדי להצטרף לחברה. ניתן להחליף בכל עת — הקוד הישן נפסל מיידית.")
+                        Employees enter this code on the signup page to join your company. Rotate any time — old codes stop working immediately.
                     </p>
                 </div>
                 <div class="text-right">
                     <div class="font-mono text-3xl tracking-widest font-bold text-ink select-all">@(string.IsNullOrEmpty(Model.InviteCode) ? "(none)" : Model.InviteCode)</div>
                     <div class="flex gap-2 mt-3 justify-end">
-                        <button id="copyInvite" type="button" class="bg-ink text-paper-50 rounded-full px-4 py-2 text-sm">📋 @L.T(HttpContext,"Copy","העתק")</button>
+                        <button id="copyInvite" type="button" class="bg-ink text-paper-50 rounded-full px-4 py-2 text-sm">📋 Copy</button>
                         <form method="post" asp-page-handler="RotateInvite" onsubmit="return confirm(this.dataset.warn);"
-                              data-warn="@L.T(HttpContext,"Rotate invite code? Old code will stop working immediately.","להחליף קוד הצטרפות? הקוד הישן ייפסל מיידית.")">
-                            <button class="bg-amber text-white rounded-full px-4 py-2 text-sm">↻ @L.T(HttpContext,"Rotate","החלף")</button>
+                              data-warn="Rotate invite code? Old code will stop working immediately.">
+                            <button class="bg-amber text-white rounded-full px-4 py-2 text-sm">↻ Rotate</button>
                         </form>
                     </div>
                 </div>

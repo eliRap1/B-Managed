@@ -8,17 +8,15 @@
 
 <div class="reveal mb-10 flex flex-wrap items-end justify-between gap-4">
     <div>
-        <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">@L.T(HttpContext,"Financing","מימון")</span>
-        <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">@L.T(HttpContext,"Loans.","הלוואות.")</h1>
-        <p class="text-ink/50 mt-3 max-w-xl">@L.T(HttpContext,
-            "Track principal (קרן), interest, monthly payments, and how much your business owes vs. earns.",
-            "עקוב אחר קרן ההלוואה, ריבית, תשלום חודשי, וכמה החוב שלך ביחס להכנסות העסק.")</p>
+        <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">Financing</span>
+        <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">Loans.</h1>
+        <p class="text-ink/50 mt-3 max-w-xl">Track principal (קרן), interest, monthly payments, and how much your business owes vs. earns.</p>
     </div>
     <form method="get" class="flex gap-3 text-sm">
         <select asp-for="DisplayCurrency" class="bg-paper-100 border border-black/5 rounded-full px-4 py-2">
             <option>ILS</option><option>USD</option>
         </select>
-        <button class="bg-ink text-paper-50 rounded-full px-4 py-2">@L.T(HttpContext,"Apply","החל")</button>
+        <button class="bg-ink text-paper-50 rounded-full px-4 py-2">Apply</button>
     </form>
 </div>
 
@@ -31,41 +29,41 @@
 <section class="reveal grid md:grid-cols-4 gap-3 mb-10">
     <div class="bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
         <div class="bg-paper-50 rounded-core p-5 shadow-inset h-full">
-            <div class="pill text-ink/40">@L.T(HttpContext,"Active loans","הלוואות פעילות")</div>
+            <div class="pill text-ink/40">Active loans</div>
             <div class="display text-3xl font-bold mt-2">@Model.Summary.LoanCount</div>
             @if (Model.Summary.KerenBackedCount > 0)
             {
-                <div class="text-xs text-mint mt-1">@Model.Summary.KerenBackedCount @L.T(HttpContext,"state-backed (קרן)","בערבות מדינה")</div>
+                <div class="text-xs text-mint mt-1">@Model.Summary.KerenBackedCount state-backed (קרן)</div>
             }
         </div>
     </div>
     <div class="bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
         <div class="bg-paper-50 rounded-core p-5 shadow-inset h-full">
-            <div class="pill text-ink/40">@L.T(HttpContext,"Outstanding (קרן נותרת)","יתרת קרן")</div>
+            <div class="pill text-ink/40">Outstanding (קרן נותרת)</div>
             <div class="display text-3xl font-bold mt-2">@Model.Summary.TotalRemaining.ToString("N0") <span class="text-base text-ink/40">@cur</span></div>
             <div class="text-xs text-ink/40 mt-1">
-                @L.T(HttpContext,"of original","מתוך מקורי") @Model.Summary.TotalPrincipal.ToString("N0") @cur
+                of original @Model.Summary.TotalPrincipal.ToString("N0") @cur
             </div>
         </div>
     </div>
     <div class="bg-amber/15 ring-1 ring-amber/30 rounded-shell p-1.5">
         <div class="bg-paper-50 rounded-core p-5 shadow-inset h-full">
-            <div class="pill text-ink/40">@L.T(HttpContext,"Monthly payment","תשלום חודשי")</div>
+            <div class="pill text-ink/40">Monthly payment</div>
             <div class="display text-3xl font-bold mt-2 text-amber">@Model.Summary.MonthlyPaymentTotal.ToString("N0") <span class="text-base text-ink/40">@cur</span></div>
             @if (Model.Summary.NextPaymentDate.HasValue)
             {
                 <div class="text-xs text-ink/50 mt-1">
-                    @L.T(HttpContext,"Next","הבא"): @Model.Summary.NextPaymentDate.Value.ToString("dd/MM/yyyy")
+                    Next: @Model.Summary.NextPaymentDate.Value.ToString("dd/MM/yyyy")
                 </div>
             }
         </div>
     </div>
     <div class="bg-ink rounded-shell p-1.5 text-paper-50">
         <div class="bg-ink-soft rounded-core p-5 shadow-inset h-full">
-            <div class="pill text-paper-50/50">@L.T(HttpContext,"Debt vs annual income","חוב ביחס להכנסה שנתית")</div>
+            <div class="pill text-paper-50/50">Debt vs annual income</div>
             <div class="display text-3xl font-bold mt-2">@FormatPct(Model.Summary.DebtToAnnualIncomePct)</div>
             <div class="text-xs text-paper-50/50 mt-1">
-                @L.T(HttpContext,"Monthly burden","נטל חודשי"): @FormatPct(Model.Summary.MonthlyDebtServiceRatioPct)
+                Monthly burden: @FormatPct(Model.Summary.MonthlyDebtServiceRatioPct)
             </div>
         </div>
     </div>
@@ -74,17 +72,13 @@
 @if (Model.Summary.MonthlyDebtServiceRatioPct >= 40)
 {
     <div class="reveal mb-6 px-5 py-4 rounded-2xl bg-rose/10 text-ink border border-rose/30 max-w-3xl">
-        ⚠️ @L.T(HttpContext,
-            "Your monthly loan payments exceed 40% of recent monthly income. This is a high debt-service ratio.",
-            "התשלום החודשי על ההלוואות מעל 40% מההכנסה החודשית הממוצעת. נטל חוב גבוה.")
+        ⚠️ Your monthly loan payments exceed 40% of recent monthly income. This is a high debt-service ratio.
     </div>
 }
 else if (Model.Summary.MonthlyDebtServiceRatioPct >= 25)
 {
     <div class="reveal mb-6 px-5 py-4 rounded-2xl bg-amber/10 text-ink border border-amber/30 max-w-3xl">
-        @L.T(HttpContext,
-            "Monthly loan payments are 25–40% of recent monthly income. Watch this ratio as revenue fluctuates.",
-            "התשלום החודשי על ההלוואות 25–40% מההכנסה. כדאי לעקוב אם ההכנסה משתנה.")
+        Monthly loan payments are 25–40% of recent monthly income. Watch this ratio as revenue fluctuates.
     </div>
 }
 
@@ -92,87 +86,82 @@ else if (Model.Summary.MonthlyDebtServiceRatioPct >= 25)
 <form method="post" asp-page-handler="Add" class="reveal mb-10 bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5 max-w-4xl">
     <div class="bg-paper-50 rounded-core p-6 shadow-inset">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="display text-2xl font-semibold">@L.T(HttpContext,"Add a new loan","הוסף הלוואה חדשה")</h2>
-            <span class="pill text-ink/40">@L.T(HttpContext,"All fields, please","אנא מלא את כל השדות")</span>
+            <h2 class="display text-2xl font-semibold">Add a new loan</h2>
+            <span class="pill text-ink/40">All fields, please</span>
         </div>
 
         <div class="grid md:grid-cols-3 gap-3">
             <div>
-                <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Lender (bank / fund)","המלווה (בנק / קרן)")</label>
+                <label class="pill text-ink/40 mb-1 block">Lender (bank / fund)</label>
                 <input asp-for="NewLender" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5"
-                       placeholder="@L.T(HttpContext,"e.g. Bank Hapoalim, Keren Shemesh","למשל בנק הפועלים, קרן שמש")"/>
+                       placeholder="e.g. Bank Hapoalim, Keren Shemesh"/>
             </div>
             <div>
-                <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Principal (קרן)","קרן ההלוואה")</label>
+                <label class="pill text-ink/40 mb-1 block">Principal (קרן)</label>
                 <input asp-for="NewPrincipal" id="loan-principal" type="number" step="0.01" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5"
-                       placeholder="@L.T(HttpContext,"Original borrowed amount","סכום מקורי שלוויתי")"/>
+                       placeholder="Original borrowed amount"/>
             </div>
             <div>
-                <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Interest rate %","ריבית שנתית %")</label>
+                <label class="pill text-ink/40 mb-1 block">Interest rate %</label>
                 <input asp-for="NewInterestRate" id="loan-rate" type="number" step="0.01" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5"
                        placeholder="6.5"/>
             </div>
 
             <div>
-                <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Monthly payment","תשלום חודשי")</label>
+                <label class="pill text-ink/40 mb-1 block">Monthly payment</label>
                 <input asp-for="NewMonthlyPayment" id="loan-monthly" type="number" step="0.01" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5"
-                       placeholder="@L.T(HttpContext,"What you pay every month","הסכום שאתה משלם כל חודש")"/>
+                       placeholder="What you pay every month"/>
             </div>
             <div>
-                <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Term (months)","משך (בחודשים)")</label>
+                <label class="pill text-ink/40 mb-1 block">Term (months)</label>
                 <input asp-for="NewTermMonths" id="loan-months" type="number" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5"
                        placeholder="60"/>
             </div>
             <div>
-                <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Start date","תאריך התחלה")</label>
+                <label class="pill text-ink/40 mb-1 block">Start date</label>
                 <input asp-for="NewStartDate" type="date" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5"/>
             </div>
 
             <div>
-                <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Currency","מטבע")</label>
+                <label class="pill text-ink/40 mb-1 block">Currency</label>
                 <select asp-for="NewCurrency" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5">
                     <option>ILS</option><option>USD</option>
                 </select>
             </div>
             <div class="md:col-span-2">
-                <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Purpose","מטרת ההלוואה")</label>
+                <label class="pill text-ink/40 mb-1 block">Purpose</label>
                 <input asp-for="NewPurpose" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5"
-                       placeholder="@L.T(HttpContext,"e.g. equipment, working capital","למשל ציוד, הון חוזר")"/>
+                       placeholder="e.g. equipment, working capital"/>
             </div>
 
             <div class="md:col-span-3 flex flex-wrap items-center gap-3 text-xs">
                 <button type="button" id="loan-autocalc"
                         class="bg-ink text-paper-50 rounded-full px-4 py-2"
-                        title="@L.T(HttpContext,"Fill the missing field from the other two","חשב אוטומטית את השדה החסר משני האחרים")">
-                    @L.T(HttpContext,"Auto-calc missing field","חשב אוטומטית שדה חסר") ⚡
+                        title="Fill the missing field from the other two">
+                    Auto-calc missing field ⚡
                 </button>
                 <span id="loan-autocalc-msg" class="text-ink/50"></span>
-                <span class="text-ink/40">@L.T(HttpContext,"Fill any 2 of: principal, monthly, term — the 3rd is computed.",
-                    "מלא 2 מתוך: קרן, תשלום חודשי, חודשים — השלישי יחושב.")</span>
+                <span class="text-ink/40">Fill any 2 of: principal, monthly, term — the 3rd is computed.</span>
             </div>
 
             <label class="md:col-span-3 flex items-start gap-3 bg-amber/10 border border-amber/30 rounded-2xl px-4 py-3 cursor-pointer">
                 <input asp-for="NewHasStandingOrder" type="checkbox" class="mt-1 accent-amber"/>
                 <span>
-                    <span class="block font-semibold text-ink">@L.T(HttpContext,"Standing order (הוראת קבע)","הוראת קבע בבנק")</span>
-                    <span class="block text-xs text-ink/60 mt-0.5">@L.T(HttpContext,
-                        "Bank auto-charges the monthly payment — used to highlight which loans deduct automatically vs. need manual transfer.",
-                        "הבנק מחייב את התשלום החודשי באופן אוטומטי — מסמן הלוואות שמתחייבות לבד לעומת אלה שדורשות העברה ידנית.")</span>
+                    <span class="block font-semibold text-ink">Standing order (הוראת קבע)</span>
+                    <span class="block text-xs text-ink/60 mt-0.5">Bank auto-charges the monthly payment — used to highlight which loans deduct automatically vs. need manual transfer.</span>
                 </span>
             </label>
 
             <label class="md:col-span-3 flex items-start gap-3 bg-mint/10 border border-mint/30 rounded-2xl px-4 py-3 cursor-pointer">
                 <input asp-for="NewIsKerenBacked" type="checkbox" class="mt-1 accent-mint"/>
                 <span>
-                    <span class="block font-semibold text-ink">@L.T(HttpContext,"State-backed business fund (קרן הלוואות בערבות מדינה)","הלוואה מקרן בערבות מדינה")</span>
-                    <span class="block text-xs text-ink/60 mt-0.5">@L.T(HttpContext,
-                        "Loans from Keren Shemesh, Keren Koret, the SME state-guaranteed fund, etc. usually carry lower rates.",
-                        "הלוואות מקרן שמש, קרן קורת, קרן הלוואות בערבות מדינה לעסקים קטנים — בדרך כלל בריבית נמוכה.")</span>
+                    <span class="block font-semibold text-ink">State-backed business fund (קרן הלוואות בערבות מדינה)</span>
+                    <span class="block text-xs text-ink/60 mt-0.5">Loans from Keren Shemesh, Keren Koret, the SME state-guaranteed fund, etc. usually carry lower rates.</span>
                 </span>
             </label>
 
             <button class="md:col-span-3 bg-mint text-white rounded-full px-6 py-3 mt-1 active:scale-[0.98]">
-                + @L.T(HttpContext,"Save loan","שמור הלוואה")
+                + Save loan
             </button>
         </div>
     </div>
@@ -196,23 +185,23 @@ else if (Model.Summary.MonthlyDebtServiceRatioPct >= 25)
                         @if (l.IsKerenBacked)
                         { <span class="pill bg-mint/15 text-mint border border-mint/30 rounded-full px-2 py-0.5 text-xs">קרן ⓘ</span> }
                         @if (l.HasStandingOrder)
-                        { <span class="pill bg-amber/15 text-amber border border-amber/30 rounded-full px-2 py-0.5 text-xs ml-1" title="@L.T(HttpContext,"Bank auto-charges","הוראת קבע")">⏱ @L.T(HttpContext,"Auto","קבע")</span> }
+                        { <span class="pill bg-amber/15 text-amber border border-amber/30 rounded-full px-2 py-0.5 text-xs ml-1" title="Bank auto-charges">⏱ Auto</span> }
                         @if (!l.IsActive)
-                        { <span class="pill bg-black/5 text-ink/50 border border-black/10 rounded-full px-2 py-0.5 text-xs ml-1">@L.T(HttpContext,"Closed","נסגרה")</span> }
+                        { <span class="pill bg-black/5 text-ink/50 border border-black/10 rounded-full px-2 py-0.5 text-xs ml-1">Closed</span> }
                     </div>
                 </div>
 
                 <div class="grid grid-cols-3 gap-2 mt-4 text-sm">
                     <div class="bg-paper-100 rounded-2xl px-3 py-2">
-                        <div class="pill text-ink/40">@L.T(HttpContext,"Principal","קרן")</div>
+                        <div class="pill text-ink/40">Principal</div>
                         <div class="display font-semibold">@l.Principal.ToString("N0")</div>
                     </div>
                     <div class="bg-paper-100 rounded-2xl px-3 py-2">
-                        <div class="pill text-ink/40">@L.T(HttpContext,"Remaining","יתרה")</div>
+                        <div class="pill text-ink/40">Remaining</div>
                         <div class="display font-semibold">@l.RemainingBalance.ToString("N0")</div>
                     </div>
                     <div class="bg-paper-100 rounded-2xl px-3 py-2">
-                        <div class="pill text-ink/40">@L.T(HttpContext,"Monthly","חודשי")</div>
+                        <div class="pill text-ink/40">Monthly</div>
                         <div class="display font-semibold">@l.MonthlyPayment.ToString("N0")</div>
                     </div>
                 </div>
@@ -222,9 +211,9 @@ else if (Model.Summary.MonthlyDebtServiceRatioPct >= 25)
                     <div class="h-full bg-mint rounded-full" style="width:@(pct)%"></div>
                 </div>
                 <div class="text-xs text-ink/50 mt-1 flex items-center justify-between">
-                    <span>@pct% @L.T(HttpContext,"paid down","נפרע")</span>
+                    <span>@pct% paid down</span>
                     @if (l.NextPaymentDate.HasValue)
-                    { <span>@L.T(HttpContext,"Next","הבא"): @l.NextPaymentDate.Value.ToString("dd/MM/yyyy")</span> }
+                    { <span>Next: @l.NextPaymentDate.Value.ToString("dd/MM/yyyy")</span> }
                 </div>
 
                 @{
@@ -253,28 +242,28 @@ else if (Model.Summary.MonthlyDebtServiceRatioPct >= 25)
                             <polyline fill="none" stroke="#10B981" stroke-width="2" points="@pts"></polyline>
                         </svg>
                         <div class="text-[10px] text-ink/40 -mt-1">
-                            @L.T(HttpContext,"Balance trend","מגמת יתרה")
+                            Balance trend
                         </div>
                     }
                 }
 
                 <details class="mt-4">
-                    <summary class="cursor-pointer pill text-ink/50">@L.T(HttpContext,"Record a payment / history","רשום תשלום / היסטוריה")</summary>
+                    <summary class="cursor-pointer pill text-ink/50">Record a payment / history</summary>
                     <form method="post" asp-page-handler="Pay" class="mt-3 grid grid-cols-3 gap-2 text-sm">
                         <input type="hidden" name="LoanId" value="@l.Id"/>
                         <div>
-                            <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Date","תאריך")</label>
+                            <label class="pill text-ink/40 mb-1 block">Date</label>
                             <input name="PaidDate" type="date" value="@DateTime.Today.ToString("yyyy-MM-dd")" class="w-full bg-white border border-black/5 rounded-xl px-3 py-2 text-sm"/>
                         </div>
                         <div>
-                            <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Amount","סכום")</label>
+                            <label class="pill text-ink/40 mb-1 block">Amount</label>
                             <input name="Amount" type="number" step="0.01" value="@l.MonthlyPayment.ToString("F2")" class="w-full bg-white border border-black/5 rounded-xl px-3 py-2 text-sm"/>
                         </div>
                         <div>
-                            <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Of which principal","מתוכו קרן")</label>
+                            <label class="pill text-ink/40 mb-1 block">Of which principal</label>
                             <input name="PrincipalPortion" type="number" step="0.01" value="@(((l.MonthlyPayment * 0.7m)).ToString("F2"))" class="w-full bg-white border border-black/5 rounded-xl px-3 py-2 text-sm"/>
                         </div>
-                        <button class="col-span-3 bg-ink text-paper-50 rounded-full px-4 py-2 text-sm">+ @L.T(HttpContext,"Record payment","רשום תשלום")</button>
+                        <button class="col-span-3 bg-ink text-paper-50 rounded-full px-4 py-2 text-sm">+ Record payment</button>
                     </form>
 
                     @{ var hist = Model.PaymentHistory.GetValueOrDefault(l.Id); }
@@ -285,7 +274,7 @@ else if (Model.Summary.MonthlyDebtServiceRatioPct >= 25)
                             {
                                 <div class="flex justify-between bg-paper-100 rounded-xl px-3 py-1.5">
                                     <span>@p.PaidDate.ToString("dd/MM/yyyy")</span>
-                                    <span>@p.Amount.ToString("N0") (@L.T(HttpContext,"P","ק"): @p.PrincipalPortion.ToString("N0"))</span>
+                                    <span>@p.Amount.ToString("N0") (P: @p.PrincipalPortion.ToString("N0"))</span>
                                 </div>
                             }
                         </div>
@@ -294,7 +283,7 @@ else if (Model.Summary.MonthlyDebtServiceRatioPct >= 25)
 
                 <form method="post" asp-page-handler="Delete" class="mt-3" onsubmit="return confirm('Delete this loan? Payment history will also be removed.');">
                     <input type="hidden" name="id" value="@l.Id"/>
-                    <button class="text-xs text-rose hover:underline">🗑 @L.T(HttpContext,"Delete loan","מחק הלוואה")</button>
+                    <button class="text-xs text-rose hover:underline">🗑 Delete loan</button>
                 </form>
             </div>
         </div>
@@ -302,7 +291,7 @@ else if (Model.Summary.MonthlyDebtServiceRatioPct >= 25)
     @if (Model.Loans.Count == 0)
     {
         <div class="md:col-span-2 text-center py-20 text-ink/40">
-            @L.T(HttpContext,"No loans logged yet — add your first above.","אין הלוואות עדיין — הוסף ראשונה למעלה.")
+            No loans logged yet — add your first above.
         </div>
     }
 </section>

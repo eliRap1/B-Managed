@@ -3,39 +3,38 @@
 @{ ViewData["Title"] = "My expenses"; }
 
 <div class="reveal mb-12">
-    <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">@L.T(HttpContext,"Field","שטח")</span>
-    <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">@L.T(HttpContext,"Log an expense.","דווח הוצאה.")</h1>
+    <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">Field</span>
+    <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">Log an expense.</h1>
 </div>
 
 <form method="post" asp-page-handler="Add" class="reveal mb-12 bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5 max-w-3xl">
     <div class="bg-paper-50 rounded-core p-6 shadow-inset grid md:grid-cols-3 gap-3">
         <select asp-for="NewCategoryId" class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5">
-            <option value="0">@L.T(HttpContext,"Category…","קטגוריה…")</option>
+            <option value="0">Category…</option>
             @foreach (var c in Model.Categories) { <option value="@c.Id">@c.Name</option> }
         </select>
-        <input asp-for="NewVendor" placeholder="@L.T(HttpContext,"Vendor","ספק")" class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5" />
+        <input asp-for="NewVendor" placeholder="Vendor" class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5" />
         <input asp-for="NewAmount" type="number" step="0.01"
-               placeholder="@L.T(HttpContext,"Amount (gross, incl. VAT)","סכום ברוטו (כולל מע״מ)")"
-               title="@L.T(HttpContext,"Total paid, VAT included","סך ששולם כולל מע״מ")"
+               placeholder="Amount (gross, incl. VAT)"
+               title="Total paid, VAT included"
                class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5" />
         <p class="md:col-span-3 text-xs text-ink/40 -mt-1">
-            @L.T(HttpContext,"Enter the gross total. Owner adjusts VAT details later in the main report.",
-                              "הזן סכום ברוטו. הבעלים יעדכן מע״מ בדוחות.")
+            Enter the gross total. Owner adjusts VAT details later in the main report.
         </p>
-        <button class="md:col-span-3 bg-mint text-white rounded-full px-6 py-3 mt-1 active:scale-[0.98]">@L.T(HttpContext,"Submit","שלח")</button>
+        <button class="md:col-span-3 bg-mint text-white rounded-full px-6 py-3 mt-1 active:scale-[0.98]">Submit</button>
     </div>
 </form>
 
 <section class="reveal bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
     <div class="bg-paper-50 rounded-core p-6 shadow-inset">
         @if (Model.Mine.Count == 0)
-        { <p class="text-center py-12 text-ink/40">@L.T(HttpContext,"No expenses yet.","אין הוצאות עדיין.")</p> }
+        { <p class="text-center py-12 text-ink/40">No expenses yet.</p> }
         else
         {
             <table class="w-full text-sm">
                 <thead><tr class="text-ink/40 pill">
-                    <th class="text-left py-2">@L.T(HttpContext,"Date","תאריך")</th><th class="text-left">@L.T(HttpContext,"Vendor","ספק")</th>
-                    <th class="text-right">@L.T(HttpContext,"Amount","סכום")</th>
+                    <th class="text-left py-2">Date</th><th class="text-left">Vendor</th>
+                    <th class="text-right">Amount</th>
                 </tr></thead>
                 <tbody>
                 @foreach (var e in Model.Mine)
