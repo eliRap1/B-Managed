@@ -134,10 +134,15 @@
                                      Style="{StaticResource ModernTextBox}" Margin="8,0,0,8"
                                      ToolTip="e.g. equipment, working capital"/>
 
-                            <CheckBox Grid.Row="6" Grid.ColumnSpan="3" x:Name="kerenBox" Margin="0,4,0,8"
+                            <CheckBox Grid.Row="6" Grid.ColumnSpan="3" x:Name="kerenBox" Margin="0,4,0,4"
                                       FontWeight="SemiBold" Foreground="{StaticResource Mint}"
                                       Content="State-backed business fund (קרן הלוואות בערבות מדינה / קרן שמש / קרן קורת)"/>
                         </Grid>
+
+                        <CheckBox x:Name="standingOrderBox" Margin="0,4,0,8"
+                                  FontWeight="SemiBold" Foreground="{StaticResource Amber}"
+                                  Content="Standing order (הוראת קבע) — bank auto-charges the monthly payment"
+                                  ToolTip="Highlights loans that deduct automatically vs. those that need a manual transfer."/>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                             <TextBlock x:Name="addStatus" Style="{StaticResource Caption}" Foreground="{StaticResource Rose}"
@@ -174,8 +179,9 @@
                                     <GridViewColumn Header="Monthly"     DisplayMemberBinding="{Binding MonthlyPayment,   StringFormat=N0}" Width="90"/>
                                     <GridViewColumn Header="Next"        DisplayMemberBinding="{Binding NextPaymentDate,  StringFormat=dd/MM/yyyy}" Width="100"/>
                                     <GridViewColumn Header="Currency"    DisplayMemberBinding="{Binding Currency}"        Width="70"/>
-                                    <GridViewColumn Header="קרן (state)" DisplayMemberBinding="{Binding IsKerenBacked}"   Width="80"/>
-                                    <GridViewColumn Header="Active"      DisplayMemberBinding="{Binding IsActive}"        Width="60"/>
+                                    <GridViewColumn Header="קרן (state)" DisplayMemberBinding="{Binding IsKerenBacked}"    Width="80"/>
+                                    <GridViewColumn Header="הוראת קבע"   DisplayMemberBinding="{Binding HasStandingOrder}" Width="80"/>
+                                    <GridViewColumn Header="Active"      DisplayMemberBinding="{Binding IsActive}"         Width="60"/>
                                 </GridView>
                             </ListView.View>
                         </ListView>

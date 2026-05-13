@@ -121,6 +121,7 @@ namespace BManagedClient
                     Currency         = cur,
                     Purpose          = purposeBox.Text ?? "",
                     IsKerenBacked    = kerenBox.IsChecked == true,
+                    HasStandingOrder = standingOrderBox.IsChecked == true,
                     IsActive         = true,
                     CreatedAt        = DateTime.Now,
                 }));
@@ -128,6 +129,7 @@ namespace BManagedClient
                 lenderBox.Text = ""; principalBox.Text = "0"; interestBox.Text = "0";
                 monthlyBox.Text = "0"; termBox.Text = "60"; purposeBox.Text = "";
                 kerenBox.IsChecked = false;
+                standingOrderBox.IsChecked = false;
                 addStatus.Text = "";
                 Refresh();
             }
