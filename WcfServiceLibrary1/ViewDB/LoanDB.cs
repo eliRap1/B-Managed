@@ -229,52 +229,88 @@ namespace ViewDB
 
         // -----------------------------------------------------------------
         // LoanPayments — one row per payment recorded by the Owner. Updates
-        // the parent Loan's RemainingBalance + NextPaymentDate atomically.
+        // the parent Loan's RemainingBalance + NextPaymentDate atomically
+        // inside an OleDbTransaction so both the INSERT and the UPDATE either
+        // commit together or roll back together.
         // -----------------------------------------------------------------
         public int InsertPayment(LoanPayment p)
         {
-            string sql = @"INSERT INTO [LoanPayments]
+            string insertSql = @"INSERT INTO [LoanPayments]
                 ([loanId],[paidDate],[amount],[principalPortion],[interestPortion],[notes])
                 VALUES (?,?,?,?,?,?)";
+
             int newId;
             using (var conn = GetConnection())
-            using (var cmd = new OleDbCommand(sql, conn))
             {
-                cmd.Parameters.Add(new OleDbParameter("@l",  OleDbType.Integer)      { Value = p.LoanId });
-                cmd.Parameters.Add(new OleDbParameter("@d",  OleDbType.Date)         { Value = p.PaidDate });
-                cmd.Parameters.Add(new OleDbParameter("@a",  OleDbType.Currency)     { Value = p.Amount });
-                cmd.Parameters.Add(new OleDbParameter("@pp", OleDbType.Currency)     { Value = p.PrincipalPortion });
-                cmd.Parameters.Add(new OleDbParameter("@ip", OleDbType.Currency)     { Value = p.InterestPortion });
-                cmd.Parameters.Add(new OleDbParameter("@n",  OleDbType.LongVarWChar) { Value = (object)p.Notes ?? DBNull.Value });
                 conn.Open();
-                cmd.ExecuteNonQuery();
-                using (var idCmd = new OleDbCommand("SELECT @@IDENTITY", conn))
-                    newId = Convert.ToInt32(idCmd.ExecuteScalar());
-            }
-
-            // Adjust parent loan in a follow-up statement (Access OleDb does
-            // not support multi-statement transactions easily — this is a
-            // best-effort update).
-            var loan = GetById(p.LoanId);
-            if (loan != null)
-            {
-                decimal newRemaining = loan.RemainingBalance - p.PrincipalPortion;
-                if (newRemaining < 0) newRemaining = 0;
-                DateTime? next = loan.NextPaymentDate.HasValue
-                    ? loan.NextPaymentDate.Value.AddMonths(1)
-                    : (DateTime?)p.PaidDate.AddMonths(1);
-                bool stillActive = newRemaining > 0;
-
-                using (var conn = GetConnection())
-                using (var cmd = new OleDbCommand(
-                    "UPDATE [Loans] SET [remainingBalance]=?, [nextPaymentDate]=?, [isActive]=? WHERE [id]=?", conn))
+                using (var tx = conn.BeginTransaction())
                 {
-                    cmd.Parameters.Add(new OleDbParameter("@rb", OleDbType.Currency) { Value = newRemaining });
-                    cmd.Parameters.Add(new OleDbParameter("@np", OleDbType.Date)     { Value = (object)next ?? DBNull.Value });
-                    cmd.Parameters.Add(new OleDbParameter("@ia", OleDbType.Boolean)  { Value = stillActive });
-                    cmd.Parameters.Add(new OleDbParameter("@id", OleDbType.Integer)  { Value = loan.Id });
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
+                    try
+                    {
+                        // --- INSERT into LoanPayments ---
+                        using (var cmd = new OleDbCommand(insertSql, conn, tx))
+                        {
+                            cmd.Parameters.Add(new OleDbParameter("@l",  OleDbType.Integer)      { Value = p.LoanId });
+                            cmd.Parameters.Add(new OleDbParameter("@d",  OleDbType.Date)         { Value = p.PaidDate });
+                            cmd.Parameters.Add(new OleDbParameter("@a",  OleDbType.Currency)     { Value = p.Amount });
+                            cmd.Parameters.Add(new OleDbParameter("@pp", OleDbType.Currency)     { Value = p.PrincipalPortion });
+                            cmd.Parameters.Add(new OleDbParameter("@ip", OleDbType.Currency)     { Value = p.InterestPortion });
+                            cmd.Parameters.Add(new OleDbParameter("@n",  OleDbType.LongVarWChar) { Value = (object)p.Notes ?? DBNull.Value });
+                            cmd.ExecuteNonQuery();
+                        }
+                        using (var idCmd = new OleDbCommand("SELECT @@IDENTITY", conn, tx))
+                            newId = Convert.ToInt32(idCmd.ExecuteScalar());
+
+                        // --- Read parent Loan inside the same transaction ---
+                        Loan loan = null;
+                        using (var selCmd = new OleDbCommand("SELECT * FROM [Loans] WHERE [id]=?", conn, tx))
+                        {
+                            selCmd.Parameters.Add(new OleDbParameter("@id", OleDbType.Integer) { Value = p.LoanId });
+                            using (var r = selCmd.ExecuteReader())
+                            {
+                                if (r.Read())
+                                {
+                                    loan = new Loan();
+                                    try { loan.Id               = Convert.ToInt32(r["id"]); }               catch { }
+                                    try { loan.RemainingBalance = Convert.ToDecimal(r["remainingBalance"]); } catch { }
+                                    try
+                                    {
+                                        var v = r["nextPaymentDate"];
+                                        loan.NextPaymentDate = v == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(v);
+                                    } catch { }
+                                }
+                            }
+                        }
+
+                        // --- UPDATE parent Loan in the same transaction ---
+                        if (loan != null)
+                        {
+                            decimal newRemaining = loan.RemainingBalance - p.PrincipalPortion;
+                            if (newRemaining < 0) newRemaining = 0;
+                            DateTime? next = loan.NextPaymentDate.HasValue
+                                ? loan.NextPaymentDate.Value.AddMonths(1)
+                                : (DateTime?)p.PaidDate.AddMonths(1);
+                            bool stillActive = newRemaining > 0;
+
+                            using (var updCmd = new OleDbCommand(
+                                "UPDATE [Loans] SET [remainingBalance]=?, [nextPaymentDate]=?, [isActive]=? WHERE [id]=?",
+                                conn, tx))
+                            {
+                                updCmd.Parameters.Add(new OleDbParameter("@rb", OleDbType.Currency) { Value = newRemaining });
+                                updCmd.Parameters.Add(new OleDbParameter("@np", OleDbType.Date)     { Value = (object)next ?? DBNull.Value });
+                                updCmd.Parameters.Add(new OleDbParameter("@ia", OleDbType.Boolean)  { Value = stillActive });
+                                updCmd.Parameters.Add(new OleDbParameter("@id", OleDbType.Integer)  { Value = loan.Id });
+                                updCmd.ExecuteNonQuery();
+                            }
+                        }
+
+                        tx.Commit();
+                    }
+                    catch
+                    {
+                        tx.Rollback();
+                        throw;
+                    }
                 }
             }
             return newId;
