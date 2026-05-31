@@ -1,6 +1,7 @@
 using BManagedClient.BMsrv;
 using System;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -148,9 +149,8 @@ namespace BManagedClient
                 .ToUpperInvariant().Where(char.IsLetterOrDigit).Take(4).ToArray());
             if (prefix.Length < 2) prefix = "BMNG";
             const string alpha = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-            var rnd = new Random();
             var tail = new string(Enumerable.Range(0, 4)
-                .Select(_ => alpha[rnd.Next(alpha.Length)]).ToArray());
+                .Select(_ => alpha[RandomNumberGenerator.GetInt32(alpha.Length)]).ToArray());
             return prefix + "-" + tail;
         }
     }
