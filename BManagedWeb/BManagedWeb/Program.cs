@@ -20,6 +20,7 @@ builder.Services.AddSession(opts =>
     opts.Cookie.HttpOnly = true;
     opts.Cookie.IsEssential = true;
     opts.Cookie.Name = "BMA-Session";
+    opts.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
 });
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddDataProtection();
