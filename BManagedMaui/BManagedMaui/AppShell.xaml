@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:pages="clr-namespace:BManagedMaui.Pages"
+       x:Class="BManagedMaui.AppShell"
+       Shell.FlyoutBehavior="Disabled"
+       Shell.TabBarIsVisible="False"
+       Shell.NavBarIsVisible="True"
+       Title="B-Managed">
+
+    <!-- Flat list of routes; navigation is programmatic via GoToAsync("//Route").
+         Login is first, so it is the start page. (Driver-moodle Shell concept.) -->
+    <ShellContent Route="Login"
+                  ContentTemplate="{DataTemplate pages:LoginPage}" />
+
+    <ShellContent Route="OwnerHome"
+                  ContentTemplate="{DataTemplate pages:OwnerHomePage}" />
+
+    <ShellContent Route="Invoices"
+                  ContentTemplate="{DataTemplate pages:InvoicesPage}" />
+</Shell>

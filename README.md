@@ -27,7 +27,7 @@ Small businesses (1–10 people) need one place to see customers, projects, invo
 
 * 50+ WCF operations
 * 13 normalised Access tables
-* 33 UI pages (15 WPF + 18 Razor)
+* 36 UI pages (15 WPF + 18 Razor + 3 MAUI)
 * 3 roles, 2 currencies, 2 languages
 * PDF export, CSV export, receipt upload, multi-employee assignment
 * Real-time notifications via DispatcherTimer (WPF) + setInterval (Web)
@@ -179,6 +179,11 @@ yudb/
 │       ├── Pages/             ← Login, SignUp, ForgotPassword, Owner/, Employee/, Client/, Notifications, Lang
 │       ├── Helpers/L.cs       ← i18n helper (en/he)
 │       └── Connected Services/bsrv/Reference.cs    (hand-written sync)
+├── BManagedMaui/              ← .NET MAUI mobile companion (.NET 10, Android/iOS/macCatalyst)
+│   └── BManagedMaui/
+│       ├── Pages/             ← LoginPage, OwnerHomePage (dashboard), InvoicesPage  (3 screens)
+│       ├── Services/          ← AppState (session) + ServiceHelper (WCF client) + UiHelpers
+│       └── Connected Services/BMsrv/Reference.cs   (hand-written, same Service1 contract)
 ├── packages/PdfSharp.1.50.5147/  ← bundled NuGet for offline build
 ├── _init_db.ps1               ← seeds admin/dana/acme + 2 customers + 2 projects + invoice + expenses
 ├── _make_flows.py             ← regenerates arch-flow / wpf-flow / web-flow PNGs
@@ -244,7 +249,7 @@ yudb/
 - [ ] Bank-statement CSV import for expenses auto-match
 - [ ] Two-factor auth (TOTP)
 - [ ] Multi-tenant (one server, multiple Owners)
-- [ ] Mobile (.NET MAUI)
+- [x] Mobile (.NET MAUI) — owner companion app, 3 screens (Login · Dashboard · Invoices)
 
 ---
 
