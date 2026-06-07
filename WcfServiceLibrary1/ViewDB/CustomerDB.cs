@@ -79,7 +79,9 @@ namespace ViewDB
                 cmd.Parameters.Add(new OleDbParameter("@cur", OleDbType.VarWChar, 3)   { Value = c.PreferredCurrency ?? "ILS" });
                 cmd.Parameters.Add(new OleDbParameter("@n",   OleDbType.LongVarWChar)  { Value = (object)c.Notes ?? DBNull.Value });
                 conn.Open();
-                return cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQuery();
+                using (var idCmd = new OleDbCommand("SELECT @@IDENTITY", conn))
+                    return Convert.ToInt32(idCmd.ExecuteScalar());
             }
         }
 
