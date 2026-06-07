@@ -123,6 +123,7 @@ namespace BManagedWeb.bsrv
         [DataMember] public int? ProjectId { get; set; }
         [DataMember] public string ReceiptPath { get; set; }
         [DataMember] public string Currency { get; set; }
+        [DataMember] public string RecurringKind { get; set; }
     }
 
     [DataContract(Namespace = "http://schemas.datacontract.org/2004/07/Model")]
@@ -305,6 +306,7 @@ namespace BManagedWeb.bsrv
         [DataMember] public string Currency { get; set; }
         [DataMember] public string Purpose { get; set; }
         [DataMember] public bool   IsKerenBacked { get; set; }
+        [DataMember] public bool   HasStandingOrder { get; set; }
         [DataMember] public bool   IsActive { get; set; }
         [DataMember] public string Notes { get; set; }
         [DataMember] public DateTime CreatedAt { get; set; }

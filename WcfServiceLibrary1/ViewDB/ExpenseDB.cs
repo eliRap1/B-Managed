@@ -11,6 +11,33 @@ namespace ViewDB
     {
         protected override Base NewEntity() => new Expense();
 
+        private static readonly object _schemaLock = new object();
+        private static bool _schemaEnsured;
+
+        public ExpenseDB()
+        {
+            if (_schemaEnsured) return;
+            lock (_schemaLock)
+            {
+                if (_schemaEnsured) return;
+                AddColumnIfMissing("Expenses", "recurringKind", "TEXT(10)");
+                _schemaEnsured = true;
+            }
+        }
+
+        private void AddColumnIfMissing(string table, string column, string sqlType)
+        {
+            string sql = $"ALTER TABLE [{table}] ADD COLUMN [{column}] {sqlType}";
+            using (var conn = GetConnection())
+            using (var cmd = new OleDbCommand(sql, conn))
+            {
+                try { conn.Open(); cmd.ExecuteNonQuery(); }
+                catch (OleDbException) { /* column already exists — ignore */ }
+                catch (Exception ex)
+                { System.Diagnostics.Debug.WriteLine($"AddColumn({table}.{column}): " + ex.Message); }
+            }
+        }
+
         protected override void CreateModel(Base entity)
         {
             base.CreateModel(entity);
@@ -33,6 +60,11 @@ namespace ViewDB
             } catch { }
             try { e.ReceiptPath = reader["receiptPath"].ToString(); }         catch { }
             try { e.Currency    = reader["currency"].ToString(); }            catch { e.Currency = "ILS"; }
+            try
+            {
+                var v = reader["recurringKind"];
+                e.RecurringKind = v == DBNull.Value ? null : v.ToString();
+            } catch { }
         }
 
         public List<Expense> GetByOwner(int ownerId)
@@ -54,8 +86,8 @@ namespace ViewDB
         public int Insert(Expense e)
         {
             string sql = @"INSERT INTO [Expenses]
-                ([ownerId],[categoryId],[date],[amount],[vatPaid],[vendor],[description],[projectId],[receiptPath],[currency])
-                VALUES (?,?,?,?,?,?,?,?,?,?)";
+                ([ownerId],[categoryId],[date],[amount],[vatPaid],[vendor],[description],[projectId],[receiptPath],[currency],[recurringKind])
+                VALUES (?,?,?,?,?,?,?,?,?,?,?)";
             using (var conn = GetConnection())
             using (var cmd = new OleDbCommand(sql, conn))
             {
@@ -69,6 +101,7 @@ namespace ViewDB
                 cmd.Parameters.Add(new OleDbParameter("@p",   OleDbType.Integer)       { Value = (object)e.ProjectId ?? DBNull.Value });
                 cmd.Parameters.Add(new OleDbParameter("@rp",  OleDbType.VarWChar, 255) { Value = (object)e.ReceiptPath ?? DBNull.Value });
                 cmd.Parameters.Add(new OleDbParameter("@cur", OleDbType.VarWChar, 3)   { Value = e.Currency ?? "ILS" });
+                cmd.Parameters.Add(new OleDbParameter("@rk",  OleDbType.VarWChar, 10)  { Value = (object)NormaliseKind(e.RecurringKind) ?? DBNull.Value });
                 conn.Open();
                 cmd.ExecuteNonQuery();
                 using (var idCmd = new OleDbCommand("SELECT @@IDENTITY", conn))
@@ -76,11 +109,20 @@ namespace ViewDB
             }
         }
 
+        private static string NormaliseKind(string s)
+        {
+            if (string.IsNullOrWhiteSpace(s)) return null;
+            var t = s.Trim();
+            if (t.Equals("Fixed",    StringComparison.OrdinalIgnoreCase)) return "Fixed";
+            if (t.Equals("Variable", StringComparison.OrdinalIgnoreCase)) return "Variable";
+            return null;
+        }
+
         public void Update(Expense e)
         {
             string sql = @"UPDATE [Expenses] SET
                 [categoryId]=?, [date]=?, [amount]=?, [vatPaid]=?, [vendor]=?,
-                [description]=?, [projectId]=?, [receiptPath]=?, [currency]=?
+                [description]=?, [projectId]=?, [receiptPath]=?, [currency]=?, [recurringKind]=?
                 WHERE [id]=?";
             using (var conn = GetConnection())
             using (var cmd = new OleDbCommand(sql, conn))
@@ -94,6 +136,7 @@ namespace ViewDB
                 cmd.Parameters.Add(new OleDbParameter("@p",   OleDbType.Integer)       { Value = (object)e.ProjectId ?? DBNull.Value });
                 cmd.Parameters.Add(new OleDbParameter("@rp",  OleDbType.VarWChar, 255) { Value = (object)e.ReceiptPath ?? DBNull.Value });
                 cmd.Parameters.Add(new OleDbParameter("@cur", OleDbType.VarWChar, 3)   { Value = e.Currency ?? "ILS" });
+                cmd.Parameters.Add(new OleDbParameter("@rk",  OleDbType.VarWChar, 10)  { Value = (object)NormaliseKind(e.RecurringKind) ?? DBNull.Value });
                 cmd.Parameters.Add(new OleDbParameter("@id",  OleDbType.Integer)       { Value = e.Id });
                 conn.Open();
                 cmd.ExecuteNonQuery();

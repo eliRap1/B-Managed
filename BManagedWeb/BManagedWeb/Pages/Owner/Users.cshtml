@@ -3,9 +3,9 @@
 @{ ViewData["Title"] = "Users"; }
 
 <div class="reveal mb-12">
-    <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">@L.T(HttpContext,"Admin","ניהול")</span>
-    <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">@L.T(HttpContext,"Users.","משתמשים.")</h1>
-    <p class="text-ink/50 mt-3">@L.T(HttpContext,"Approve, promote, deactivate.","אשר, קדם, השבת.")</p>
+    <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">Admin</span>
+    <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">Users.</h1>
+    <p class="text-ink/50 mt-3">Approve, promote, deactivate.</p>
 </div>
 
 @if (!string.IsNullOrEmpty(Model.Message))
@@ -18,7 +18,7 @@
 {
     <section class="reveal bg-amber/[0.06] ring-1 ring-amber/20 rounded-shell p-1.5 mb-6">
         <div class="bg-paper-50 rounded-core p-6 shadow-inset">
-            <h2 class="display text-2xl font-semibold mb-4 text-amber">@L.T(HttpContext,"Pending approvals","ממתינים לאישור") (@Model.Pending.Count)</h2>
+            <h2 class="display text-2xl font-semibold mb-4 text-amber">Pending approvals (@Model.Pending.Count)</h2>
             <div class="grid md:grid-cols-2 gap-3">
                 @foreach (var u in Model.Pending)
                 {
@@ -30,10 +30,10 @@
                         </div>
                         <div class="flex gap-2">
                             <form method="post" asp-page-handler="Approve" asp-route-id="@u.Id">
-                                <button class="bg-mint text-white rounded-full px-4 py-2 text-sm">@L.T(HttpContext,"Approve","אשר")</button>
+                                <button class="bg-mint text-white rounded-full px-4 py-2 text-sm">Approve</button>
                             </form>
                             <form method="post" asp-page-handler="Delete" asp-route-id="@u.Id">
-                                <button class="bg-rose text-white rounded-full px-4 py-2 text-sm">@L.T(HttpContext,"Reject","דחה")</button>
+                                <button class="bg-rose text-white rounded-full px-4 py-2 text-sm">Reject</button>
                             </form>
                         </div>
                     </div>
@@ -46,14 +46,14 @@
 <!-- All users -->
 <section class="reveal bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
     <div class="bg-paper-50 rounded-core p-6 shadow-inset">
-        <h2 class="display text-2xl font-semibold mb-4">@L.T(HttpContext,"All users","כל המשתמשים") (@Model.AllUsers.Count)</h2>
+        <h2 class="display text-2xl font-semibold mb-4">All users (@Model.AllUsers.Count)</h2>
         <table class="w-full text-sm">
             <thead><tr class="text-ink/40 pill">
-                <th class="text-left py-2">@L.T(HttpContext,"Username","שם משתמש")</th>
-                <th class="text-left">@L.T(HttpContext,"Email","אימייל")</th>
-                <th class="text-left">@L.T(HttpContext,"Role","תפקיד")</th>
-                <th class="text-left">@L.T(HttpContext,"Status","סטטוס")</th>
-                <th class="text-right">@L.T(HttpContext,"Actions","פעולות")</th>
+                <th class="text-left py-2">Username</th>
+                <th class="text-left">Email</th>
+                <th class="text-left">Role</th>
+                <th class="text-left">Status</th>
+                <th class="text-right">Actions</th>
             </tr></thead>
             <tbody>
             @foreach (var u in Model.AllUsers)
@@ -65,9 +65,9 @@
                     <td><span class="pill rounded-full px-2 py-0.5 bg-@(color)/10 text-@(color) border border-@(color)/20">@u.Role</span></td>
                     <td>
                         @if (u.IsActive)
-                        { <span class="pill text-mint">@L.T(HttpContext,"Active","פעיל")</span> }
+                        { <span class="pill text-mint">Active</span> }
                         else
-                        { <span class="pill text-rose">@L.T(HttpContext,"Blocked","חסום")</span> }
+                        { <span class="pill text-rose">Blocked</span> }
                     </td>
                     <td class="text-right">
                         <form method="post" asp-page-handler="Promote" asp-route-id="@u.Id" class="inline">
@@ -76,13 +76,13 @@
                                 <option value="Employee" selected="@(u.Role=="Employee")">Employee</option>
                                 <option value="Client"   selected="@(u.Role=="Client")">Client</option>
                             </select>
-                            <button class="bg-ink text-paper-50 rounded-full px-3 py-1 text-xs ml-1">@L.T(HttpContext,"Set","קבע")</button>
+                            <button class="bg-ink text-paper-50 rounded-full px-3 py-1 text-xs ml-1">Set</button>
                         </form>
                         <form method="post" asp-page-handler="Toggle" asp-route-id="@u.Id" class="inline">
-                            <button class="bg-amber text-white rounded-full px-3 py-1 text-xs">@(u.IsActive ? L.T(HttpContext,"Block","חסום") : L.T(HttpContext,"Unblock","שחרר"))</button>
+                            <button class="bg-amber text-white rounded-full px-3 py-1 text-xs">@(u.IsActive ? "Block" : "Unblock")</button>
                         </form>
                         <form method="post" asp-page-handler="Reset" asp-route-id="@u.Id" class="inline">
-                            <button class="bg-paper-200 text-ink rounded-full px-3 py-1 text-xs" title="Reset to 'reset1234'">@L.T(HttpContext,"Reset PW","אפס סיסמה")</button>
+                            <button class="bg-paper-200 text-ink rounded-full px-3 py-1 text-xs" title="Reset to 'reset1234'">Reset PW</button>
                         </form>
                     </td>
                 </tr>

@@ -9,11 +9,11 @@
 
         <!-- Eyebrow tag -->
         <div class="flex justify-center mb-6">
-            <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">@L.T(HttpContext,"Workspace","סביבת עבודה")</span>
+            <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">Workspace</span>
         </div>
 
-        <h1 class="display text-5xl md:text-6xl font-bold text-center text-ink mb-2">@L.T(HttpContext,"Welcome back","ברוך שובך")</h1>
-        <p class="text-center text-ink/50 mb-12">@L.T(HttpContext,"Run your business — calmly.","נהל את העסק שלך — בקלות.")</p>
+        <h1 class="display text-5xl md:text-6xl font-bold text-center text-ink mb-2">Welcome back</h1>
+        <p class="text-center text-ink/50 mb-12">Run your business — calmly.</p>
 
         <!-- Double-bezel card -->
         <div class="bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5 shadow-float">
@@ -21,22 +21,21 @@
                 @if (TempData["NewOwnerCode"] is string newCode && !string.IsNullOrEmpty(newCode))
                 {
                     <div class="mb-5 px-4 py-3 rounded-2xl bg-mint/10 text-mint border border-mint/20 text-sm">
-                        ✅ @L.T(HttpContext,"Owner account created. Your company invite code is:","חשבון בעלים נוצר. קוד הצטרפות לחברה שלך:")
+                        ✅ Owner account created. Your company invite code is:
                         <div class="font-mono text-lg tracking-widest mt-1">@newCode</div>
                         <div class="text-xs text-ink/60 mt-1">
-                            @L.T(HttpContext,"Share this with employees who join your company. Rotate it from Settings any time.",
-                                              "שתף עם עובדים שיצטרפו לחברה. ניתן להחליף מההגדרות בכל עת.")
+                            Share this with employees who join your company. Rotate it from Settings any time.
                         </div>
                     </div>
                 }
                 <form id="loginForm" method="post" class="space-y-5">
                     <div>
-                        <label class="pill text-ink/40 mb-2 block">@L.T(HttpContext,"Username","שם משתמש")</label>
+                        <label class="pill text-ink/40 mb-2 block">Username</label>
                         <input asp-for="Username" autocomplete="username" autofocus
                                class="w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-3 outline-none focus:border-accent transition" />
                     </div>
                     <div>
-                        <label class="pill text-ink/40 mb-2 block">@L.T(HttpContext,"Password","סיסמה")</label>
+                        <label class="pill text-ink/40 mb-2 block">Password</label>
                         <input asp-for="Password" type="password" autocomplete="current-password"
                                class="w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-3 outline-none focus:border-accent transition" />
                     </div>
@@ -48,7 +47,7 @@
 
                     <button id="loginSubmit" type="submit"
                             class="group w-full inline-flex items-center justify-center gap-3 bg-ink text-paper-50 rounded-full px-6 py-3 mt-2 transition-all duration-500 ease-spring active:scale-[0.98] hover:opacity-95 disabled:opacity-70 disabled:cursor-wait">
-                        <span data-label class="font-semibold">@L.T(HttpContext,"Sign in","כניסה")</span>
+                        <span data-label class="font-semibold">Sign in</span>
                         <span data-arrow class="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center transition-all duration-500 ease-spring group-hover:translate-x-0.5 group-hover:-translate-y-px">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                         </span>
@@ -73,7 +72,7 @@
                             var label = b.querySelector('[data-label]');
                             var arrow = b.querySelector('[data-arrow]');
                             var sp    = b.querySelector('[data-spinner]');
-                            if (label) label.textContent = @Html.Raw(Json.Serialize(L.T(HttpContext, "Signing in…", "מתחבר…")));
+                            if (label) label.textContent = "Signing in…";
                             if (arrow) arrow.classList.add('hidden');
                             if (sp)    { sp.classList.remove('hidden'); sp.classList.add('flex'); }
                         });
@@ -83,11 +82,11 @@
         </div>
 
         <p class="text-xs text-ink/40 text-center mt-8">
-            <a asp-page="/SignUp" class="text-accent hover:underline">@L.T(HttpContext,"Create an account","צור חשבון")</a>
+            <a asp-page="/SignUp" class="text-accent hover:underline">Create an account</a>
             ·
-            <a asp-page="/ForgotPassword" class="text-accent hover:underline">@L.T(HttpContext,"Forgot password","שכחת סיסמה")</a>
+            <a asp-page="/ForgotPassword" class="text-accent hover:underline">Forgot password</a>
             <br/>
-            @L.T(HttpContext,"Seeded admin","משתמש דמו"): <span class="font-mono">admin</span> / <span class="font-mono">admin1234</span>
+            Seeded admin: <span class="font-mono">admin</span> / <span class="font-mono">admin1234</span>
         </p>
     </div>
 </section>

@@ -22,6 +22,7 @@ namespace BManagedWeb.Pages.Owner
         [BindProperty] public decimal NewVat { get; set; }
         [BindProperty] public string NewDescription { get; set; }
         [BindProperty] public string NewCurrency { get; set; } = "ILS";
+        [BindProperty] public string NewRecurringKind { get; set; } = "";
         [BindProperty] public IFormFile NewReceipt { get; set; }
         [BindProperty(SupportsGet = true)] public string Q { get; set; }
 
@@ -64,7 +65,8 @@ namespace BManagedWeb.Pages.Owner
                     VatPaid = NewVat,
                     Vendor = NewVendor ?? "",
                     Description = NewDescription ?? "",
-                    Currency = NewCurrency ?? "ILS"
+                    Currency = NewCurrency ?? "ILS",
+                    RecurringKind = string.IsNullOrWhiteSpace(NewRecurringKind) ? null : NewRecurringKind
                 });
 
                 if (NewReceipt != null && NewReceipt.Length > 0 && NewReceipt.Length <= 5 * 1024 * 1024)
@@ -91,13 +93,13 @@ namespace BManagedWeb.Pages.Owner
             var list = _srv.GetExpensesByOwner(ownerId) ?? new Expense[0];
 
             var sb = new System.Text.StringBuilder();
-            sb.AppendLine("Id,Date,Category,Vendor,Description,Amount,VatPaid,Currency");
+            sb.AppendLine("Id,Date,Category,Vendor,Description,Amount,VatPaid,Currency,RecurringKind");
             foreach (var e in list)
             {
                 var catName = cats.FirstOrDefault(c => c.Id == (e.CategoryId ?? 0))?.Name ?? "";
                 sb.AppendLine(string.Join(",",
                     e.Id, e.Date.ToString("yyyy-MM-dd"), Csv(catName), Csv(e.Vendor),
-                    Csv(e.Description), e.Amount, e.VatPaid, Csv(e.Currency)));
+                    Csv(e.Description), e.Amount, e.VatPaid, Csv(e.Currency), Csv(e.RecurringKind)));
             }
             byte[] bytes = new System.Text.UTF8Encoding(true).GetBytes(sb.ToString());
             return File(bytes, "text/csv", "BManaged_Expenses.csv");
@@ -115,6 +117,24 @@ namespace BManagedWeb.Pages.Owner
         {
             if (HttpContext.Session.GetString("Role") != "Owner") return RedirectToPage("/Login");
             try { _srv.DeleteExpense(id); } catch { }
+            return RedirectToPage();
+        }
+
+        // Mark/unmark an existing expense as a recurring (הוצאה קבועה)
+        // Fixed-amount or Variable-amount line. Empty string clears the flag.
+        public IActionResult OnPostMark(int id, string kind)
+        {
+            if (HttpContext.Session.GetString("Role") != "Owner") return RedirectToPage("/Login");
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            try
+            {
+                var list = _srv.GetExpensesByOwner(ownerId) ?? new Expense[0];
+                var e = list.FirstOrDefault(x => x.Id == id);
+                if (e == null) return RedirectToPage();
+                e.RecurringKind = string.IsNullOrWhiteSpace(kind) ? null : kind;
+                _srv.UpdateExpense(e);
+            }
+            catch (Exception ex) { Message = "Mark failed: " + ex.Message; IsSuccess = false; return OnGet(); }
             return RedirectToPage();
         }
     }

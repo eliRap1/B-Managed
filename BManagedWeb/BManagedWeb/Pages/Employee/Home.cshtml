@@ -5,9 +5,9 @@
 }
 
 <div class="reveal mb-12">
-    <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">@L.T(HttpContext,"Employee","עובד")</span>
-    <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">@L.T(HttpContext,"Hi","שלום") @Model.Username.</h1>
-    <p class="text-ink/50 mt-3">@L.T(HttpContext,"Your assigned projects.","הפרויקטים שלך.")</p>
+    <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">Employee</span>
+    <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">Hi @Model.Username.</h1>
+    <p class="text-ink/50 mt-3">Your assigned projects.</p>
 </div>
 
 <section class="reveal grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -16,9 +16,9 @@
         var color = p.Status == "Done" ? "mint" : (p.Status == "AwaitingPayment" ? "amber" : "accent");
         <div class="bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
             <div class="bg-paper-50 rounded-core p-6 shadow-inset h-full">
-                <span class="pill text-ink/40">@L.T(HttpContext,"Project","פרויקט") #@p.Id</span>
+                <span class="pill text-ink/40">Project #@p.Id</span>
                 <div class="display text-xl font-semibold mt-1">@p.Title</div>
-                <div class="text-xs text-ink/40 mt-1">@L.T(HttpContext,"Due","יעד") @(p.DueDate?.ToString("dd MMM") ?? "—")</div>
+                <div class="text-xs text-ink/40 mt-1">Due @(p.DueDate?.ToString("dd MMM") ?? "—")</div>
                 <div class="pill rounded-full px-2 py-0.5 mt-3 inline-block bg-@(color)/10 text-@(color) border border-@(color)/20">@p.Status</div>
             </div>
         </div>

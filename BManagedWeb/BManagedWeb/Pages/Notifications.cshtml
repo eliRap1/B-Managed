@@ -3,12 +3,12 @@
 @{ ViewData["Title"] = "Notifications"; }
 
 <div class="reveal mb-8">
-    <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">@L.T(HttpContext, "Inbox", "תיבת דואר")</span>
-    <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">@L.T(HttpContext, "Notifications", "התראות")</h1>
+    <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">Inbox</span>
+    <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">Notifications</h1>
 </div>
 
 <form method="post" asp-page-handler="MarkAll" class="reveal mb-6">
-    <button class="bg-ink text-paper-50 rounded-full px-4 py-2 text-sm">@L.T(HttpContext, "Mark all read", "סמן הכל כנקרא")</button>
+    <button class="bg-ink text-paper-50 rounded-full px-4 py-2 text-sm">Mark all read</button>
 </form>
 
 <section class="reveal grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -27,6 +27,6 @@
     }
     @if (Model.Notifications.Count == 0)
     {
-        <div class="md:col-span-2 text-center py-16 text-ink/40">@L.T(HttpContext, "No notifications.", "אין התראות.")</div>
+        <div class="md:col-span-2 text-center py-16 text-ink/40">No notifications.</div>
     }
 </section>

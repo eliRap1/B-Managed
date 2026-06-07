@@ -1,4 +1,0 @@
-<?xml version="1.0"?>
-<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
-  <s:Body><CheckUserExist xmlns="http://tempuri.org/"><username>admin</username></CheckUserExist></s:Body>
-</s:Envelope>

@@ -76,6 +76,7 @@ namespace ViewDB
                 "  [currency] TEXT(3)," +
                 "  [purpose] TEXT(200)," +
                 "  [isKerenBacked] BIT," +
+                "  [hasStandingOrder] BIT," +
                 "  [isActive] BIT," +
                 "  [notes] MEMO," +
                 "  [createdAt] DATETIME)";
@@ -92,6 +93,22 @@ namespace ViewDB
 
             CreateTableIfMissing(loansSql, "Loans");
             CreateTableIfMissing(paymentsSql, "LoanPayments");
+            // Idempotent migration for older .accdb files that pre-date the
+            // hasStandingOrder column.
+            AddColumnIfMissing("Loans", "hasStandingOrder", "BIT");
+        }
+
+        private void AddColumnIfMissing(string table, string column, string sqlType)
+        {
+            string sql = $"ALTER TABLE [{table}] ADD COLUMN [{column}] {sqlType}";
+            using (var conn = GetConnection())
+            using (var cmd = new OleDbCommand(sql, conn))
+            {
+                try { conn.Open(); cmd.ExecuteNonQuery(); }
+                catch (OleDbException) { /* column already exists — ignore */ }
+                catch (Exception ex)
+                { System.Diagnostics.Debug.WriteLine($"AddColumn({table}.{column}): " + ex.Message); }
+            }
         }
 
         private void CreateTableIfMissing(string sql, string tableName)
@@ -131,6 +148,7 @@ namespace ViewDB
             try { l.Currency         = reader["currency"].ToString(); }                              catch { l.Currency = "ILS"; }
             try { l.Purpose          = reader["purpose"].ToString(); }                               catch { }
             try { l.IsKerenBacked    = Convert.ToBoolean(reader["isKerenBacked"]); }                 catch { }
+            try { l.HasStandingOrder = Convert.ToBoolean(reader["hasStandingOrder"]); }              catch { }
             try { l.IsActive         = Convert.ToBoolean(reader["isActive"]); }                      catch { l.IsActive = true; }
             try { l.Notes            = reader["notes"].ToString(); }                                 catch { }
             try { l.CreatedAt        = Convert.ToDateTime(reader["createdAt"]); }                    catch { l.CreatedAt = DateTime.Now; }
@@ -145,8 +163,8 @@ namespace ViewDB
             string sql = @"INSERT INTO [Loans]
                 ([ownerId],[lender],[principal],[remainingBalance],[interestRatePct],
                  [monthlyPayment],[startDate],[termMonths],[nextPaymentDate],[currency],
-                 [purpose],[isKerenBacked],[isActive],[notes],[createdAt])
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                 [purpose],[isKerenBacked],[hasStandingOrder],[isActive],[notes],[createdAt])
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             using (var conn = GetConnection())
             using (var cmd = new OleDbCommand(sql, conn))
             {
@@ -162,6 +180,7 @@ namespace ViewDB
                 cmd.Parameters.Add(new OleDbParameter("@cu", OleDbType.VarWChar, 3)    { Value = l.Currency ?? "ILS" });
                 cmd.Parameters.Add(new OleDbParameter("@pu", OleDbType.VarWChar, 200)  { Value = l.Purpose ?? "" });
                 cmd.Parameters.Add(new OleDbParameter("@kb", OleDbType.Boolean)        { Value = l.IsKerenBacked });
+                cmd.Parameters.Add(new OleDbParameter("@so", OleDbType.Boolean)        { Value = l.HasStandingOrder });
                 cmd.Parameters.Add(new OleDbParameter("@ia", OleDbType.Boolean)        { Value = l.IsActive });
                 cmd.Parameters.Add(new OleDbParameter("@nt", OleDbType.LongVarWChar)   { Value = (object)l.Notes ?? DBNull.Value });
                 cmd.Parameters.Add(new OleDbParameter("@ca", OleDbType.Date)           { Value = l.CreatedAt });
@@ -177,7 +196,7 @@ namespace ViewDB
             string sql = @"UPDATE [Loans] SET
                 [lender]=?, [principal]=?, [remainingBalance]=?, [interestRatePct]=?,
                 [monthlyPayment]=?, [startDate]=?, [termMonths]=?, [nextPaymentDate]=?,
-                [currency]=?, [purpose]=?, [isKerenBacked]=?, [isActive]=?, [notes]=?
+                [currency]=?, [purpose]=?, [isKerenBacked]=?, [hasStandingOrder]=?, [isActive]=?, [notes]=?
                 WHERE [id]=?";
             using (var conn = GetConnection())
             using (var cmd = new OleDbCommand(sql, conn))
@@ -193,6 +212,7 @@ namespace ViewDB
                 cmd.Parameters.Add(new OleDbParameter("@cu", OleDbType.VarWChar, 3)    { Value = l.Currency ?? "ILS" });
                 cmd.Parameters.Add(new OleDbParameter("@pu", OleDbType.VarWChar, 200)  { Value = l.Purpose ?? "" });
                 cmd.Parameters.Add(new OleDbParameter("@kb", OleDbType.Boolean)        { Value = l.IsKerenBacked });
+                cmd.Parameters.Add(new OleDbParameter("@so", OleDbType.Boolean)        { Value = l.HasStandingOrder });
                 cmd.Parameters.Add(new OleDbParameter("@ia", OleDbType.Boolean)        { Value = l.IsActive });
                 cmd.Parameters.Add(new OleDbParameter("@nt", OleDbType.LongVarWChar)   { Value = (object)l.Notes ?? DBNull.Value });
                 cmd.Parameters.Add(new OleDbParameter("@id", OleDbType.Integer)        { Value = l.Id });
