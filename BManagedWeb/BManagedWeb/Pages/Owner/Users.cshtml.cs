@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using BManagedWeb.bsrv;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -19,6 +20,24 @@ namespace BManagedWeb.Pages.Owner
         {
             if (HttpContext.Session.GetString("Role") != "Owner") return RedirectToPage("/Login");
             return null;
+        }
+
+        // Returns true when the target user's OwnerId matches the current
+        // session owner's UserId, preventing cross-company IDOR mutations.
+        private bool BelongsToCurrentOwner(int targetId)
+        {
+            int currentOwnerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            var target = _srv.GetUserById(targetId);
+            return target != null && target.OwnerId.HasValue && target.OwnerId.Value == currentOwnerId;
+        }
+
+        // Generates a cryptographically random 12-character temporary password.
+        private static string GenerateTempPassword()
+        {
+            // Use RandomNumberGenerator (crypto-safe) rather than System.Random.
+            byte[] bytes = new byte[9]; // 9 bytes → 12 Base64 chars (no padding)
+            RandomNumberGenerator.Fill(bytes);
+            return Convert.ToBase64String(bytes).Replace("+", "A").Replace("/", "B").Replace("=", "C");
         }
 
         public IActionResult OnGet()
@@ -46,6 +65,8 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostApprove(int id)
         {
             var g = GuardOwner(); if (g != null) return g;
+            if (!BelongsToCurrentOwner(id))
+            { Message = "User not found or not in your company."; IsSuccess = false; Reload(); return Page(); }
             try { _srv.SetUserActive(id, true); Message = "Approved."; IsSuccess = true; }
             catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }
             Reload(); return Page();
@@ -54,6 +75,8 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostToggle(int id)
         {
             var g = GuardOwner(); if (g != null) return g;
+            if (!BelongsToCurrentOwner(id))
+            { Message = "User not found or not in your company."; IsSuccess = false; Reload(); return Page(); }
             try
             {
                 var u = _srv.GetUserById(id);
@@ -70,6 +93,8 @@ namespace BManagedWeb.Pages.Owner
             var g = GuardOwner(); if (g != null) return g;
             if (newRole != "Owner" && newRole != "Employee" && newRole != "Client")
             { Message = "Invalid role."; IsSuccess = false; Reload(); return Page(); }
+            if (!BelongsToCurrentOwner(id))
+            { Message = "User not found or not in your company."; IsSuccess = false; Reload(); return Page(); }
             try { _srv.UpdateUserRole(id, newRole); Message = "Role updated."; IsSuccess = true; }
             catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }
             Reload(); return Page();
@@ -78,7 +103,19 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostReset(int id)
         {
             var g = GuardOwner(); if (g != null) return g;
-            try { _srv.ResetPassword(id, "reset1234"); Message = "Password reset to 'reset1234'."; IsSuccess = true; }
+            if (!BelongsToCurrentOwner(id))
+            { Message = "User not found or not in your company."; IsSuccess = false; Reload(); return Page(); }
+            try
+            {
+                // Generate a unique, cryptographically random temporary password
+                // rather than the previous hardcoded "reset1234" which was both
+                // guessable and, combined with the former IDOR, allowed any
+                // Owner to take over any user account.
+                string tempPwd = GenerateTempPassword();
+                _srv.ResetPassword(id, tempPwd);
+                Message = $"Password reset. Temporary password: {tempPwd}";
+                IsSuccess = true;
+            }
             catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }
             Reload(); return Page();
         }
@@ -86,6 +123,8 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostDelete(int id)
         {
             var g = GuardOwner(); if (g != null) return g;
+            if (!BelongsToCurrentOwner(id))
+            { Message = "User not found or not in your company."; IsSuccess = false; Reload(); return Page(); }
             try { _srv.DeleteUser(id); Message = "Deleted."; IsSuccess = true; }
             catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }
             Reload(); return Page();
