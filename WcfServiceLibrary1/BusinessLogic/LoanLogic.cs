@@ -32,6 +32,16 @@ namespace BusinessLogic
             try { loanDB.Delete(id); }
             catch (Exception ex) { throw new FaultException("DeleteLoan failed: " + ex.Message); }
         }
+
+        /// <summary>
+        /// Ownership check: returns true only if the loan row exists and belongs to
+        /// the given owner. Used by callers that receive a raw loan id from client input.
+        /// </summary>
+        public bool LoanBelongsToOwner(int loanId, int ownerId)
+        {
+            var loan = loanDB.GetById(loanId);
+            return loan != null && loan.OwnerId == ownerId;
+        }
         public Loan GetLoanById(int id) => loanDB.GetById(id);
         public List<Loan> GetLoansForOwner(int ownerId) => loanDB.GetForOwner(ownerId);
         public int RecordLoanPayment(LoanPayment p)
