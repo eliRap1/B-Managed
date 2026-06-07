@@ -59,6 +59,11 @@ namespace ViewDB
                 i.PaidDate = v == DBNull.Value ? (DateTime?)null : DateTime.Parse(v.ToString());
             } catch { }
             try { i.Notes      = reader["notes"].ToString(); }             catch { }
+            try
+            {
+                var v = reader["contractId"];
+                i.ContractId = v == DBNull.Value ? (int?)null : Convert.ToInt32(v);
+            } catch { }
         }
 
         public Invoice GetById(int id)
