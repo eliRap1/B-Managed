@@ -43,9 +43,30 @@ namespace BManagedWeb.Pages.Owner
             { Message = "Load failed: " + ex.Message; IsSuccess = false; }
         }
 
+        // TODO(audit): OnPostApprove/Toggle/Promote/Reset/Delete all operate on an arbitrary
+        // `id` from POST form data without verifying that the target user belongs to this
+        // Owner's company (IDOR). The service-layer operations (SetUserActive, DeleteUser,
+        // ResetPassword, UpdateUserRole) also lack an ownerId parameter. Until
+        // owner-scoped variants are added to IService1, add a page-side fence that
+        // validates the target id is in this Owner's user list before acting.
+
+        private bool UserBelongsToOwner(int userId)
+        {
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            // Re-use the already-tenant-scoped query — if the id isn't in the list it
+            // doesn't belong to this owner.
+            try
+            {
+                var all = _srv.GetUsersForOwner(ownerId);
+                return all != null && all.Any(u => u.Id == userId);
+            }
+            catch { return false; }
+        }
+
         public IActionResult OnPostApprove(int id)
         {
             var g = GuardOwner(); if (g != null) return g;
+            if (!UserBelongsToOwner(id)) { Message = "User not found."; IsSuccess = false; Reload(); return Page(); }
             try { _srv.SetUserActive(id, true); Message = "Approved."; IsSuccess = true; }
             catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }
             Reload(); return Page();
@@ -54,6 +75,7 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostToggle(int id)
         {
             var g = GuardOwner(); if (g != null) return g;
+            if (!UserBelongsToOwner(id)) { Message = "User not found."; IsSuccess = false; Reload(); return Page(); }
             try
             {
                 var u = _srv.GetUserById(id);
@@ -70,6 +92,7 @@ namespace BManagedWeb.Pages.Owner
             var g = GuardOwner(); if (g != null) return g;
             if (newRole != "Owner" && newRole != "Employee" && newRole != "Client")
             { Message = "Invalid role."; IsSuccess = false; Reload(); return Page(); }
+            if (!UserBelongsToOwner(id)) { Message = "User not found."; IsSuccess = false; Reload(); return Page(); }
             try { _srv.UpdateUserRole(id, newRole); Message = "Role updated."; IsSuccess = true; }
             catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }
             Reload(); return Page();
@@ -78,6 +101,7 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostReset(int id)
         {
             var g = GuardOwner(); if (g != null) return g;
+            if (!UserBelongsToOwner(id)) { Message = "User not found."; IsSuccess = false; Reload(); return Page(); }
             try { _srv.ResetPassword(id, "reset1234"); Message = "Password reset to 'reset1234'."; IsSuccess = true; }
             catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }
             Reload(); return Page();
@@ -86,6 +110,7 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostDelete(int id)
         {
             var g = GuardOwner(); if (g != null) return g;
+            if (!UserBelongsToOwner(id)) { Message = "User not found."; IsSuccess = false; Reload(); return Page(); }
             try { _srv.DeleteUser(id); Message = "Deleted."; IsSuccess = true; }
             catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }
             Reload(); return Page();
