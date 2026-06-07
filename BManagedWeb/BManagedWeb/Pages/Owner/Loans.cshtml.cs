@@ -137,7 +137,17 @@ namespace BManagedWeb.Pages.Owner
         {
             var role = HttpContext.Session.GetString("Role");
             if (role != "Owner") return RedirectToPage("/Login");
-            try { _srv.DeleteLoan(id); TempData["LoanMsg"] = "Loan deleted."; }
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            try
+            {
+                // Verify the loan belongs to this Owner before deleting to prevent
+                // cross-tenant deletion via a guessed loan id (IDOR).
+                var loans = _srv.GetLoansForOwner(ownerId);
+                if (loans == null || !loans.Any(l => l.Id == id))
+                { TempData["LoanMsg"] = "Loan not found."; return RedirectToPage(new { DisplayCurrency }); }
+                _srv.DeleteLoan(id);
+                TempData["LoanMsg"] = "Loan deleted.";
+            }
             catch (Exception ex) { TempData["LoanMsg"] = "Failed: " + ex.Message; }
             return RedirectToPage(new { DisplayCurrency });
         }
