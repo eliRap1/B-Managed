@@ -14,8 +14,13 @@ namespace BManagedClient
         private static readonly Regex PhoneRx    = new Regex(@"^\+?\d{7,15}$");
         private static readonly Regex PasswordRx = new Regex(@"^(?=.*[A-Za-z])(?=.*\d).{8,}$");
 
-        // "Owner" or "Employee" — set when the user picks a path. Empty = step 1 still.
+        // "Owner", "Employee", or "Client" — set when the user picks a path.
+        // Empty = step 1 still.
         private string _selectedRole = "";
+
+        // Employee + Client both join via invite code, so they share the same
+        // invite-code panel and the same lookup path.
+        private static bool IsInviteRole(string r) => r == "Employee" || r == "Client";
 
         public SignUp() => InitializeComponent();
 
@@ -25,17 +30,24 @@ namespace BManagedClient
         private void ChooseEmployee_Click(object s, RoutedEventArgs e)
             => SwitchToForm("Employee");
 
+        private void ChooseClient_Click(object s, RoutedEventArgs e)
+            => SwitchToForm("Client");
+
         private void SwitchToForm(string role)
         {
             _selectedRole = role;
             roleStep.Visibility = Visibility.Collapsed;
             formStep.Visibility = Visibility.Visible;
-            ownerExtras.Visibility    = role == "Owner"    ? Visibility.Visible : Visibility.Collapsed;
-            employeeExtras.Visibility = role == "Employee" ? Visibility.Visible : Visibility.Collapsed;
-            titleText.Text = role == "Owner" ? "Owner sign-up" : "Employee sign-up";
-            subtitleText.Text = role == "Owner"
-                ? "Run the business — you'll log invoices, expenses, and VAT."
-                : "Enter the invite code from your company's Owner.";
+            ownerExtras.Visibility    = role == "Owner"     ? Visibility.Visible : Visibility.Collapsed;
+            employeeExtras.Visibility = IsInviteRole(role)  ? Visibility.Visible : Visibility.Collapsed;
+            titleText.Text =
+                role == "Owner"  ? "Owner sign-up" :
+                role == "Client" ? "Client sign-up" :
+                                   "Employee sign-up";
+            subtitleText.Text =
+                role == "Owner"  ? "Run the business — you'll log invoices, expenses, and VAT." :
+                role == "Client" ? "Enter the invite code your business sent you." :
+                                   "Enter the invite code from your company's Owner.";
         }
 
         private void ResetSteps_Click(object s, RoutedEventArgs e)
@@ -135,7 +147,7 @@ namespace BManagedClient
 
         private void Create_Click(object s, RoutedEventArgs e)
         {
-            if (_selectedRole != "Owner" && _selectedRole != "Employee")
+            if (_selectedRole != "Owner" && _selectedRole != "Employee" && _selectedRole != "Client")
             { ResetSteps_Click(s, e); return; }
 
             string u = usernameBox.Text?.Trim() ?? "";
@@ -177,16 +189,16 @@ namespace BManagedClient
                 isZair = zairBox.IsChecked == true;
                 bizName = (bizNameBox.Text ?? "").Trim();
             }
-            else if (_selectedRole == "Employee")
+            else if (IsInviteRole(_selectedRole))
             {
                 string code = (inviteBox.Text ?? "").Trim().ToUpperInvariant();
                 if (string.IsNullOrEmpty(code))
-                { status.Text = "Enter the invite code from your company's Owner."; return; }
+                { status.Text = "Enter the invite code from your business."; return; }
                 try
                 {
                     var owner = ServiceGateway.Use(c => c.GetOwnerByInviteCode(code));
                     if (owner == null)
-                    { status.Text = "Invite code not recognised. Ask your Owner to share it."; return; }
+                    { status.Text = "Invite code not recognised. Ask the business for it."; return; }
                     employeeOwnerId = owner.Id;
                 }
                 catch (Exception ex)
@@ -224,7 +236,7 @@ namespace BManagedClient
                     }
                     catch { /* best-effort; account exists either way */ }
                 }
-                else if (_selectedRole == "Employee" && employeeOwnerId.HasValue)
+                else if (IsInviteRole(_selectedRole) && employeeOwnerId.HasValue)
                 {
                     try
                     {
@@ -232,6 +244,28 @@ namespace BManagedClient
                         {
                             int newId = c.GetUserId(u);
                             c.SetOwnerId(newId, employeeOwnerId.Value);
+
+                            // Mirror Web behaviour: when a Client signs up, drop
+                            // a Customer row into the Owner's CRM so they show
+                            // up immediately. Best-effort — failure here
+                            // doesn't roll back the user account.
+                            if (_selectedRole == "Client")
+                            {
+                                try
+                                {
+                                    c.AddCustomer(new Customer
+                                    {
+                                        BusinessName      = u,
+                                        ContactName       = u,
+                                        Email             = em,
+                                        Phone             = ph,
+                                        OwnerId           = employeeOwnerId.Value,
+                                        PreferredCurrency = cur ?? "ILS",
+                                        Notes             = "Auto-created from Client signup",
+                                    });
+                                }
+                                catch { /* best-effort */ }
+                            }
                         });
                     }
                     catch { /* link is best-effort; Owner can fix in Manage Users */ }
@@ -243,7 +277,11 @@ namespace BManagedClient
                     msg = "Owner account created. You can sign in now.";
                     if (!string.IsNullOrEmpty(newInviteCode))
                         msg += "\n\nYour company invite code is: " + newInviteCode +
-                               "\nShare it with employees who need to join your company.";
+                               "\nShare it with employees and clients who need to join your company.";
+                }
+                else if (_selectedRole == "Client")
+                {
+                    msg = "Client account created. The business owner must approve your account before you can sign in.";
                 }
                 else
                 {

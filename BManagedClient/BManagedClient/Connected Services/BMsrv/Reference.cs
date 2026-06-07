@@ -914,16 +914,19 @@ namespace BManagedClient.BMsrv {
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.Nullable<int> ProjectIdField;
-        
+
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string ReceiptPathField;
-        
+
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string RecurringKindField;
+
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private decimal VatPaidField;
-        
+
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string VendorField;
-        
+
         [System.Runtime.Serialization.DataMemberAttribute()]
         public decimal Amount {
             get {
@@ -1027,7 +1030,20 @@ namespace BManagedClient.BMsrv {
                 }
             }
         }
-        
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string RecurringKind {
+            get {
+                return this.RecurringKindField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.RecurringKindField, value) != true)) {
+                    this.RecurringKindField = value;
+                    this.RaisePropertyChanged("RecurringKind");
+                }
+            }
+        }
+
         [System.Runtime.Serialization.DataMemberAttribute()]
         public decimal VatPaid {
             get {
@@ -1040,7 +1056,7 @@ namespace BManagedClient.BMsrv {
                 }
             }
         }
-        
+
         [System.Runtime.Serialization.DataMemberAttribute()]
         public string Vendor {
             get {
@@ -1105,16 +1121,19 @@ namespace BManagedClient.BMsrv {
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string CurrencyField;
-        
+
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool HasStandingOrderField;
+
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private double InterestRatePctField;
-        
+
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private bool IsActiveField;
-        
+
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private bool IsKerenBackedField;
-        
+
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string LenderField;
         
@@ -1170,7 +1189,20 @@ namespace BManagedClient.BMsrv {
                 }
             }
         }
-        
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool HasStandingOrder {
+            get {
+                return this.HasStandingOrderField;
+            }
+            set {
+                if ((this.HasStandingOrderField.Equals(value) != true)) {
+                    this.HasStandingOrderField = value;
+                    this.RaisePropertyChanged("HasStandingOrder");
+                }
+            }
+        }
+
         [System.Runtime.Serialization.DataMemberAttribute()]
         public double InterestRatePct {
             get {

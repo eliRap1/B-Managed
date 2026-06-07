@@ -4,33 +4,33 @@
 
 <div class="reveal mb-12 flex flex-wrap items-end justify-between gap-4">
     <div>
-        <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">@L.T(HttpContext,"Pipeline","צבר")</span>
-        <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">@L.T(HttpContext,"Projects.","פרויקטים.")</h1>
+        <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">Pipeline</span>
+        <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">Projects.</h1>
     </div>
     <form method="get" class="flex items-center gap-3 text-sm">
-        <input asp-for="Q" placeholder="@L.T(HttpContext,"Search title…","חיפוש לפי כותרת…")"
+        <input asp-for="Q" placeholder="Search title…"
                class="bg-paper-100 border border-black/5 rounded-full px-4 py-2 outline-none focus:border-accent" />
         <select asp-for="StatusFilter" class="bg-paper-100 border border-black/5 rounded-full px-4 py-2">
-            <option value="">@L.T(HttpContext,"All","הכל")</option>
-            <option value="Active">@L.T(HttpContext,"Active","פעיל")</option>
-            <option value="AwaitingPayment">@L.T(HttpContext,"Awaiting Payment","ממתין לתשלום")</option>
-            <option value="Done">@L.T(HttpContext,"Done","הסתיים")</option>
-            <option value="Cancelled">@L.T(HttpContext,"Cancelled","בוטל")</option>
+            <option value="">All</option>
+            <option value="Active">Active</option>
+            <option value="AwaitingPayment">Awaiting Payment</option>
+            <option value="Done">Done</option>
+            <option value="Cancelled">Cancelled</option>
         </select>
-        <button class="bg-ink text-paper-50 rounded-full px-4 py-2">@L.T(HttpContext,"Filter","סנן")</button>
+        <button class="bg-ink text-paper-50 rounded-full px-4 py-2">Filter</button>
     </form>
 </div>
 
 <form method="post" asp-page-handler="Add" class="reveal mb-12 bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5 max-w-3xl">
     <div class="bg-paper-50 rounded-core p-6 shadow-inset grid md:grid-cols-3 gap-3">
         <select asp-for="NewCustomerId" class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5">
-            <option value="0">@L.T(HttpContext,"Customer…","לקוח…")</option>
+            <option value="0">Customer…</option>
             @foreach (var c in Model.Customers)
             { <option value="@c.Id">@c.BusinessName</option> }
         </select>
-        <input asp-for="NewTitle" placeholder="@L.T(HttpContext,"Project title","שם פרויקט")" class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5" />
-        <input asp-for="NewBudget" type="number" step="0.01" placeholder="@L.T(HttpContext,"Budget","תקציב")" class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5" />
-        <button class="md:col-span-3 bg-mint text-white rounded-full px-6 py-3 mt-1 active:scale-[0.98]">@L.T(HttpContext,"Add project","הוסף פרויקט")</button>
+        <input asp-for="NewTitle" placeholder="Project title" class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5" />
+        <input asp-for="NewBudget" type="number" step="0.01" placeholder="Budget" class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5" />
+        <button class="md:col-span-3 bg-mint text-white rounded-full px-6 py-3 mt-1 active:scale-[0.98]">Add project</button>
     </div>
 </form>
 
@@ -43,20 +43,20 @@
             <div class="bg-paper-50 rounded-core p-6 shadow-inset h-full">
                 <span class="pill text-ink/40">#@p.Id · @p.Currency</span>
                 <div class="display text-2xl font-semibold mt-2">@p.Title</div>
-                <div class="text-xs text-ink/40 mt-1">@L.T(HttpContext,"Due","יעד") @(p.DueDate?.ToString("dd/MM/yyyy") ?? "—")</div>
+                <div class="text-xs text-ink/40 mt-1">Due @(p.DueDate?.ToString("dd/MM/yyyy") ?? "—")</div>
                 <div class="display text-xl font-semibold mt-3">@p.TotalBudget.ToString("N0") <span class="text-ink/40 text-xs">@p.Currency</span></div>
                 <div class="pill rounded-full px-2 py-0.5 mt-4 inline-block bg-@(color)/10 text-@(color) border border-@(color)/20">@(p.Status switch {
-                    "Active"          => L.T(HttpContext,"Active","פעיל"),
-                    "AwaitingPayment" => L.T(HttpContext,"Awaiting Payment","ממתין לתשלום"),
-                    "Done"            => L.T(HttpContext,"Done","הסתיים"),
-                    "Cancelled"       => L.T(HttpContext,"Cancelled","בוטל"),
+                    "Active"          => "Active",
+                    "AwaitingPayment" => "Awaiting Payment",
+                    "Done"            => "Done",
+                    "Cancelled"       => "Cancelled",
                     _                 => p.Status })</div>
-                <div class="text-xs text-ink/40 mt-3">@L.T(HttpContext,"Click to manage employees + status","לחץ לניהול עובדים וסטטוס")</div>
+                <div class="text-xs text-ink/40 mt-3">Click to manage employees + status</div>
             </div>
         </button>
     }
     @if (Model.Projects.Count == 0)
-    { <div class="md:col-span-3 text-center py-20 text-ink/40">@L.T(HttpContext,"No projects yet.","אין פרויקטים עדיין.")</div> }
+    { <div class="md:col-span-3 text-center py-20 text-ink/40">No projects yet.</div> }
 </section>
 
 <!-- Manage project modal -->
@@ -65,14 +65,14 @@
         <div class="bg-paper-50 rounded-core p-8 shadow-inset overflow-y-auto max-h-[83vh]">
             <div class="flex items-start justify-between gap-4 mb-6">
                 <div>
-                    <span class="pill text-ink/40">@L.T(HttpContext,"Project","פרויקט") · <span id="pm-status">—</span></span>
+                    <span class="pill text-ink/40">Project · <span id="pm-status">—</span></span>
                     <h2 class="display text-3xl font-bold mt-1" id="pm-title">—</h2>
                 </div>
                 <button type="button" id="pm-close"
                         class="w-9 h-9 rounded-full bg-black/5 hover:bg-black/10 transition flex items-center justify-center">✕</button>
             </div>
 
-            <h3 class="display font-semibold mt-2 mb-2">@L.T(HttpContext,"Assigned employees","עובדים מוקצים")</h3>
+            <h3 class="display font-semibold mt-2 mb-2">Assigned employees</h3>
             <div id="pm-assigned" class="space-y-1.5 text-sm text-ink/60 mb-4">—</div>
 
             <div class="flex items-center gap-2 mb-6">
@@ -80,19 +80,19 @@
                         class="flex-1 bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5 text-sm">
                 </select>
                 <button type="button" id="pm-add-btn"
-                        class="bg-mint text-white rounded-full px-4 py-2 text-sm">+ @L.T(HttpContext,"Add","הוסף")</button>
+                        class="bg-mint text-white rounded-full px-4 py-2 text-sm">+ Add</button>
             </div>
 
-            <h3 class="display font-semibold mt-2 mb-2">@L.T(HttpContext,"Update status","עדכן סטטוס")</h3>
+            <h3 class="display font-semibold mt-2 mb-2">Update status</h3>
             <form method="post" asp-page-handler="Status" class="flex items-center gap-2 mb-2">
                 <input type="hidden" id="pm-status-pid" name="projectId" value="0"/>
                 <select name="newStatus" class="flex-1 bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5 text-sm">
-                    <option value="Active">@L.T(HttpContext,"Active","פעיל")</option>
-                    <option value="AwaitingPayment">@L.T(HttpContext,"Awaiting Payment","ממתין לתשלום")</option>
-                    <option value="Done">@L.T(HttpContext,"Done","הסתיים")</option>
-                    <option value="Cancelled">@L.T(HttpContext,"Cancelled","בוטל")</option>
+                    <option value="Active">Active</option>
+                    <option value="AwaitingPayment">Awaiting Payment</option>
+                    <option value="Done">Done</option>
+                    <option value="Cancelled">Cancelled</option>
                 </select>
-                <button class="bg-amber text-white rounded-full px-4 py-2 text-sm">@L.T(HttpContext,"Save","שמור")</button>
+                <button class="bg-amber text-white rounded-full px-4 py-2 text-sm">Save</button>
             </form>
         </div>
     </div>

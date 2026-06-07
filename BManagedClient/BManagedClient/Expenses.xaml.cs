@@ -37,6 +37,7 @@ namespace BManagedClient
             decimal.TryParse(vatBox.Text, out decimal vat);
             try
             {
+                var kind = (kindCombo?.SelectedValue as string) ?? "";
                 ServiceGateway.Use(c => c.AddExpense(new Expense
                 {
                     OwnerId = LogIn.sign.Id,
@@ -45,9 +46,11 @@ namespace BManagedClient
                     Amount = amt,
                     VatPaid = vat,
                     Vendor = vendorBox.Text ?? "",
-                    Currency = LogIn.sign.PreferredCurrency
+                    Currency = LogIn.sign.PreferredCurrency,
+                    RecurringKind = string.IsNullOrWhiteSpace(kind) ? null : kind
                 }));
                 vendorBox.Text = ""; amountBox.Text = "0"; vatBox.Text = "0";
+                if (kindCombo != null) kindCombo.SelectedIndex = 0;
                 Refresh();
             }
             catch (Exception ex) { MessageBox.Show("Add failed: " + ex.Message); }

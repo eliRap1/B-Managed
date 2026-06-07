@@ -4,14 +4,14 @@
 
 <div class="reveal mb-8 flex flex-wrap items-end justify-between gap-4">
     <div>
-        <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">@L.T(HttpContext,"Outflows","הוצאות")</span>
-        <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">@L.T(HttpContext,"Expenses.","הוצאות.")</h1>
+        <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">Outflows</span>
+        <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">Expenses.</h1>
     </div>
     <form method="get" class="flex items-center gap-3 text-sm">
-        <input asp-for="Q" placeholder="@L.T(HttpContext,"Search vendor / description…","חיפוש ספק / תיאור…")"
+        <input asp-for="Q" placeholder="Search vendor / description…"
                class="bg-paper-100 border border-black/5 rounded-full px-4 py-2 outline-none focus:border-accent" />
-        <button class="bg-ink text-paper-50 rounded-full px-4 py-2">@L.T(HttpContext,"Search","חיפוש")</button>
-        <a asp-page-handler="Csv" class="bg-mint text-white rounded-full px-4 py-2">@L.T(HttpContext,"CSV","CSV")</a>
+        <button class="bg-ink text-paper-50 rounded-full px-4 py-2">Search</button>
+        <a asp-page-handler="Csv" class="bg-mint text-white rounded-full px-4 py-2">CSV</a>
     </form>
 </div>
 
@@ -23,16 +23,14 @@
 <!-- Cheat-sheet card explaining the two amount fields -->
 <div class="reveal mb-6 max-w-3xl bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
     <div class="bg-paper-50 rounded-core p-5 shadow-inset text-sm text-ink/70">
-        <div class="pill text-ink/40 mb-2">@L.T(HttpContext,"How to log an expense","איך לרשום הוצאה")</div>
+        <div class="pill text-ink/40 mb-2">How to log an expense</div>
         <p class="mb-1">
-            <span class="font-semibold">@L.T(HttpContext,"Amount (gross)","סכום (ברוטו)")</span> —
-            @L.T(HttpContext,"total you paid, VAT included. e.g. a 117 ₪ supplier bill → enter 117.",
-                              "סך ששולם, כולל מע״מ. דוגמה: חשבונית של 117 ₪ → הזן 117.")
+            <span class="font-semibold">Amount (gross)</span> —
+            total you paid, VAT included. e.g. a 117 ₪ supplier bill → enter 117.
         </p>
         <p>
-            <span class="font-semibold">@L.T(HttpContext,"VAT paid","מע״מ ששולם")</span> —
-            @L.T(HttpContext,"only the VAT portion you can later deduct. From 117 → VAT = 17. Click Auto-VAT to fill it from the gross amount automatically.",
-                              "רק מרכיב המע״מ שניתן לקזז. מתוך 117 → מע״מ = 17. לחיצה על Auto-VAT תמלא אוטומטית מהברוטו.")
+            <span class="font-semibold">VAT paid</span> —
+            only the VAT portion you can later deduct. From 117 → VAT = 17. Click Auto-VAT to fill it from the gross amount automatically.
         </p>
     </div>
 </div>
@@ -40,37 +38,44 @@
 <form method="post" asp-page-handler="Add" enctype="multipart/form-data" class="reveal mb-12 bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5 max-w-4xl">
     <div class="bg-paper-50 rounded-core p-6 shadow-inset grid md:grid-cols-4 gap-3">
         <select asp-for="NewCategoryId" class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5">
-            <option value="0">@L.T(HttpContext,"Category…","קטגוריה…")</option>
+            <option value="0">Category…</option>
             @foreach (var c in Model.Categories)
             { <option value="@c.Id">@c.Name</option> }
         </select>
-        <input asp-for="NewVendor" placeholder="@L.T(HttpContext,"Vendor","ספק")" class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5" />
+        <input asp-for="NewVendor" placeholder="Vendor" class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5" />
         <div class="relative">
             <input asp-for="NewAmount" id="exp-amount" type="number" step="0.01"
-                   placeholder="@L.T(HttpContext,"Amount (gross, incl. VAT)","סכום ברוטו (כולל מע״מ)")"
-                   title="@L.T(HttpContext,"Total paid to supplier, VAT included","סך ששולם לספק כולל מע״מ")"
+                   placeholder="Amount (gross, incl. VAT)"
+                   title="Total paid to supplier, VAT included"
                    class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5" />
         </div>
         <div class="relative flex items-center gap-1">
             <input asp-for="NewVat" id="exp-vat" type="number" step="0.01"
-                   placeholder="@L.T(HttpContext,"VAT (deductible)","מע״מ (לקיזוז)")"
-                   title="@L.T(HttpContext,"Only the VAT portion of the gross amount","רק מרכיב המע״מ מתוך הברוטו")"
+                   placeholder="VAT (deductible)"
+                   title="Only the VAT portion of the gross amount"
                    class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5" />
             <button type="button" id="exp-autovat"
                     class="shrink-0 bg-ink text-paper-50 rounded-full px-3 py-1.5 text-xs"
-                    title="@L.T(HttpContext,"Auto = Amount × 18 ÷ 118 (Israeli VAT, since 2025)","חישוב אוטומטי = סכום × 18 ÷ 118")">
+                    title="Auto = Amount × 18 ÷ 118 (Israeli VAT, since 2025)">
                 Auto&nbsp;18%
             </button>
         </div>
-        <input asp-for="NewDescription" placeholder="@L.T(HttpContext,"Description","תיאור")" class="md:col-span-3 bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5" />
+        <input asp-for="NewDescription" placeholder="Description" class="md:col-span-3 bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5" />
         <select asp-for="NewCurrency" class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5">
             <option>ILS</option><option>USD</option>
         </select>
+        <select asp-for="NewRecurringKind"
+                title="Mark recurring (הוצאה קבועה / משתנה)"
+                class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5">
+            <option value="">One-time</option>
+            <option value="Fixed">Recurring · Fixed (rent, insurance)</option>
+            <option value="Variable">Recurring · Variable (utilities)</option>
+        </select>
         <label class="md:col-span-4 bg-paper-100 border border-dashed border-black/10 rounded-2xl px-4 py-3 text-sm text-ink/60 cursor-pointer hover:border-accent transition flex items-center gap-3">
-            <span class="pill">@L.T(HttpContext,"Receipt (optional, ≤5 MB)","קבלה (אופציונלי, עד 5MB)")</span>
+            <span class="pill">Receipt (optional, ≤5 MB)</span>
             <input asp-for="NewReceipt" type="file" accept="image/*,application/pdf" class="text-xs" />
         </label>
-        <button class="md:col-span-4 bg-rose text-white rounded-full px-6 py-3 mt-1 active:scale-[0.98]">@L.T(HttpContext,"Log expense","דווח הוצאה")</button>
+        <button class="md:col-span-4 bg-rose text-white rounded-full px-6 py-3 mt-1 active:scale-[0.98]">Log expense</button>
     </div>
 </form>
 
@@ -127,9 +132,10 @@
     <div class="bg-paper-50 rounded-core p-6 shadow-inset">
         <table class="w-full text-sm">
             <thead><tr class="text-ink/40 pill">
-                <th class="text-left py-2">@L.T(HttpContext,"Date","תאריך")</th><th class="text-left">@L.T(HttpContext,"Category","קטגוריה")</th>
-                <th class="text-left">@L.T(HttpContext,"Vendor","ספק")</th><th class="text-right">@L.T(HttpContext,"Amount","סכום")</th>
-                <th class="text-right">@L.T(HttpContext,"VAT","מע״מ")</th><th class="text-right">@L.T(HttpContext,"Currency","מטבע")</th>
+                <th class="text-left py-2">Date</th><th class="text-left">Category</th>
+                <th class="text-left">Vendor</th><th class="text-right">Amount</th>
+                <th class="text-right">VAT</th><th class="text-right">Currency</th>
+                <th class="text-center">Recurring</th>
             </tr></thead>
             <tbody>
             @foreach (var e in Model.Expenses)
@@ -142,10 +148,22 @@
                     <td class="text-right font-medium">@e.Amount.ToString("N2")</td>
                     <td class="text-right text-ink/60">@e.VatPaid.ToString("N2")</td>
                     <td class="text-right text-ink/40 text-xs">@e.Currency</td>
+                    <td class="text-center">
+                        <form method="post" asp-page-handler="Mark" class="inline-flex items-center gap-1">
+                            <input type="hidden" name="id" value="@e.Id" />
+                            @{ var kind = e.RecurringKind ?? ""; }
+                            <select name="kind" onchange="this.form.requestSubmit()"
+                                    class="bg-paper-100 border border-black/5 rounded-full px-2 py-1 text-xs">
+                                <option value=""         selected="@(kind == ""         ? "selected" : null)">—</option>
+                                <option value="Fixed"    selected="@(kind == "Fixed"    ? "selected" : null)">Fixed</option>
+                                <option value="Variable" selected="@(kind == "Variable" ? "selected" : null)">Variable</option>
+                            </select>
+                        </form>
+                    </td>
                 </tr>
             }
             @if (Model.Expenses.Count == 0)
-            { <tr><td colspan="6" class="text-center py-12 text-ink/40">@L.T(HttpContext,"No expenses yet.","אין הוצאות עדיין.")</td></tr> }
+            { <tr><td colspan="7" class="text-center py-12 text-ink/40">No expenses yet.</td></tr> }
             </tbody>
         </table>
     </div>

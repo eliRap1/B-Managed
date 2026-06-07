@@ -53,7 +53,8 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="200"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="160"/>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="150"/>
                         <ColumnDefinition Width="160"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
@@ -63,10 +64,11 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="CATEGORY"      Style="{StaticResource InputLabel}" Margin="0,0,6,4"/>
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text="VENDOR"        Style="{StaticResource InputLabel}" Margin="0,0,6,4"/>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="CATEGORY"       Style="{StaticResource InputLabel}" Margin="0,0,6,4"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="VENDOR"         Style="{StaticResource InputLabel}" Margin="0,0,6,4"/>
                     <TextBlock Grid.Row="0" Grid.Column="2" Text="AMOUNT (GROSS)" Style="{StaticResource InputLabel}" Margin="0,0,6,4"/>
-                    <TextBlock Grid.Row="0" Grid.Column="3" Text="VAT PAID"      Style="{StaticResource InputLabel}" Margin="0,0,6,4"/>
+                    <TextBlock Grid.Row="0" Grid.Column="3" Text="VAT PAID"       Style="{StaticResource InputLabel}" Margin="0,0,6,4"/>
+                    <TextBlock Grid.Row="0" Grid.Column="4" Text="RECURRING"      Style="{StaticResource InputLabel}" Margin="0,0,6,4"/>
 
                     <ComboBox Grid.Row="1" Grid.Column="0" x:Name="catCombo" Style="{StaticResource ModernCombo}"
                               DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,6,0"/>
@@ -77,10 +79,17 @@
                     <TextBox Grid.Row="1" Grid.Column="3" x:Name="vatBox" Style="{StaticResource ModernTextBox}"
                              Margin="0,0,6,0" Text="0"
                              ToolTip="VAT portion only — the part you can deduct"/>
-                    <Button  Grid.Row="1" Grid.Column="4" Content="Auto VAT (18%)" Click="AutoVat_Click"
+                    <ComboBox Grid.Row="1" Grid.Column="4" x:Name="kindCombo" Style="{StaticResource ModernCombo}"
+                              SelectedValuePath="Tag" Margin="0,0,6,0"
+                              ToolTip="Mark הוצאה קבועה / משתנה — used for budget forecasting">
+                        <ComboBoxItem Content="One-time"          Tag=""         IsSelected="True"/>
+                        <ComboBoxItem Content="Fixed (rent etc.)" Tag="Fixed"/>
+                        <ComboBoxItem Content="Variable (utils)"  Tag="Variable"/>
+                    </ComboBox>
+                    <Button  Grid.Row="1" Grid.Column="5" Content="Auto VAT (18%)" Click="AutoVat_Click"
                              Style="{StaticResource SecondaryButton}" Margin="0,0,6,0"
                              ToolTip="Fill VAT = Amount × 18 ÷ 118 (Israeli standard, since 2025). Forced 0 for Osek Patur."/>
-                    <Button  Grid.Row="1" Grid.Column="5" Content="➕ Log expense" Click="Add_Click" Style="{StaticResource RoseButton}"/>
+                    <Button  Grid.Row="1" Grid.Column="6" Content="➕ Log expense" Click="Add_Click" Style="{StaticResource RoseButton}"/>
                 </Grid>
             </Border>
         </Border>
@@ -95,6 +104,7 @@
                             <GridViewColumn Header="Amount gross" DisplayMemberBinding="{Binding Amount, StringFormat=N2}"  Width="120"/>
                             <GridViewColumn Header="VAT paid"     DisplayMemberBinding="{Binding VatPaid, StringFormat=N2}" Width="100"/>
                             <GridViewColumn Header="Currency"     DisplayMemberBinding="{Binding Currency}" Width="80"/>
+                            <GridViewColumn Header="Recurring"    DisplayMemberBinding="{Binding RecurringKind}" Width="100"/>
                         </GridView>
                     </ListView.View>
                 </ListView>

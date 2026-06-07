@@ -3,10 +3,9 @@
 @{ ViewData["Title"] = "Import"; }
 
 <div class="reveal mb-12 max-w-3xl">
-    <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">@L.T(HttpContext,"Bulk import","ייבוא בכמות")</span>
-    <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">@L.T(HttpContext,"Import.","ייבוא.")</h1>
-    <p class="text-ink/50 mt-3">@L.T(HttpContext,"CSV from your bank, or paste receipt text — auto-classified, VAT auto-filled.",
-                                      "CSV מהבנק, או הדבק טקסט מקבלה — סיווג + מע״מ אוטומטיים.")</p>
+    <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">Bulk import</span>
+    <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">Import.</h1>
+    <p class="text-ink/50 mt-3">CSV from your bank, or paste receipt text — auto-classified, VAT auto-filled.</p>
 </div>
 
 @if (!string.IsNullOrEmpty(Model.Message))
@@ -18,20 +17,19 @@
     <!-- CSV import -->
     <div class="reveal bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
         <div class="bg-paper-50 rounded-core p-6 shadow-inset">
-            <h2 class="display text-2xl font-semibold mb-2">@L.T(HttpContext,"Bank statement CSV","דוח בנק (CSV)")</h2>
+            <h2 class="display text-2xl font-semibold mb-2">Bank statement CSV</h2>
             <p class="text-sm text-ink/50 mb-4">
-                @L.T(HttpContext,"Format: 3 columns — date, description, amount. Negative amounts (debits) become expenses; positives ignored.",
-                                  "פורמט: 3 עמודות — תאריך, תיאור, סכום. ערכים שליליים (חיובים) הופכים להוצאות; חיוביים מתעלמים.")
+                Format: 3 columns — date, description, amount. Negative amounts (debits) become expenses; positives ignored.
             </p>
             <form method="post" asp-page-handler="Csv" enctype="multipart/form-data" class="space-y-3">
                 <input asp-for="CsvFile" type="file" accept=".csv,text/csv"
                        class="w-full bg-paper-100 border border-dashed border-black/10 rounded-2xl px-4 py-3 text-sm"/>
-                <button class="bg-mint text-white rounded-full px-5 py-2.5 text-sm">📥 @L.T(HttpContext,"Import CSV","ייבא CSV")</button>
+                <button class="bg-mint text-white rounded-full px-5 py-2.5 text-sm">📥 Import CSV</button>
             </form>
             @if (Model.Imported.Count > 0)
             {
                 <details class="mt-4 text-xs text-ink/60">
-                    <summary class="cursor-pointer pill text-ink/40">@L.T(HttpContext,"Show imported rows","הצג שורות שיובאו") (@Model.Imported.Count)</summary>
+                    <summary class="cursor-pointer pill text-ink/40">Show imported rows (@Model.Imported.Count)</summary>
                     <ul class="mt-2 space-y-1">
                         @foreach (var r in Model.Imported.Take(40))
                         { <li class="text-xs">· @r</li> }
@@ -44,16 +42,15 @@
     <!-- Receipt text -->
     <div class="reveal bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
         <div class="bg-paper-50 rounded-core p-6 shadow-inset">
-            <h2 class="display text-2xl font-semibold mb-2">@L.T(HttpContext,"Receipt text → expense","טקסט קבלה → הוצאה")</h2>
+            <h2 class="display text-2xl font-semibold mb-2">Receipt text → expense</h2>
             <p class="text-sm text-ink/50 mb-4">
-                @L.T(HttpContext,"Paste text from a printed or PDF receipt. We extract the total (Total / סה״כ / לתשלום) and category from keywords.",
-                                  "הדבק טקסט מקבלה מודפסת או PDF. נחלץ את הסכום (Total / סה״כ / לתשלום) ונסווג לפי מילות מפתח.")
+                Paste text from a printed or PDF receipt. We extract the total (Total / סה״כ / לתשלום) and category from keywords.
             </p>
             <form method="post" asp-page-handler="Receipt" class="space-y-3">
                 <textarea asp-for="ReceiptText" rows="10"
                           placeholder="שופרסל&#10;קופה 5 תאריך 06/05/26&#10;...&#10;לתשלום 234.50"
                           class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-3 text-sm font-mono"></textarea>
-                <button class="bg-amber text-white rounded-full px-5 py-2.5 text-sm">🔍 @L.T(HttpContext,"Parse + create expense","חלץ + צור הוצאה")</button>
+                <button class="bg-amber text-white rounded-full px-5 py-2.5 text-sm">🔍 Parse + create expense</button>
             </form>
         </div>
     </div>

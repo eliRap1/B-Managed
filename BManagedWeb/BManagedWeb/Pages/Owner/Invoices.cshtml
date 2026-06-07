@@ -6,32 +6,31 @@
 {
     <div class="reveal mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-            <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">@L.T(HttpContext,"Billing","חיוב")</span>
-            <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">@L.T(HttpContext,"Invoices.","חשבוניות.")</h1>
+            <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">Billing</span>
+            <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">Invoices.</h1>
         </div>
         <form method="get" class="flex items-center gap-3 text-sm">
-            <input asp-for="Q" placeholder="@L.T(HttpContext,"Search by # or customer…","חיפוש לפי מס׳ או לקוח…")"
+            <input asp-for="Q" placeholder="Search by # or customer…"
                    class="bg-paper-100 border border-black/5 rounded-full px-4 py-2 outline-none focus:border-accent" />
             <select asp-for="StatusFilter" class="bg-paper-100 border border-black/5 rounded-full px-4 py-2">
-                <option value="">@L.T(HttpContext,"All","הכל")</option>
-                <option value="Draft">@L.T(HttpContext,"Draft","טיוטה")</option>
-                <option value="Sent">@L.T(HttpContext,"Sent","נשלח")</option>
-                <option value="Paid">@L.T(HttpContext,"Paid","שולם")</option>
-                <option value="Overdue">@L.T(HttpContext,"Overdue","באיחור")</option>
+                <option value="">All</option>
+                <option value="Draft">Draft</option>
+                <option value="Sent">Sent</option>
+                <option value="Paid">Paid</option>
+                <option value="Overdue">Overdue</option>
             </select>
-            <button class="bg-ink text-paper-50 rounded-full px-4 py-2">@L.T(HttpContext,"Filter","סנן")</button>
+            <button class="bg-ink text-paper-50 rounded-full px-4 py-2">Filter</button>
         </form>
     </div>
 
     @if (Model.LinkedContract != null)
     {
         <div class="reveal mb-4 max-w-3xl bg-mint/10 text-mint border border-mint/20 rounded-2xl px-5 py-3 text-sm">
-            🧾 @L.T(HttpContext,"Creating invoice from contract","יוצר חשבונית מחוזה")
+            🧾 Creating invoice from contract
             <span class="font-semibold">@Model.LinkedContract.ContractNumber</span>
-            (@L.T(HttpContext,"Title","כותרת"): @Model.LinkedContract.Title ·
-            @L.T(HttpContext,"Total","סה״כ"): @Model.LinkedContract.TotalAmount.ToString("N2") @Model.LinkedContract.Currency).
-            @L.T(HttpContext,"Customer + currency are pre-filled. After creation, an initial line will seed from the contract title and amount.",
-                              "הלקוח והמטבע ימולאו אוטומטית. שורה ראשונה תיווצר מתוך כותרת וסכום החוזה.")
+            (Title: @Model.LinkedContract.Title ·
+            Total: @Model.LinkedContract.TotalAmount.ToString("N2") @Model.LinkedContract.Currency).
+            Customer + currency are pre-filled. After creation, an initial line will seed from the contract title and amount.
         </div>
     }
 
@@ -42,29 +41,28 @@
         <div class="bg-paper-50 rounded-core p-6 shadow-inset">
             <div class="grid md:grid-cols-3 gap-3">
                 <div>
-                    <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Customer (bill to)","לקוח (חיוב ל-)")</label>
+                    <label class="pill text-ink/40 mb-1 block">Customer (bill to)</label>
                     <select asp-for="NewCustomerId" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5">
-                        <option value="0">@L.T(HttpContext,"Pick a customer…","בחר לקוח…")</option>
+                        <option value="0">Pick a customer…</option>
                         @foreach (var c in Model.Customers)
                         { <option value="@c.Id">@c.BusinessName</option> }
                     </select>
                 </div>
                 <div>
-                    <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Due date","תאריך לתשלום")</label>
+                    <label class="pill text-ink/40 mb-1 block">Due date</label>
                     <input asp-for="NewDueDate" type="date" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5" />
                 </div>
                 <div>
-                    <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Currency","מטבע")</label>
+                    <label class="pill text-ink/40 mb-1 block">Currency</label>
                     <select asp-for="NewCurrency" class="w-full bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5">
                         <option>ILS</option><option>USD</option>
                     </select>
                 </div>
             </div>
             <p class="text-xs text-ink/50 mt-3">
-                @L.T(HttpContext,"Creates a Draft invoice. After it's created, add line items below it (description, qty, unit price). VAT is added on the totals row — 18% for Murshe, 0% for Osek Patur.",
-                                  "יוצר טיוטת חשבונית. אחרי היצירה, הוסף שורות חיוב (תיאור, כמות, מחיר ליחידה). מע״מ מתווסף בשורת הסיכום — 18% למורשה, 0% לעוסק פטור.")
+                Creates a Draft invoice. After it's created, add line items below it (description, qty, unit price). VAT is added on the totals row — 18% for Murshe, 0% for Osek Patur.
             </p>
-            <button class="w-full bg-ink text-paper-50 rounded-full px-6 py-3 mt-3 active:scale-[0.98]">@L.T(HttpContext,"Create draft invoice","צור טיוטת חשבונית")</button>
+            <button class="w-full bg-ink text-paper-50 rounded-full px-6 py-3 mt-3 active:scale-[0.98]">Create draft invoice</button>
         </div>
     </form>
 
@@ -78,42 +76,42 @@
                     <div>
                         <div class="pill text-ink/40">@inv.InvoiceNumber</div>
                         <div class="font-medium">@custName</div>
-                        <div class="text-xs text-ink/40">@L.T(HttpContext,"Due","יעד") @inv.DueDate.ToString("dd/MM/yyyy")</div>
+                        <div class="text-xs text-ink/40">Due @inv.DueDate.ToString("dd/MM/yyyy")</div>
                     </div>
                     <div class="text-right">
                         <div class="display font-semibold">@inv.Total.ToString("N0") <span class="text-ink/40 text-xs">@inv.Currency</span></div>
                         <div class="pill rounded-full px-2 py-0.5 mt-1 inline-block bg-@(color)/10 text-@(color) border border-@(color)/20">@(inv.Status switch {
-                            "Draft"   => L.T(HttpContext,"Draft","טיוטה"),
-                            "Sent"    => L.T(HttpContext,"Sent","נשלח"),
-                            "Paid"    => L.T(HttpContext,"Paid","שולם"),
-                            "Overdue" => L.T(HttpContext,"Overdue","באיחור"),
+                            "Draft"   => "Draft",
+                            "Sent"    => "Sent",
+                            "Paid"    => "Paid",
+                            "Overdue" => "Overdue",
                             _         => inv.Status })</div>
                     </div>
                 </div>
             </a>
         }
         @if (Model.AllInvoices.Count == 0)
-        { <div class="md:col-span-2 text-center py-20 text-ink/40">@L.T(HttpContext,"No invoices yet.","אין חשבוניות עדיין.")</div> }
+        { <div class="md:col-span-2 text-center py-20 text-ink/40">No invoices yet.</div> }
     </section>
 }
 else
 {
     <div class="reveal mb-8">
-        <a asp-page="/Owner/Invoices" asp-route-id="" class="inline-block bg-ink text-paper-50 rounded-full px-4 py-2 text-sm">← @L.T(HttpContext,"Back to all invoices","חזרה לכל החשבוניות")</a>
+        <a asp-page="/Owner/Invoices" asp-route-id="" class="inline-block bg-ink text-paper-50 rounded-full px-4 py-2 text-sm">← Back to all invoices</a>
         <h1 class="display text-4xl md:text-6xl font-bold mt-4">@Model.Selected.InvoiceNumber</h1>
     </div>
 
     <section class="grid md:grid-cols-12 gap-4 md:gap-6 reveal">
         <div class="md:col-span-7 bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
             <div class="bg-paper-50 rounded-core p-6 shadow-inset">
-                <h2 class="display text-2xl font-semibold mb-4">@L.T(HttpContext,"Line items","שורות חשבונית")</h2>
+                <h2 class="display text-2xl font-semibold mb-4">Line items</h2>
 
                 <table class="w-full text-sm">
                     <thead><tr class="text-ink/40 pill">
-                        <th class="text-left py-2">@L.T(HttpContext,"Description","תיאור")</th>
-                        <th class="text-right">@L.T(HttpContext,"Qty","כמות")</th>
-                        <th class="text-right">@L.T(HttpContext,"Unit","יחידה")</th>
-                        <th class="text-right">@L.T(HttpContext,"Total","סה״כ")</th>
+                        <th class="text-left py-2">Description</th>
+                        <th class="text-right">Qty</th>
+                        <th class="text-right">Unit</th>
+                        <th class="text-right">Total</th>
                     </tr></thead>
                     <tbody>
                     @foreach (var l in Model.Lines)
@@ -130,22 +128,21 @@ else
 
                 <form method="post" asp-page-handler="AddLine" asp-route-id="@Model.Selected.Id" class="mt-4 grid grid-cols-4 gap-2">
                     <div class="col-span-2">
-                        <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Description (what was done)","תיאור (מה בוצע)")</label>
+                        <label class="pill text-ink/40 mb-1 block">Description (what was done)</label>
                         <input asp-for="LineDescription" class="w-full bg-paper-100 border border-black/5 rounded-xl px-3 py-2 text-sm"/>
                     </div>
                     <div>
-                        <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Quantity (hours / units)","כמות (שעות / יח׳)")</label>
+                        <label class="pill text-ink/40 mb-1 block">Quantity (hours / units)</label>
                         <input asp-for="LineQuantity" type="number" step="0.01" class="w-full bg-paper-100 border border-black/5 rounded-xl px-3 py-2 text-sm"/>
                     </div>
                     <div>
-                        <label class="pill text-ink/40 mb-1 block">@L.T(HttpContext,"Unit price (per hour / unit)","מחיר ליחידה")</label>
+                        <label class="pill text-ink/40 mb-1 block">Unit price (per hour / unit)</label>
                         <input asp-for="LineUnitPrice" type="number" step="0.01" class="w-full bg-paper-100 border border-black/5 rounded-xl px-3 py-2 text-sm"/>
                     </div>
                     <p class="col-span-4 text-xs text-ink/50">
-                        @L.T(HttpContext,"Line total = Quantity × Unit price (calculated automatically). VAT 18% added on the totals row below (0% for Osek Patur).",
-                                          "סה״כ שורה = כמות × מחיר ליחידה (חישוב אוטומטי). מע״מ 18% נוסף בשורת הסיכום למטה (0% לעוסק פטור).")
+                        Line total = Quantity × Unit price (calculated automatically). VAT 18% added on the totals row below (0% for Osek Patur).
                     </p>
-                    <button class="col-span-4 bg-mint text-white rounded-full px-4 py-2 text-sm">+ @L.T(HttpContext,"Add line","הוסף שורה")</button>
+                    <button class="col-span-4 bg-mint text-white rounded-full px-4 py-2 text-sm">+ Add line</button>
                 </form>
             </div>
         </div>
@@ -153,34 +150,34 @@ else
         <div class="md:col-span-5 space-y-4">
             <div class="bg-ink rounded-shell p-1.5">
                 <div class="bg-ink-soft rounded-core p-6 text-paper-50 shadow-inset">
-                    <div class="flex justify-between text-sm"><span>@L.T(HttpContext,"Subtotal","סכום ביניים")</span><span>@Model.Selected.Subtotal.ToString("N2") @Model.Selected.Currency</span></div>
-                    <div class="flex justify-between text-sm mt-1"><span>@L.T(HttpContext,"VAT","מע״מ") (@(Model.Selected.VatRate.ToString("P0")))</span><span>@Model.Selected.VatAmount.ToString("N2")</span></div>
-                    <div class="flex justify-between display font-bold mt-3 text-2xl"><span>@L.T(HttpContext,"Total","סה״כ")</span><span>@Model.Selected.Total.ToString("N2") @Model.Selected.Currency</span></div>
+                    <div class="flex justify-between text-sm"><span>Subtotal</span><span>@Model.Selected.Subtotal.ToString("N2") @Model.Selected.Currency</span></div>
+                    <div class="flex justify-between text-sm mt-1"><span>VAT (@(Model.Selected.VatRate.ToString("P0")))</span><span>@Model.Selected.VatAmount.ToString("N2")</span></div>
+                    <div class="flex justify-between display font-bold mt-3 text-2xl"><span>Total</span><span>@Model.Selected.Total.ToString("N2") @Model.Selected.Currency</span></div>
                 </div>
             </div>
 
             <div class="bg-paper-100 ring-1 ring-black/5 rounded-shell p-1.5">
                 <div class="bg-paper-50 rounded-core p-6 shadow-inset space-y-2 text-sm">
-                    <div class="flex justify-between"><span class="text-ink/40">@L.T(HttpContext,"Status","סטטוס")</span><span class="font-semibold">@(Model.Selected.Status switch {
-                        "Draft"   => L.T(HttpContext,"Draft","טיוטה"),
-                        "Sent"    => L.T(HttpContext,"Sent","נשלח"),
-                        "Paid"    => L.T(HttpContext,"Paid","שולם"),
-                        "Overdue" => L.T(HttpContext,"Overdue","באיחור"),
+                    <div class="flex justify-between"><span class="text-ink/40">Status</span><span class="font-semibold">@(Model.Selected.Status switch {
+                        "Draft"   => "Draft",
+                        "Sent"    => "Sent",
+                        "Paid"    => "Paid",
+                        "Overdue" => "Overdue",
                         _         => Model.Selected.Status })</span></div>
-                    <div class="flex justify-between"><span class="text-ink/40">@L.T(HttpContext,"Issued","הופק")</span><span>@Model.Selected.IssueDate.ToString("dd/MM/yyyy")</span></div>
-                    <div class="flex justify-between"><span class="text-ink/40">@L.T(HttpContext,"Due","יעד")</span><span>@Model.Selected.DueDate.ToString("dd/MM/yyyy")</span></div>
+                    <div class="flex justify-between"><span class="text-ink/40">Issued</span><span>@Model.Selected.IssueDate.ToString("dd/MM/yyyy")</span></div>
+                    <div class="flex justify-between"><span class="text-ink/40">Due</span><span>@Model.Selected.DueDate.ToString("dd/MM/yyyy")</span></div>
                 </div>
             </div>
 
             <div class="flex flex-wrap gap-2">
                 <form method="post" asp-page-handler="MarkSent" asp-route-id="@Model.Selected.Id">
-                    <button class="bg-amber text-white rounded-full px-4 py-2 text-sm">@L.T(HttpContext,"Mark Sent","סמן כנשלח")</button>
+                    <button class="bg-amber text-white rounded-full px-4 py-2 text-sm">Mark Sent</button>
                 </form>
                 <form method="post" asp-page-handler="MarkPaid" asp-route-id="@Model.Selected.Id">
-                    <button class="bg-mint text-white rounded-full px-4 py-2 text-sm">@L.T(HttpContext,"Mark Paid","סמן כשולם")</button>
+                    <button class="bg-mint text-white rounded-full px-4 py-2 text-sm">Mark Paid</button>
                 </form>
                 <a asp-page="/Owner/Invoices" asp-page-handler="Pdf" asp-route-id="@Model.Selected.Id"
-                   class="bg-ink text-paper-50 rounded-full px-4 py-2 text-sm">@L.T(HttpContext,"Download PDF","הורד PDF")</a>
+                   class="bg-ink text-paper-50 rounded-full px-4 py-2 text-sm">Download PDF</a>
             </div>
         </div>
     </section>
