@@ -116,6 +116,10 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostDelete(int id)
         {
             if (HttpContext.Session.GetString("Role") != "Owner") return RedirectToPage("/Login");
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            // Verify ownership before deleting — prevents cross-tenant deletion (IDOR).
+            var list = _srv.GetExpensesByOwner(ownerId) ?? new Expense[0];
+            if (!list.Any(e => e.Id == id)) return RedirectToPage();
             try { _srv.DeleteExpense(id); } catch { }
             return RedirectToPage();
         }
