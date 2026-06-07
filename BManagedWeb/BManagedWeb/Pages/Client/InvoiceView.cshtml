@@ -4,23 +4,23 @@
 
 @if (Model.Invoice == null)
 {
-    <p class="text-ink/40 text-center py-32">@L.T(HttpContext,"Invoice not found.","חשבונית לא נמצאה.")</p>
+    <p class="text-ink/40 text-center py-32">Invoice not found.</p>
 }
 else
 {
     <div class="reveal mb-8">
-        <a asp-page="/Client/Portal" class="pill text-ink/40">← @L.T(HttpContext,"Portal","פורטל")</a>
+        <a asp-page="/Client/Portal" class="pill text-ink/40">← Portal</a>
         <h1 class="display text-4xl md:text-6xl font-bold mt-4">@Model.Invoice.InvoiceNumber</h1>
     </div>
 
     <section class="grid md:grid-cols-12 gap-4 md:gap-6 reveal">
         <div class="md:col-span-7 bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5">
             <div class="bg-paper-50 rounded-core p-6 shadow-inset">
-                <h2 class="display text-2xl font-semibold mb-4">@L.T(HttpContext,"Items","פריטים")</h2>
+                <h2 class="display text-2xl font-semibold mb-4">Items</h2>
                 <table class="w-full text-sm">
                     <thead><tr class="text-ink/40 pill">
-                        <th class="text-left py-2">@L.T(HttpContext,"Description","תיאור")</th><th class="text-right">@L.T(HttpContext,"Qty","כמות")</th>
-                        <th class="text-right">@L.T(HttpContext,"Unit","יחידה")</th><th class="text-right">@L.T(HttpContext,"Total","סה״כ")</th>
+                        <th class="text-left py-2">Description</th><th class="text-right">Qty</th>
+                        <th class="text-right">Unit</th><th class="text-right">Total</th>
                     </tr></thead>
                     <tbody>
                     @foreach (var l in Model.Lines)
@@ -40,13 +40,13 @@ else
         <div class="md:col-span-5 space-y-4">
             <div class="bg-ink rounded-shell p-1.5">
                 <div class="bg-ink-soft rounded-core p-6 text-paper-50 shadow-inset">
-                    <div class="flex justify-between text-sm"><span>@L.T(HttpContext,"Subtotal","סכום ביניים")</span><span>@Model.Invoice.Subtotal.ToString("N2") @Model.Invoice.Currency</span></div>
-                    <div class="flex justify-between text-sm mt-1"><span>@L.T(HttpContext,"VAT","מע״מ")</span><span>@Model.Invoice.VatAmount.ToString("N2")</span></div>
-                    <div class="flex justify-between display font-bold mt-3 text-2xl"><span>@L.T(HttpContext,"Total","סה״כ")</span><span>@Model.Invoice.Total.ToString("N2") @Model.Invoice.Currency</span></div>
+                    <div class="flex justify-between text-sm"><span>Subtotal</span><span>@Model.Invoice.Subtotal.ToString("N2") @Model.Invoice.Currency</span></div>
+                    <div class="flex justify-between text-sm mt-1"><span>VAT</span><span>@Model.Invoice.VatAmount.ToString("N2")</span></div>
+                    <div class="flex justify-between display font-bold mt-3 text-2xl"><span>Total</span><span>@Model.Invoice.Total.ToString("N2") @Model.Invoice.Currency</span></div>
                 </div>
             </div>
             <a asp-page="/Owner/Invoices" asp-page-handler="Pdf" asp-route-id="@Model.Invoice.Id"
-               class="block text-center bg-ink text-paper-50 rounded-full px-6 py-3 active:scale-[0.98]">@L.T(HttpContext,"Download PDF","הורד PDF")</a>
+               class="block text-center bg-ink text-paper-50 rounded-full px-6 py-3 active:scale-[0.98]">Download PDF</a>
         </div>
     </section>
 }

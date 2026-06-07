@@ -32,3 +32,20 @@ __pycache__/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Local diagnostic / smoke-test artifacts (cookies, probe XML, raw log dumps)
+_smoke*.txt
+_login*.txt
+_login*.html
+_logintest_*.html
+_web_*.log
+_wcf_*.xml
+_test_*.xml
+_extract_*.py
+_make_*.py
+_md_to_*.py
+_init_*.ps1
+_smoke*.py
+_*.md
+*-flow.png
+nav-map

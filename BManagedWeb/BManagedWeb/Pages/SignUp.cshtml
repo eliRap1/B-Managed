@@ -5,30 +5,36 @@
 <section class="reveal min-h-[80dvh] grid place-items-center">
     <div class="w-full max-w-xl">
         <div class="flex justify-center mb-6">
-            <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">@L.T(HttpContext,"New here","חדש כאן")</span>
+            <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">New here</span>
         </div>
-        <h1 class="display text-5xl md:text-6xl font-bold text-center text-ink mb-2">@L.T(HttpContext,"Create account","צור חשבון")</h1>
-        <p id="subtitle" class="text-center text-ink/50 mb-10">@L.T(HttpContext,"Pick the role that fits you.","בחר את התפקיד שמתאים לך.")</p>
+        <h1 class="display text-5xl md:text-6xl font-bold text-center text-ink mb-2">Create account</h1>
+        <p id="subtitle" class="text-center text-ink/50 mb-10">Pick the role that fits you.</p>
 
         @* Step 1: role picker *@
         @{ var roleStepClass = string.IsNullOrEmpty(Model.SelectedRole) ? "" : "hidden"; }
         @{ var formStepClass = string.IsNullOrEmpty(Model.SelectedRole) ? "hidden" : ""; }
         @{ var ownerOnlyClass = Model.SelectedRole == "Owner" ? "" : "hidden"; }
-        @{ var employeeOnlyClass = Model.SelectedRole == "Employee" ? "" : "hidden"; }
-        @{ var roleBadgeText = Model.SelectedRole == "Owner" ? "OWNER" : "EMPLOYEE"; }
-        <div id="roleStep" class="grid md:grid-cols-2 gap-4 @roleStepClass">
+        @{ var inviteOnlyClass = (Model.SelectedRole == "Employee" || Model.SelectedRole == "Client") ? "" : "hidden"; }
+        @{
+            var roleBadgeText = Model.SelectedRole switch
+            {
+                "Owner"    => "OWNER",
+                "Employee" => "EMPLOYEE",
+                "Client"   => "CLIENT",
+                _          => ""
+            };
+        }
+        <div id="roleStep" class="grid md:grid-cols-3 gap-4 @roleStepClass">
             <button type="button" onclick="pickRole('Owner')"
                     class="text-left bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5 hover:shadow-float transition-all duration-500 ease-spring">
                 <div class="bg-paper-50 rounded-core p-6 shadow-inset h-full">
                     <div class="text-3xl mb-3">🏢</div>
-                    <div class="display text-2xl font-bold mb-2">@L.T(HttpContext,"Owner — I run a business","בעלים — אני מנהל עסק")</div>
+                    <div class="display text-2xl font-bold mb-2">Owner — I run a business</div>
                     <p class="text-sm text-ink/60">
-                        @L.T(HttpContext,
-                            "Manage customers, projects, invoices, expenses and VAT. Pick Osek Patur or Murshe.",
-                            "ניהול לקוחות, פרויקטים, חשבוניות, הוצאות ומע״מ. בחר עוסק פטור או מורשה.")
+                        Manage customers, projects, invoices, expenses and VAT. Pick Osek Patur or Murshe.
                     </p>
                     <div class="mt-3 inline-flex items-center gap-2 bg-mint text-white rounded-full px-4 py-1.5 text-sm">
-                        @L.T(HttpContext,"Continue as Owner","המשך כבעלים") →
+                        Continue as Owner →
                     </div>
                 </div>
             </button>
@@ -36,20 +42,31 @@
                     class="text-left bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5 hover:shadow-float transition-all duration-500 ease-spring">
                 <div class="bg-paper-50 rounded-core p-6 shadow-inset h-full">
                     <div class="text-3xl mb-3">👤</div>
-                    <div class="display text-2xl font-bold mb-2">@L.T(HttpContext,"Employee — I work on assigned projects","עובד — אני עובד על פרויקטים")</div>
+                    <div class="display text-2xl font-bold mb-2">Employee — I work on assigned projects</div>
                     <p class="text-sm text-ink/60">
-                        @L.T(HttpContext,
-                            "Pick the company you work for, log expenses, see your tasks. Owner approves before activation.",
-                            "בחר את החברה שאתה עובד בה, דווח הוצאות, ראה משימות. הבעלים מאשר לפני הפעלה.")
+                        Pick the company you work for, log expenses, see your tasks. Owner approves before activation.
                     </p>
                     <div class="mt-3 inline-flex items-center gap-2 bg-ink text-paper-50 rounded-full px-4 py-1.5 text-sm">
-                        @L.T(HttpContext,"Continue as Employee","המשך כעובד") →
+                        Continue as Employee →
                     </div>
                 </div>
             </button>
-            <p class="md:col-span-2 text-center text-xs text-ink/40 mt-2">
-                @L.T(HttpContext,"Already have an account?","יש לך חשבון?")
-                <a asp-page="/Login" class="text-accent hover:underline">@L.T(HttpContext,"Sign in","כניסה")</a>
+            <button type="button" onclick="pickRole('Client')"
+                    class="text-left bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5 hover:shadow-float transition-all duration-500 ease-spring">
+                <div class="bg-paper-50 rounded-core p-6 shadow-inset h-full">
+                    <div class="text-3xl mb-3">🛍️</div>
+                    <div class="display text-2xl font-bold mb-2">Client — I'm a customer of a business</div>
+                    <p class="text-sm text-ink/60">
+                        View your invoices, projects, and contracts. Use the invite code your business sent you.
+                    </p>
+                    <div class="mt-3 inline-flex items-center gap-2 bg-amber text-white rounded-full px-4 py-1.5 text-sm">
+                        Continue as Client →
+                    </div>
+                </div>
+            </button>
+            <p class="md:col-span-3 text-center text-xs text-ink/40 mt-2">
+                Already have an account?
+                <a asp-page="/Login" class="text-accent hover:underline">Sign in</a>
             </p>
         </div>
 
@@ -62,98 +79,94 @@
 
                         <div class="flex items-center justify-between">
                             <span id="roleBadge" class="pill rounded-full px-3 py-1 bg-mint/10 text-mint border border-mint/20 text-xs">@roleBadgeText</span>
-                            <button type="button" onclick="goBackToRole()" class="text-xs text-ink/50 hover:underline">← @L.T(HttpContext,"Change role","שנה תפקיד")</button>
+                            <button type="button" onclick="goBackToRole()" class="text-xs text-ink/50 hover:underline">← Change role</button>
                         </div>
 
                         <div>
-                            <label class="pill text-ink/40 mb-2 block">@L.T(HttpContext,"Username","שם משתמש")</label>
+                            <label class="pill text-ink/40 mb-2 block">Username</label>
                             <input asp-for="Username" autocomplete="username"
                                    minlength="4" maxlength="20" pattern="[A-Za-z0-9_.]{4,20}" required
                                    data-validate="username"
                                    class="signup-field w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-3 outline-none focus:border-accent transition invalid:border-rose invalid:bg-rose/5" />
-                            <p class="text-xs text-ink/40 mt-1">@L.T(HttpContext,"4–20 letters, digits, _ or .","4–20 אותיות, ספרות, _ או .")</p>
+                            <p class="text-xs text-ink/40 mt-1">4–20 letters, digits, _ or .</p>
                             <p data-error="username" class="text-xs text-rose mt-1 hidden"></p>
                         </div>
                         <div>
-                            <label class="pill text-ink/40 mb-2 block">@L.T(HttpContext,"Password","סיסמה")</label>
+                            <label class="pill text-ink/40 mb-2 block">Password</label>
                             <input asp-for="Password" type="password" autocomplete="new-password"
                                    id="pwField" minlength="8" required data-validate="password"
                                    class="signup-field w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-3 outline-none focus:border-accent transition invalid:border-rose invalid:bg-rose/5" />
                             <div id="pwHint" class="mt-1 text-xs space-y-0.5">
-                                <div data-rule="len"   class="text-ink/40">• @L.T(HttpContext,"At least 8 characters","לפחות 8 תווים")</div>
-                                <div data-rule="alpha" class="text-ink/40">• @L.T(HttpContext,"Contains a letter","מכילה אות")</div>
-                                <div data-rule="num"   class="text-ink/40">• @L.T(HttpContext,"Contains a digit","מכילה ספרה")</div>
+                                <div data-rule="len"   class="text-ink/40">• At least 8 characters</div>
+                                <div data-rule="alpha" class="text-ink/40">• Contains a letter</div>
+                                <div data-rule="num"   class="text-ink/40">• Contains a digit</div>
                             </div>
                             <p data-error="password" class="text-xs text-rose mt-1 hidden"></p>
                         </div>
                         <div>
-                            <label class="pill text-ink/40 mb-2 block">@L.T(HttpContext,"Email","אימייל")</label>
+                            <label class="pill text-ink/40 mb-2 block">Email</label>
                             <input asp-for="Email" type="email" autocomplete="email" required
                                    data-validate="email"
                                    class="signup-field w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-3 outline-none focus:border-accent transition invalid:border-rose invalid:bg-rose/5" />
                             <p data-error="email" class="text-xs text-rose mt-1 hidden"></p>
                         </div>
                         <div>
-                            <label class="pill text-ink/40 mb-2 block">@L.T(HttpContext,"Phone","טלפון")</label>
+                            <label class="pill text-ink/40 mb-2 block">Phone</label>
                             <input asp-for="Phone" type="tel" autocomplete="tel" required pattern="\+?\d{7,15}"
                                    data-validate="phone"
                                    class="signup-field w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-3 outline-none focus:border-accent transition invalid:border-rose invalid:bg-rose/5" />
-                            <p class="text-xs text-ink/40 mt-1">@L.T(HttpContext,"7–15 digits, optional + country code.","7–15 ספרות, ניתן להוסיף + לקידומת מדינה.")</p>
+                            <p class="text-xs text-ink/40 mt-1">7–15 digits, optional + country code.</p>
                             <p data-error="phone" class="text-xs text-rose mt-1 hidden"></p>
                         </div>
 
                         @* Owner-only fields *@
                         <div id="ownerOnly" class="space-y-4 @ownerOnlyClass">
                             <div>
-                                <label class="pill text-ink/40 mb-2 block">@L.T(HttpContext,"Business / studio name","שם העסק / הסטודיו")</label>
+                                <label class="pill text-ink/40 mb-2 block">Business / studio name</label>
                                 <input asp-for="BusinessName" maxlength="120" minlength="2"
                                        data-validate="biz"
-                                       placeholder="@L.T(HttpContext,"e.g. Acme Studio","למשל סטודיו אקמי")"
+                                       placeholder="e.g. Acme Studio"
                                        class="signup-field w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-3 outline-none focus:border-accent transition" />
-                                <p class="text-xs text-ink/40 mt-1">@L.T(HttpContext,"2–120 characters. Shown across the system instead of your username.","2–120 תווים. יוצג במערכת במקום שם המשתמש.")</p>
+                                <p class="text-xs text-ink/40 mt-1">2–120 characters. Shown across the system instead of your username.</p>
                                 <p data-error="biz" class="text-xs text-rose mt-1 hidden"></p>
                             </div>
                             <div>
-                                <label class="pill text-ink/40 mb-2 block">@L.T(HttpContext,"VAT registration","רישום מע״מ")</label>
+                                <label class="pill text-ink/40 mb-2 block">VAT registration</label>
                                 <select asp-for="BusinessType" id="bizSelect"
                                         class="w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-3 outline-none focus:border-accent transition">
-                                    <option value="Patur">@L.T(HttpContext,"Osek Patur (VAT-exempt, ≤120k ₪/yr)","עוסק פטור (ללא מע״מ, עד 120k ₪/שנה)")</option>
-                                    <option value="Murshe">@L.T(HttpContext,"Osek Murshe (regular 18% VAT)","עוסק מורשה (מע״מ 18%)")</option>
+                                    <option value="Patur">Osek Patur (VAT-exempt, ≤120k ₪/yr)</option>
+                                    <option value="Murshe">Osek Murshe (regular 18% VAT)</option>
                                 </select>
                                 <p class="text-xs text-ink/40 mt-2">
-                                    @L.T(HttpContext,"Patur invoices issue without 18% VAT. Murshe collects VAT on every sale (Form 836/874).",
-                                                      "עוסק פטור מנפיק חשבוניות ללא 18% מע״מ. עוסק מורשה גובה מע״מ על כל עסקה (טופס 836/874).")
+                                    Patur invoices issue without 18% VAT. Murshe collects VAT on every sale (Form 836/874).
                                 </p>
                             </div>
                             <label class="flex items-start gap-3 select-none cursor-pointer bg-paper-100/40 border border-black/5 rounded-2xl px-4 py-3">
                                 <input asp-for="IsZair" type="checkbox" class="mt-1 accent-ink"/>
                                 <span class="block">
-                                    <span class="block font-semibold text-ink">@L.T(HttpContext,"Claim Osek Zair income-tax status","סטטוס עוסק זעיר במס הכנסה")</span>
+                                    <span class="block font-semibold text-ink">Claim Osek Zair income-tax status</span>
                                     <span class="block text-xs text-ink/50 mt-1">
-                                        @L.T(HttpContext,"Available if annual revenue ≤ ~122,833 ₪. Income tax on 70% of revenue (flat 30% deemed-expenses).",
-                                                          "זמין אם מחזור שנתי עד ~122,833 ₪. מס הכנסה על 70% מהמחזור (ניכוי הוצאות אוטומטי 30%).")
+                                        Available if annual revenue ≤ ~122,833 ₪. Income tax on 70% of revenue (flat 30% deemed-expenses).
                                     </span>
                                 </span>
                             </label>
                         </div>
 
-                        @* Employee-only field: company invite code (no public dropdown of every company) *@
-                        <div id="employeeOnly" class="@employeeOnlyClass">
-                            <label class="pill text-ink/40 mb-2 block">@L.T(HttpContext,"Company invite code","קוד הצטרפות לחברה")</label>
+                        @* Employee/Client field: company invite code (no public dropdown of every company) *@
+                        <div id="inviteOnly" class="@inviteOnlyClass">
+                            <label class="pill text-ink/40 mb-2 block">Company invite code</label>
                             <input asp-for="InviteCode" maxlength="16" pattern="[A-Z0-9\-]{4,16}"
                                    data-validate="invite"
                                    class="signup-field w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-3 outline-none focus:border-accent transition uppercase tracking-widest"
-                                   placeholder="@L.T(HttpContext,"e.g. ACME-7K3D","למשל ACME-7K3D")" />
+                                   placeholder="e.g. ACME-7K3D" />
                             <p data-error="invite" class="text-xs text-rose mt-1 hidden"></p>
                             <p class="text-xs text-ink/40 mt-2">
-                                @L.T(HttpContext,
-                                    "Ask the Owner of the company you're joining for their invite code. We don't show a public list of companies for privacy reasons.",
-                                    "בקש מהבעלים של החברה שאתה מצטרף אליה את קוד ההצטרפות. לא מוצגת רשימה ציבורית של חברות מטעמי פרטיות.")
+                                Ask the Owner of the company you're joining for their invite code. We don't show a public list of companies for privacy reasons.
                             </p>
                         </div>
 
                         <div>
-                            <label class="pill text-ink/40 mb-2 block">@L.T(HttpContext,"Preferred currency","מטבע מועדף")</label>
+                            <label class="pill text-ink/40 mb-2 block">Preferred currency</label>
                             <select asp-for="Currency"
                                     class="w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-3 outline-none focus:border-accent transition">
                                 <option>ILS</option>
@@ -168,7 +181,7 @@
 
                         <button type="submit"
                                 class="group w-full inline-flex items-center justify-center gap-3 bg-ink text-paper-50 rounded-full px-6 py-3 mt-2 transition-all duration-500 ease-spring active:scale-[0.98]">
-                            <span class="font-semibold">@L.T(HttpContext,"Create account","צור חשבון")</span>
+                            <span class="font-semibold">Create account</span>
                             <span class="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center group-hover:translate-x-0.5 transition-all duration-500 ease-spring">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                             </span>
@@ -178,26 +191,28 @@
             </div>
 
             <p class="text-center text-xs text-ink/40 mt-6">
-                @L.T(HttpContext,"Already have an account?","יש לך חשבון?")
-                <a asp-page="/Login" class="text-accent hover:underline">@L.T(HttpContext,"Sign in","כניסה")</a>
+                Already have an account?
+                <a asp-page="/Login" class="text-accent hover:underline">Sign in</a>
             </p>
         </div>
     </div>
     @{
-        var iSubDef   = L.T(HttpContext,"Pick the role that fits you.","בחר את התפקיד שמתאים לך.");
-        var iSubOwn   = L.T(HttpContext,"Run the business — track invoices, expenses, VAT.","נהל את העסק — חשבוניות, הוצאות, מע״מ.");
-        var iSubEmp   = L.T(HttpContext,"Join a company and log your work.","הצטרף לחברה ודווח את העבודה שלך.");
-        var iErrUser  = L.T(HttpContext,"4–20 letters, digits, _ or . only.","4–20 אותיות, ספרות, _ או . בלבד.");
-        var iErrPw    = L.T(HttpContext,"8+ chars and must include a letter and a digit.","8+ תווים ולפחות אות אחת וספרה אחת.");
-        var iErrEmail = L.T(HttpContext,"Looks invalid (e.g. name@@example.com).","לא תקין (למשל: name@@example.com).");
-        var iErrPhone  = L.T(HttpContext,"7–15 digits, optional + country code.","7–15 ספרות, ניתן להוסיף + לקידומת מדינה.");
-        var iErrBiz    = L.T(HttpContext,"Business name: 2–120 characters.","שם עסק: 2–120 תווים.");
-        var iErrInvite = L.T(HttpContext,"Invite code looks like ACME-7K3D (4–16 chars, letters / digits / dash).","קוד הצטרפות נראה כמו ACME-7K3D (4–16 תווים, אותיות / ספרות / מקף).");
+        var iSubDef   = "Pick the role that fits you.";
+        var iSubOwn   = "Run the business — track invoices, expenses, VAT.";
+        var iSubEmp   = "Join a company and log your work.";
+        var iSubCli   = "View invoices, projects and contracts from your business.";
+        var iErrUser  = "4–20 letters, digits, _ or . only.";
+        var iErrPw    = "8+ chars and must include a letter and a digit.";
+        var iErrEmail = "Looks invalid (e.g. name@@example.com).";
+        var iErrPhone  = "7–15 digits, optional + country code.";
+        var iErrBiz    = "Business name: 2–120 characters.";
+        var iErrInvite = "Invite code looks like ACME-7K3D (4–16 chars, letters / digits / dash).";
     }
     <div id="i18n"
          data-subtitle-default="@iSubDef"
          data-subtitle-owner="@iSubOwn"
          data-subtitle-employee="@iSubEmp"
+         data-subtitle-client="@iSubCli"
          data-err-username="@iErrUser"
          data-err-password="@iErrPw"
          data-err-email="@iErrEmail"
@@ -214,13 +229,14 @@
         document.getElementById('roleBadge').textContent = role.toUpperCase();
         document.getElementById('roleStep').classList.add('hidden');
         document.getElementById('formStep').classList.remove('hidden');
-        var owner = document.getElementById('ownerOnly');
-        var emp   = document.getElementById('employeeOnly');
-        if (role === 'Owner') { owner.classList.remove('hidden'); emp.classList.add('hidden'); }
-        else                  { owner.classList.add('hidden');    emp.classList.remove('hidden'); }
-        document.getElementById('subtitle').textContent = role === 'Owner'
-            ? I18N.getAttribute('data-subtitle-owner')
-            : I18N.getAttribute('data-subtitle-employee');
+        var owner  = document.getElementById('ownerOnly');
+        var invite = document.getElementById('inviteOnly');
+        if (role === 'Owner') { owner.classList.remove('hidden'); invite.classList.add('hidden'); }
+        else                  { owner.classList.add('hidden');    invite.classList.remove('hidden'); }
+        var subKey = role === 'Owner' ? 'data-subtitle-owner'
+                   : role === 'Client' ? 'data-subtitle-client'
+                   : 'data-subtitle-employee';
+        document.getElementById('subtitle').textContent = I18N.getAttribute(subKey);
     }
     function goBackToRole() {
         document.getElementById('selectedRoleHidden').value = '';
@@ -287,6 +303,8 @@
         if (form) form.addEventListener('submit', function (e) {
             var bad = false;
             document.querySelectorAll('.signup-field').forEach(function (el) {
+                // Skip fields hidden by role-switching (offsetParent is null when display:none).
+                if (el.offsetParent === null) return;
                 if (!check(el, true)) bad = true;
             });
             if (bad) e.preventDefault();

@@ -25,6 +25,7 @@ namespace Model
         [DataMember] public string Currency { get; set; } = "ILS";
         [DataMember] public string Purpose { get; set; }                 // free text — equipment, working capital, marketing
         [DataMember] public bool   IsKerenBacked { get; set; }           // state-backed business fund
+        [DataMember] public bool   HasStandingOrder { get; set; }        // הוראת קבע — bank auto-charges every month
         [DataMember] public bool   IsActive { get; set; } = true;
         [DataMember] public string Notes { get; set; }
         [DataMember] public DateTime CreatedAt { get; set; } = DateTime.Now;

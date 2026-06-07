@@ -42,6 +42,7 @@ namespace BManagedWeb.Pages.Owner
         [BindProperty] public string  NewCurrency { get; set; } = "ILS";
         [BindProperty] public string  NewPurpose { get; set; }
         [BindProperty] public bool    NewIsKerenBacked { get; set; }
+        [BindProperty] public bool    NewHasStandingOrder { get; set; }
 
         public List<Loan> Loans { get; set; } = new();
         public LoanSummary Summary { get; set; } = new LoanSummary();
@@ -97,6 +98,7 @@ namespace BManagedWeb.Pages.Owner
                     Currency         = NewCurrency ?? "ILS",
                     Purpose          = NewPurpose,
                     IsKerenBacked    = NewIsKerenBacked,
+                    HasStandingOrder = NewHasStandingOrder,
                     IsActive         = true,
                     CreatedAt        = DateTime.Now,
                 });

@@ -3,9 +3,9 @@
 @{ ViewData["Title"] = "Contracts"; }
 
 <div class="reveal mb-12 max-w-3xl">
-    <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">@L.T(HttpContext,"Agreements","הסכמים")</span>
-    <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">@L.T(HttpContext,"Contracts.","חוזים.")</h1>
-    <p class="text-ink/50 mt-3">@L.T(HttpContext,"Sign first, invoice after.","חתום קודם, חייב אחר כך.")</p>
+    <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">Agreements</span>
+    <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">Contracts.</h1>
+    <p class="text-ink/50 mt-3">Sign first, invoice after.</p>
 </div>
 
 @if (TempData["ContractMsg"] is string msg)
@@ -16,12 +16,12 @@
 <form method="post" asp-page-handler="Add" class="reveal mb-12 bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5 max-w-4xl">
     <div class="bg-paper-50 rounded-core p-6 shadow-inset grid md:grid-cols-3 gap-3">
         <select asp-for="NewCustomerId" class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5">
-            <option value="0">@L.T(HttpContext,"Customer…","לקוח…")</option>
+            <option value="0">Customer…</option>
             @foreach (var c in Model.Customers)
             { <option value="@c.Id">@c.BusinessName</option> }
         </select>
         <select asp-for="NewProjectId" class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5">
-            <option value="0">@L.T(HttpContext,"Project (optional)…","פרויקט (אופציונלי)…")</option>
+            <option value="0">Project (optional)…</option>
             @foreach (var p in Model.Projects)
             { <option value="@p.Id">@p.Title</option> }
         </select>
@@ -29,18 +29,18 @@
             <option>ILS</option><option>USD</option>
         </select>
 
-        <input asp-for="NewTitle" placeholder="@L.T(HttpContext,"Engagement title","כותרת התקשרות")"
+        <input asp-for="NewTitle" placeholder="Engagement title"
                class="md:col-span-2 bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5" />
         <input asp-for="NewAmount" type="number" step="0.01"
-               placeholder="@L.T(HttpContext,"Total amount","סכום כולל")"
+               placeholder="Total amount"
                class="bg-paper-100 border border-black/5 rounded-2xl px-4 py-2.5" />
 
         <textarea asp-for="NewBody" rows="6"
-                  placeholder="@L.T(HttpContext,"Scope of work, deliverables, payment terms…","היקף עבודה, תוצרים, תנאי תשלום…")"
+                  placeholder="Scope of work, deliverables, payment terms…"
                   class="md:col-span-3 bg-paper-100 border border-black/5 rounded-2xl px-4 py-3"></textarea>
 
         <button class="md:col-span-3 bg-mint text-white rounded-full px-6 py-3 mt-1 active:scale-[0.98]">
-            @L.T(HttpContext,"Create contract","צור חוזה")
+            Create contract
         </button>
     </div>
 </form>
@@ -56,19 +56,19 @@
                         <span class="pill text-ink/40">@c.ContractNumber · @c.Currency</span>
                         <div class="display text-2xl font-semibold mt-2">@c.Title</div>
                         <div class="text-xs text-ink/40 mt-1">
-                            @L.T(HttpContext,"Created","נוצר"): @c.CreatedAt.ToString("dd/MM/yyyy")
+                            Created: @c.CreatedAt.ToString("dd/MM/yyyy")
                             @if (c.SignedDate.HasValue)
                             {
-                                <text> · @L.T(HttpContext,"signed","נחתם"): @c.SignedDate.Value.ToString("dd/MM/yyyy")</text>
+                                <text> · signed: @c.SignedDate.Value.ToString("dd/MM/yyyy")</text>
                             }
                         </div>
                     </div>
                     <div class="pill rounded-full px-2 py-0.5 bg-@(color)/10 text-@(color) border border-@(color)/20">@(c.Status switch {
-                        "Draft"     => L.T(HttpContext,"Draft","טיוטה"),
-                        "Sent"      => L.T(HttpContext,"Sent","נשלח"),
-                        "Signed"    => L.T(HttpContext,"Signed","חתום"),
-                        "Fulfilled" => L.T(HttpContext,"Fulfilled (paid)","הושלם (שולם)"),
-                        "Cancelled" => L.T(HttpContext,"Cancelled","בוטל"),
+                        "Draft"     => "Draft",
+                        "Sent"      => "Sent",
+                        "Signed"    => "Signed",
+                        "Fulfilled" => "Fulfilled (paid)",
+                        "Cancelled" => "Cancelled",
                         _           => c.Status })</div>
                 </div>
 
@@ -81,25 +81,25 @@
 
                 <div class="flex flex-wrap gap-2 mt-5">
                     <a asp-page-handler="Pdf" asp-route-id="@c.Id"
-                       class="bg-ink text-paper-50 rounded-full px-4 py-2 text-sm">📄 @L.T(HttpContext,"Download PDF","הורד PDF")</a>
+                       class="bg-ink text-paper-50 rounded-full px-4 py-2 text-sm">📄 Download PDF</a>
                     @if (c.Status != "Signed")
                     {
                         <form method="post" asp-page-handler="MarkSigned" asp-route-id="@c.Id">
-                            <button class="bg-mint text-white rounded-full px-4 py-2 text-sm">✓ @L.T(HttpContext,"Mark signed","סמן חתום")</button>
+                            <button class="bg-mint text-white rounded-full px-4 py-2 text-sm">✓ Mark signed</button>
                         </form>
                     }
                     @if (c.Status == "Signed")
                     {
                         <a asp-page="/Owner/Invoices" asp-route-contractId="@c.Id"
-                           class="bg-amber text-white rounded-full px-4 py-2 text-sm">🧾 @L.T(HttpContext,"Invoice this contract","חייב מהחוזה")</a>
+                           class="bg-amber text-white rounded-full px-4 py-2 text-sm">🧾 Invoice this contract</a>
                     }
                     <form method="post" asp-page-handler="Delete" asp-route-id="@c.Id" onsubmit="return confirm('Delete this contract?');">
-                        <button class="bg-rose text-white rounded-full px-4 py-2 text-sm">🗑 @L.T(HttpContext,"Delete","מחק")</button>
+                        <button class="bg-rose text-white rounded-full px-4 py-2 text-sm">🗑 Delete</button>
                     </form>
                 </div>
             </div>
         </div>
     }
     @if (Model.Contracts.Count == 0)
-    { <div class="md:col-span-2 text-center py-20 text-ink/40">@L.T(HttpContext,"No contracts yet — create one above.","אין חוזים עדיין — צור אחד למעלה.")</div> }
+    { <div class="md:col-span-2 text-center py-20 text-ink/40">No contracts yet — create one above.</div> }
 </section>

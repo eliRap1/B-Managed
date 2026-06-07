@@ -23,6 +23,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="PdfSharp">
       <HintPath>..\..\packages\PdfSharp.1.50.5147\lib\net20\PdfSharp.dll</HintPath>
     </Reference>
@@ -35,12 +36,27 @@
     <Compile Include="InvoicePdfBuilder.cs" />
     <Compile Include="ContractPdfBuilder.cs" />
     <Compile Include="VatCalculator.cs" />
+    <Compile Include="Guards.cs" />
+    <Compile Include="UserLogic.cs" />
+    <Compile Include="CustomerLogic.cs" />
+    <Compile Include="ProjectLogic.cs" />
+    <Compile Include="ContractLogic.cs" />
+    <Compile Include="InvoiceLogic.cs" />
+    <Compile Include="ExpenseLogic.cs" />
+    <Compile Include="LoanLogic.cs" />
+    <Compile Include="NotificationLogic.cs" />
+    <Compile Include="ReportsLogic.cs" />
+    <Compile Include="CurrencyLogic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Model\Model.csproj">
       <Project>{A1A1A1A1-0000-0000-0001-000000000001}</Project>
       <Name>Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ViewDB\ViewDB.csproj">
+      <Project>{A1A1A1A1-0000-0000-0001-000000000002}</Project>
+      <Name>ViewDB</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

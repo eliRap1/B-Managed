@@ -26,10 +26,13 @@ CRM · Projects · Invoices · Expenses · VAT · Reports — one ledger, two cl
 Small businesses (1–10 people) need one place to see customers, projects, invoices, expenses, VAT due, and notifications — without paying QuickBooks rent. B-Managed is that place. Run it on your own machine, your own .accdb, your own port. Two front-ends share one WCF service so the desktop you use at home and the browser your client opens stay in sync.
 
 * 50+ WCF operations
-* 13 normalised Access tables
-* 33 UI pages (15 WPF + 18 Razor)
-* 3 roles, 2 currencies, 2 languages
+* 16 normalised Access tables (incl. Loans, LoanPayments, ExchangeRates, ProjectAssignments)
+* 35+ UI pages across WPF + Razor
+* 3 roles, multi-tenant via invite codes, 2 currencies, 2 languages (Hebrew RTL + English)
 * PDF export, CSV export, receipt upload, multi-employee assignment
+* Loan tracking (קרן, ריבית, debt-service ratio, standing-order flag, state-backed funds)
+* Recurring-expense marking (הוצאות קבועות — Fixed / Variable / one-time)
+* Owner KPI dashboard with single-roundtrip snapshot (12 SOAP calls → 1)
 * Real-time notifications via DispatcherTimer (WPF) + setInterval (Web)
 
 ---
@@ -58,11 +61,14 @@ See `arch-flow.png`, `wpf-flow.png`, `web-flow.png` for the full project map.
 <td valign="top" width="33%">
 
 ### Owner
-* Customers — search, modal edit, CSV
+* Customers — search, modal edit, CSV, auto-add when a Client signs up
 * Projects — multi-employee assign, status flow
 * Invoices — auto-numbered, line items, VAT auto-calc, **PDF export**
-* Expenses — **Auto-VAT 17/117**, receipt upload, CSV
+* Expenses — **Auto-VAT 18/118**, recurring (Fixed/Variable) marker, receipt upload, CSV
+* Loans — principal/interest/term auto-calc, standing-order flag (הוראת קבע),
+  state-backed קרן flag, payment recorder, debt-service-ratio warnings
 * Reports — VAT summary, top customers (INNER JOIN + GROUP BY), profit chart, **Mark VAT paid**
+* Settings — business name, VAT type, Zair flag, rotate company invite code
 * Manage Users — approve, promote, reset
 * Notifications inbox + live badge
 
@@ -94,8 +100,11 @@ See `arch-flow.png`, `wpf-flow.png`, `web-flow.png` for the full project map.
 ## Highlights
 
 * **Multi-employee assignment** — `ProjectAssignments` table auto-created on first run, no migration needed.
-* **Auto-VAT 17/117** — Israeli formula baked in. Type a gross amount, VAT field fills automatically.
+* **Self-migrating schema** — new columns (`recurringKind`, `hasStandingOrder`, `inviteCode`, `businessName`, etc.) are added idempotently via `ALTER TABLE ... ADD COLUMN`; existing .accdb files upgrade themselves on first load.
+* **Auto-VAT 18/118** — current Israeli rate (since Jan 2025) baked in. Type a gross amount, VAT field fills automatically. Osek Patur is forced to 0 VAT.
 * **Mark VAT paid** — one-click record of the periodic settlement to Israel Tax Authority.
+* **Loan amortization auto-calc** — fill any 2 of {principal, monthly, term} and the third is computed from the standard formula (collapses to P/n at 0% interest).
+* **Multi-tenant via invite codes** — each Owner gets a `PREFIX-XXXX` invite code; Employees and Clients sign up against that code so cross-company data stays isolated. Cross-tenant data queries are server-side guarded.
 * **PDF invoices** via PdfSharp.
 * **Receipt upload** up to 5 MB with sanitised filenames stored under `/Receipts`.
 * **6-month profit sparkline** on Owner dashboard (Chart.js + JSON handler).
@@ -123,7 +132,7 @@ See `arch-flow.png`, `wpf-flow.png`, `web-flow.png` for the full project map.
 
 ## Quick start
 
-**Prereqs:** Visual Studio 2022, .NET Framework 4.7.2 + .NET 8, Microsoft Access Database Engine 2016 (32-bit), PowerShell.
+**Prereqs:** Visual Studio 2022 (or newer), .NET Framework 4.7.2 + .NET 8, Microsoft Access Database Engine 2016 (must match the WCF host bitness — the bundled `ConsoleHost` targets **x64**), PowerShell.
 
 ```powershell
 # 1. Clone
@@ -239,11 +248,13 @@ yudb/
 
 ## Roadmap
 
+- [x] Multi-tenant (one server, multiple Owners) — via invite codes + server-side tenant guards
+- [x] Loan tracker (principal, interest, monthly payment, debt-service ratio, state-backed funds, standing order)
+- [x] Recurring-expense flag for budget forecasting
 - [ ] Audit log table + viewer
 - [ ] Background job for overdue-invoice email reminders
 - [ ] Bank-statement CSV import for expenses auto-match
 - [ ] Two-factor auth (TOTP)
-- [ ] Multi-tenant (one server, multiple Owners)
 - [ ] Mobile (.NET MAUI)
 
 ---

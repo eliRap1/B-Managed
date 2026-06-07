@@ -6,20 +6,20 @@
 
 <div class="reveal mb-12 max-w-3xl">
     <span class="pill rounded-full px-3 py-1 bg-black/5 border border-black/5">CRM</span>
-    <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">@L.T(HttpContext,"Customers","לקוחות")</h1>
-    <p class="text-ink/50 mt-3">@L.T(HttpContext,"Everyone you bill. Right here.","כל מי שאתה מחייב, כאן.")</p>
+    <h1 class="display text-5xl md:text-7xl font-bold mt-4 leading-[0.95]">Customers</h1>
+    <p class="text-ink/50 mt-3">Everyone you bill. Right here.</p>
 </div>
 
 <form method="get" class="reveal flex gap-3 mb-8 max-w-xl">
-    <input asp-for="Q" placeholder="@L.T(HttpContext,"Search by name, email, contact…","חיפוש לפי שם / אימייל / איש קשר…")"
+    <input asp-for="Q" placeholder="Search by name, email, contact…"
            class="flex-1 bg-paper-100/60 border border-black/5 rounded-full px-5 py-3 outline-none focus:border-accent transition" />
     <button class="group inline-flex items-center gap-2 bg-ink text-paper-50 rounded-full px-5 py-3 transition-all duration-500 ease-spring active:scale-[0.98]">
-        @L.T(HttpContext,"Search","חיפוש")
+        Search
         <span class="w-6 h-6 rounded-full bg-white/15 flex items-center justify-center group-hover:translate-x-0.5 transition-all duration-500 ease-spring">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
         </span>
     </button>
-    <a asp-page-handler="Csv" class="bg-mint text-white rounded-full px-5 py-3 transition active:scale-[0.98]">@L.T(HttpContext,"CSV","CSV")</a>
+    <a asp-page-handler="Csv" class="bg-mint text-white rounded-full px-5 py-3 transition active:scale-[0.98]">CSV</a>
 </form>
 
 <form id="custForm" method="post" asp-page-handler="Add" class="reveal mb-12 bg-black/[0.04] ring-1 ring-black/5 rounded-shell p-1.5 max-w-3xl">
@@ -27,50 +27,49 @@
         <div class="grid md:grid-cols-3 gap-3">
             <div>
                 <input asp-for="NewBusinessName" required minlength="2" data-cv="biz"
-                       placeholder="@L.T(HttpContext,"Business name *","שם עסק *")"
+                       placeholder="Business name *"
                        class="cust-field w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-2.5 outline-none focus:border-accent transition" />
                 <p data-cerr="biz" class="text-xs text-rose mt-1 hidden"></p>
             </div>
             <div>
                 <input asp-for="NewContactName" data-cv="contact"
-                       placeholder="@L.T(HttpContext,"Contact name","איש קשר")"
+                       placeholder="Contact name"
                        class="cust-field w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-2.5 outline-none focus:border-accent transition" />
             </div>
             <div>
                 <input asp-for="NewTaxId" data-cv="tax"
-                       placeholder="@L.T(HttpContext,"Tax ID (ח.פ / ע.מ)","ח.פ / ע.מ")"
+                       placeholder="Tax ID (ח.פ / ע.מ)"
                        class="cust-field w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-2.5 outline-none focus:border-accent transition" />
                 <p data-cerr="tax" class="text-xs text-rose mt-1 hidden"></p>
             </div>
             <div>
                 <input asp-for="NewEmail" type="email" data-cv="email"
-                       placeholder="@L.T(HttpContext,"Email","אימייל")"
+                       placeholder="Email"
                        class="cust-field w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-2.5 outline-none focus:border-accent transition" />
                 <p data-cerr="email" class="text-xs text-rose mt-1 hidden"></p>
             </div>
             <div>
                 <input asp-for="NewPhone" type="tel" pattern="\+?\d{7,15}" data-cv="phone"
-                       placeholder="@L.T(HttpContext,"Phone","טלפון")"
+                       placeholder="Phone"
                        class="cust-field w-full bg-paper-100/60 border border-black/5 rounded-2xl px-4 py-2.5 outline-none focus:border-accent transition" />
                 <p data-cerr="phone" class="text-xs text-rose mt-1 hidden"></p>
             </div>
             <button class="md:col-span-1 group inline-flex items-center justify-center gap-2 bg-mint text-white rounded-full px-6 py-3 mt-1 active:scale-[0.98] transition">
-                @L.T(HttpContext,"Add customer","הוסף לקוח")
+                Add customer
                 <span class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center group-hover:translate-x-0.5 transition">→</span>
             </button>
         </div>
         <p class="text-xs text-ink/40 mt-3">
-            @L.T(HttpContext,"Business name is required. Email + phone are validated when provided.",
-                              "שם עסק חובה. אימייל וטלפון נבדקים אם הוזנו.")
+            Business name is required. Email + phone are validated when provided.
         </p>
     </div>
 </form>
 
 @{
-    var cvBiz   = L.T(HttpContext,"Business name is required (2+ chars).","שם עסק חובה (2+ תווים).");
-    var cvEmail = L.T(HttpContext,"Email looks invalid.","אימייל לא תקין.");
-    var cvPhone = L.T(HttpContext,"7–15 digits, optional + country code.","7–15 ספרות, אופציונלי + קידומת מדינה.");
-    var cvTax   = L.T(HttpContext,"Tax ID: 4–20 digits / dashes.","ע.מ: 4–20 ספרות / מקפים.");
+    var cvBiz   = "Business name is required (2+ chars).";
+    var cvEmail = "Email looks invalid.";
+    var cvPhone = "7–15 digits, optional + country code.";
+    var cvTax   = "Tax ID: 4–20 digits / dashes.";
 }
 <div id="cv-i18n"
      data-cv-biz="@cvBiz"
@@ -153,7 +152,7 @@
     }
     @if (Model.Customers.Count == 0)
     {
-        <div class="md:col-span-3 text-center py-20 text-ink/40">@L.T(HttpContext,"No customers yet — add your first above.","אין לקוחות עדיין — הוסף ראשון למעלה.")</div>
+        <div class="md:col-span-3 text-center py-20 text-ink/40">No customers yet — add your first above.</div>
     }
 </section>
 
@@ -173,53 +172,53 @@
 
             <div class="grid grid-cols-2 gap-3 mb-6">
                 <div class="bg-paper-100 rounded-2xl px-5 py-4">
-                    <div class="pill text-ink/40">@L.T(HttpContext,"Outstanding","יתרת חוב")</div>
+                    <div class="pill text-ink/40">Outstanding</div>
                     <div class="display text-2xl font-semibold mt-1" id="cm-out">0</div>
                 </div>
                 <div class="bg-paper-100 rounded-2xl px-5 py-4">
-                    <div class="pill text-ink/40">@L.T(HttpContext,"Lifetime paid","סך שולם")</div>
+                    <div class="pill text-ink/40">Lifetime paid</div>
                     <div class="display text-2xl font-semibold mt-1 text-mint" id="cm-life">0</div>
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3 text-sm mb-6">
-                <div><span class="pill text-ink/40 block">@L.T(HttpContext,"Email","אימייל")</span><span id="cm-email">—</span></div>
-                <div><span class="pill text-ink/40 block">@L.T(HttpContext,"Phone","טלפון")</span><span id="cm-phone">—</span></div>
-                <div><span class="pill text-ink/40 block">@L.T(HttpContext,"Tax ID","ח.פ")</span><span id="cm-tax">—</span></div>
+                <div><span class="pill text-ink/40 block">Email</span><span id="cm-email">—</span></div>
+                <div><span class="pill text-ink/40 block">Phone</span><span id="cm-phone">—</span></div>
+                <div><span class="pill text-ink/40 block">Tax ID</span><span id="cm-tax">—</span></div>
             </div>
 
-            <h3 class="display font-semibold mt-2 mb-2">@L.T(HttpContext,"Projects","פרויקטים")</h3>
+            <h3 class="display font-semibold mt-2 mb-2">Projects</h3>
             <div id="cm-projects" class="space-y-1.5 text-sm mb-4 text-ink/60">—</div>
 
-            <h3 class="display font-semibold mt-2 mb-2">@L.T(HttpContext,"Recent invoices","חשבוניות אחרונות")</h3>
+            <h3 class="display font-semibold mt-2 mb-2">Recent invoices</h3>
             <div id="cm-invoices" class="space-y-1.5 text-sm text-ink/60 mb-6">—</div>
 
             <details class="bg-paper-100 rounded-2xl px-5 py-3 text-sm">
-                <summary class="cursor-pointer pill text-ink/50">@L.T(HttpContext,"Edit / delete","עריכה / מחיקה")</summary>
+                <summary class="cursor-pointer pill text-ink/50">Edit / delete</summary>
                 <form method="post" asp-page-handler="Update" class="mt-3 space-y-2" id="cm-edit-form">
                     <input type="hidden" name="id" id="cm-edit-id" />
                     <input type="text" name="businessName" id="cm-edit-name"   data-cv="biz"   required minlength="2"
-                           placeholder="@L.T(HttpContext,"Business name *","שם עסק *")"
+                           placeholder="Business name *"
                            class="cust-field w-full bg-white border border-black/5 rounded-xl px-3 py-2"/>
                     <p data-cerr="biz" class="text-xs text-rose hidden"></p>
                     <input type="text" name="contactName"  id="cm-edit-contact"
-                           placeholder="@L.T(HttpContext,"Contact","איש קשר")"
+                           placeholder="Contact"
                            class="w-full bg-white border border-black/5 rounded-xl px-3 py-2"/>
                     <input type="text" name="email"        id="cm-edit-email"   data-cv="email" type="email"
-                           placeholder="@L.T(HttpContext,"Email","אימייל")"
+                           placeholder="Email"
                            class="cust-field w-full bg-white border border-black/5 rounded-xl px-3 py-2"/>
                     <p data-cerr="email" class="text-xs text-rose hidden"></p>
                     <input type="text" name="phone"        id="cm-edit-phone"   data-cv="phone" pattern="\+?\d{7,15}"
-                           placeholder="@L.T(HttpContext,"Phone","טלפון")"
+                           placeholder="Phone"
                            class="cust-field w-full bg-white border border-black/5 rounded-xl px-3 py-2"/>
                     <p data-cerr="phone" class="text-xs text-rose hidden"></p>
                     <input type="text" name="taxId"        id="cm-edit-tax"     data-cv="tax"
-                           placeholder="@L.T(HttpContext,"Tax ID","ח.פ")"
+                           placeholder="Tax ID"
                            class="cust-field w-full bg-white border border-black/5 rounded-xl px-3 py-2"/>
                     <p data-cerr="tax" class="text-xs text-rose hidden"></p>
                     <div class="flex gap-2">
-                        <button class="bg-ink text-paper-50 rounded-full px-4 py-2 text-sm">@L.T(HttpContext,"Save","שמור")</button>
-                        <button type="button" id="cm-delete-btn" class="bg-rose text-white rounded-full px-4 py-2 text-sm">@L.T(HttpContext,"Delete","מחק")</button>
+                        <button class="bg-ink text-paper-50 rounded-full px-4 py-2 text-sm">Save</button>
+                        <button type="button" id="cm-delete-btn" class="bg-rose text-white rounded-full px-4 py-2 text-sm">Delete</button>
                     </div>
                 </form>
                 <form method="post" asp-page-handler="Delete" id="cm-delete-form" class="hidden">

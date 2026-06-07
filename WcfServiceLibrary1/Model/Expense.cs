@@ -20,5 +20,9 @@ namespace Model
         [DataMember] public int? ProjectId { get; set; }
         [DataMember] public string ReceiptPath { get; set; }
         [DataMember] public string Currency { get; set; } = "ILS";
+        // Recurring marker — null/"" = one-time, "Fixed" = recurring fixed-amount
+        // (rent, insurance), "Variable" = recurring variable-amount (electricity,
+        // utilities). Used for hora'at-keva tracking and budget forecasting.
+        [DataMember] public string RecurringKind { get; set; }
     }
 }
