@@ -33,7 +33,7 @@ namespace BManagedWeb.Pages.Owner
             (new Regex(@"שופרסל|רמי לוי|אושר עד|יוחננוף|מגה|ויקטורי|טיב טעם|shufersal|coffee|cafe|מסעדה|פיצה|קפה",
                        RegexOptions.IgnoreCase), "Food"),
             (new Regex(@"דלק|פז|סונול|דור אלון|delek|paz|sonol|חניון|parking",          RegexOptions.IgnoreCase), "Fuel"),
-            (new Regex(@"שכירות|נדל[״""׳]?ן|rent",                                       RegexOptions.IgnoreCase), "Rent"),
+            (new Regex(@"שכירות|נדל[״""״]?ן|rent",                                       RegexOptions.IgnoreCase), "Rent"),
             (new Regex(@"חשמל|מים|בזק|hot|cellcom|partner|פלאפון|electricity|water",     RegexOptions.IgnoreCase), "Utilities"),
             (new Regex(@"facebook|instagram|google\s*ads|tiktok|לינקדאין|מיתוג|פרסום|advertising|marketing",
                        RegexOptions.IgnoreCase), "Marketing"),
@@ -62,7 +62,8 @@ namespace BManagedWeb.Pages.Owner
             return Page();
         }
 
-        // Patur cannot deduct VAT on expenses, so VAT is 0; everyone else uses 18 %.
+        // Patur cannot deduct VAT on expenses, so VAT is 0; everyone else uses the
+        // current Israeli standard rate (18 % as of Jan 2025).
         private bool IsOwnerPatur(int ownerId)
         {
             try
@@ -73,8 +74,13 @@ namespace BManagedWeb.Pages.Owner
             catch { return false; }
         }
 
+        // VAT rate must stay in sync with VatCalculator.DefaultRate (0.18).
+        // Express as a single named constant here rather than two magic literals
+        // so a rate change only needs to be made in one place.
+        private const decimal VatRate = 0.18m;
+
         private static decimal VatFromGross(decimal gross, bool isPatur)
-            => isPatur ? 0m : Math.Round(gross * 18m / 118m, 2);
+            => isPatur ? 0m : Math.Round(gross * VatRate / (1m + VatRate), 2);
 
         public IActionResult OnPostCsv()
         {

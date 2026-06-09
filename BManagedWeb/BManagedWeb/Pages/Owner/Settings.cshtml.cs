@@ -147,6 +147,8 @@ namespace BManagedWeb.Pages.Owner
             return RedirectToPage();
         }
 
+        // TODO(audit): identical copy exists in SignUp.cshtml.cs — extract to
+        // a shared InviteCodeHelper in BManagedWeb/Helpers/ to avoid drift.
         private static string NewInviteCode(string seed)
         {
             string prefix = new string((seed ?? "")

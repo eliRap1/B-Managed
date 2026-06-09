@@ -20,20 +20,26 @@ namespace BManagedWeb.Pages
             { Message = "Enter a username."; return Page(); }
             try
             {
-                if (!_srv.CheckUserExist(Username))
-                { Message = "User not found."; IsSuccess = false; return Page(); }
-
+                // Resolve the user without revealing whether the username exists.
+                // Both "not found" and "no owner linked" show the same generic
+                // message to prevent username enumeration.
                 int uid = _srv.GetUserId(Username);
-                var user = _srv.GetUserById(uid);
-                if (user == null)
-                { Message = "User not found."; IsSuccess = false; return Page(); }
+                var user = uid > 0 ? _srv.GetUserById(uid) : null;
 
                 // Notify only the Owner of the company this user belongs to —
                 // not every Owner on the server (which leaked the request
                 // across tenants).
-                int? ownerId = user.Role == "Owner" ? (int?)user.Id : user.OwnerId;
-                if (!ownerId.HasValue || ownerId.Value <= 0)
-                { Message = "No company Owner is linked to this account. Ask an admin."; IsSuccess = false; return Page(); }
+                int? ownerId = user?.Role == "Owner" ? (int?)user.Id : user?.OwnerId;
+
+                // Use a single generic response for all failure cases (user not
+                // found, no owner linked) so the form cannot be used to enumerate
+                // valid usernames via different error text.
+                if (user == null || !ownerId.HasValue || ownerId.Value <= 0)
+                {
+                    Message = "If an account exists for that username, its Owner has been notified.";
+                    IsSuccess = true;
+                    return Page();
+                }
 
                 _srv.SendNotification(new Notification
                 {
@@ -45,7 +51,7 @@ namespace BManagedWeb.Pages
                     IsRead = false,
                     CreatedAt = System.DateTime.Now,
                 });
-                Message = "Your company's Owner has been notified. They will reset your password to 'reset1234'.";
+                Message = "If an account exists for that username, its Owner has been notified.";
                 IsSuccess = true;
             }
             catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }

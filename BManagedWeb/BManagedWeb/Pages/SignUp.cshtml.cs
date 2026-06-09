@@ -171,6 +171,8 @@ namespace BManagedWeb.Pages
         // Format: PREFIX-XXXX where PREFIX is 4 alpha-numeric chars from the
         // business name and XXXX is 4 random alpha-numerics. 9 chars total
         // including the dash. Easy to read / type.
+        // TODO(audit): identical copy exists in Settings.cshtml.cs — extract to
+        // a shared InviteCodeHelper in BManagedWeb/Helpers/ to avoid drift.
         private static string NewInviteCode(string seed)
         {
             string prefix = new string((seed ?? "")

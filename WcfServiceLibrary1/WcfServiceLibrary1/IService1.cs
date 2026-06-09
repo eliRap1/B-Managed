@@ -20,7 +20,7 @@ namespace WcfServiceLibrary1
         [OperationContract] bool CheckUserPassword(string username, string password);
 
         /// <summary>True if the username exists (any role).</summary>
-        [OperationContract] bool CheckUserExist(string username);
+    [OperationContract] bool CheckUserExist(string username);
 
         /// <summary>Get a single user row (any role).</summary>
         [OperationContract] User GetUserById(int id);
@@ -146,7 +146,7 @@ namespace WcfServiceLibrary1
         /// <summary>All invoices for an Owner — single JOIN, replaces per-customer loop in UI.</summary>
         [OperationContract] List<Invoice> GetInvoicesForOwner(int ownerId);
 
-        /// <summary>Render invoice as a PDF byte array using QuestPDF.</summary>
+        /// <summary>Render invoice as a PDF byte array using PdfSharp.</summary>
         [OperationContract] byte[] GenerateInvoicePdf(int invoiceId);
         [OperationContract] byte[] GenerateInvoicePdfForOwner(int invoiceId, int ownerId);
 
