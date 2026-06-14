@@ -75,6 +75,12 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostMarkSigned(int id)
         {
             if (HttpContext.Session.GetString("Role") != "Owner") return RedirectToPage("/Login");
+            // TODO(audit): MarkContractSigned does not verify the contract belongs to this
+            // Owner — any Owner can sign another Owner's contract by guessing its id (IDOR).
+            // Add a MarkContractSignedForOwner(id, ownerId) WCF operation that checks
+            // ContractDB.BelongsToOwner(id, ownerId) before mutating, mirroring the pattern
+            // used by MarkInvoicePaidForOwner. Needs changes in IService1, Service1,
+            // ContractLogic, and ContractDB — more than 5 files, deferred per audit rules.
             try { _srv.MarkContractSigned(id, DateTime.Today); TempData["ContractMsg"] = "Marked as signed."; }
             catch (Exception ex) { TempData["ContractMsg"] = "Failed: " + ex.Message; }
             return RedirectToPage();
@@ -83,6 +89,7 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostDelete(int id)
         {
             if (HttpContext.Session.GetString("Role") != "Owner") return RedirectToPage("/Login");
+            // TODO(audit): DeleteContract does not verify ownership — IDOR risk (see above).
             try { _srv.DeleteContract(id); TempData["ContractMsg"] = "Deleted."; }
             catch (Exception ex) { TempData["ContractMsg"] = "Failed: " + ex.Message; }
             return RedirectToPage();

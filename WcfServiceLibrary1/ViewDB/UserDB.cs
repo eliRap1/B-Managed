@@ -40,7 +40,9 @@ namespace ViewDB
         // every Service1 instantiation pays for an ALTER TABLE round-trip and
         // a fresh OleDb connection-pool entry, which exhausts under load.
         private static readonly object _schemaLock = new object();
-        private static bool _schemaEnsured;
+        // volatile prevents the JIT from reordering the write to _schemaEnsured
+        // ahead of the EnsureSchema() body in the double-checked locking pattern.
+        private static volatile bool _schemaEnsured;
 
         public UserDB()
         {

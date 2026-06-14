@@ -12,6 +12,12 @@ namespace Model
     public class User : Base
     {
         [DataMember] public string Username { get; set; }
+        // TODO(audit): PasswordHash and InviteCode must NOT be returned to clients.
+        // Remove [DataMember] from both fields and strip them server-side in every
+        // query that returns User objects (GetAllUsers, GetById, GetUsersForOwner, …).
+        // Touching this requires regenerating the svcutil proxy in BManagedClient and
+        // updating BManagedWeb/Connected Services/bsrv/Reference.cs — do as a
+        // dedicated PR touching those 3 files together.
         [DataMember] public string PasswordHash { get; set; }
         [DataMember] public string Email { get; set; }
         [DataMember] public string Phone { get; set; }

@@ -19,19 +19,18 @@ namespace BManagedWeb.Pages
             if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(Password))
             { ErrorMessage = "Please fill all fields"; return Page(); }
 
-            // Fail-fast for unknown user — skips the expensive PBKDF2 path entirely
-            // when the username does not exist, so the spinner only spins for real
-            // verification work.
-            if (!_srv.CheckUserExist(Username))
-            { ErrorMessage = "Invalid username or password"; return Page(); }
-
+            // Always call CheckUserPassword (PBKDF2) first — do NOT short-circuit
+            // with CheckUserExist before it, because that two-call pattern allows an
+            // attacker to enumerate valid usernames via timing differences between a
+            // "user not found" fast-path and the slow PBKDF2 path.
             bool ok = _srv.CheckUserPassword(Username, Password);
             if (!ok)
             {
                 // VerifyPassword filters by [isActive]=true, so an unapproved
                 // Employee/Client gets the same 'wrong password' result as a
                 // real wrong-password attempt. Look up the user once more to
-                // tell them the actual reason.
+                // tell them the actual reason (username-existence is already
+                // known at this point because we called CheckUserPassword first).
                 try
                 {
                     int probeId = _srv.GetUserId(Username);

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using BManagedWeb.bsrv;
 using Microsoft.AspNetCore.Mvc;
@@ -171,6 +172,8 @@ namespace BManagedWeb.Pages
         // Format: PREFIX-XXXX where PREFIX is 4 alpha-numeric chars from the
         // business name and XXXX is 4 random alpha-numerics. 9 chars total
         // including the dash. Easy to read / type.
+        // Uses RandomNumberGenerator (CSPRNG) so the tail cannot be predicted
+        // even if the caller's business name is known.
         private static string NewInviteCode(string seed)
         {
             string prefix = new string((seed ?? "")
@@ -180,8 +183,10 @@ namespace BManagedWeb.Pages
                 .ToArray());
             if (prefix.Length < 2) prefix = "BMNG";
             const string alpha = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // skip ambiguous I/O/0/1
-            var rnd = new Random();
-            var tail = new string(Enumerable.Range(0, 4).Select(_ => alpha[rnd.Next(alpha.Length)]).ToArray());
+            var bytes = new byte[4];
+            using (var rng = RandomNumberGenerator.Create())
+                rng.GetBytes(bytes);
+            var tail = new string(bytes.Select(b => alpha[b % alpha.Length]).ToArray());
             return prefix + "-" + tail;
         }
     }

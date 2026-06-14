@@ -58,7 +58,8 @@ namespace ViewDB
                 cmd.Parameters.Add(new OleDbParameter("@m",  OleDbType.LongVarWChar)   { Value = n.Message ?? "" });
                 cmd.Parameters.Add(new OleDbParameter("@nt", OleDbType.VarWChar, 30)   { Value = n.NotificationType ?? "Info" });
                 cmd.Parameters.Add(new OleDbParameter("@r",  OleDbType.Boolean)        { Value = false });
-                cmd.Parameters.Add(new OleDbParameter("@c",  OleDbType.Date)           { Value = n.CreatedAt });
+                // DBTimeStamp preserves time-of-day; OleDbType.Date truncates to midnight.
+                cmd.Parameters.Add(new OleDbParameter("@c",  OleDbType.DBTimeStamp)    { Value = n.CreatedAt });
                 try
                 {
                     conn.Open();
@@ -80,9 +81,10 @@ namespace ViewDB
             using (var cmd = new OleDbCommand(
                 "UPDATE [Notifications] SET [isRead]=?, [readAt]=? WHERE [id]=?", conn))
             {
-                cmd.Parameters.Add(new OleDbParameter("@r",  OleDbType.Boolean) { Value = true });
-                cmd.Parameters.Add(new OleDbParameter("@d",  OleDbType.Date)    { Value = DateTime.Now });
-                cmd.Parameters.Add(new OleDbParameter("@id", OleDbType.Integer) { Value = notificationId });
+                cmd.Parameters.Add(new OleDbParameter("@r",  OleDbType.Boolean)     { Value = true });
+                // DBTimeStamp preserves time-of-day; OleDbType.Date truncates to midnight.
+                cmd.Parameters.Add(new OleDbParameter("@d",  OleDbType.DBTimeStamp) { Value = DateTime.Now });
+                cmd.Parameters.Add(new OleDbParameter("@id", OleDbType.Integer)     { Value = notificationId });
                 conn.Open();
                 if (cmd.ExecuteNonQuery() <= 0)
                     throw new InvalidOperationException("MarkAsRead: id=" + notificationId + " not found.");
@@ -96,8 +98,9 @@ namespace ViewDB
                 @"UPDATE [Notifications] SET [isRead]=?, [readAt]=?
                   WHERE [userId]=? AND [isRead]=?", conn))
             {
-                cmd.Parameters.Add(new OleDbParameter("@r",  OleDbType.Boolean) { Value = true });
-                cmd.Parameters.Add(new OleDbParameter("@d",  OleDbType.Date)    { Value = DateTime.Now });
+                cmd.Parameters.Add(new OleDbParameter("@r",  OleDbType.Boolean)     { Value = true });
+                // DBTimeStamp preserves time-of-day; OleDbType.Date truncates to midnight.
+                cmd.Parameters.Add(new OleDbParameter("@d",  OleDbType.DBTimeStamp) { Value = DateTime.Now });
                 cmd.Parameters.Add(new OleDbParameter("@u",  OleDbType.Integer) { Value = userId });
                 cmd.Parameters.Add(new OleDbParameter("@ro", OleDbType.Boolean) { Value = false });
                 conn.Open();

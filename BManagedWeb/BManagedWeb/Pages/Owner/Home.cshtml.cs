@@ -67,6 +67,7 @@ namespace BManagedWeb.Pages.Owner
         public decimal RevenueChangePct   { get; set; }
         public bool    HasInsights        { get; set; }
         public string  BusinessType       { get; set; } = "Individual";
+        public bool    IsZair             { get; set; } = false;
 
         public IActionResult OnGet()
         {
@@ -81,6 +82,8 @@ namespace BManagedWeb.Pages.Owner
                 var u = _srv.GetUserById(id);
                 if (u != null && !string.IsNullOrEmpty(u.BusinessType))
                     BusinessType = u.BusinessType;
+                if (u != null)
+                    IsZair = u.IsZair;
             }
             catch { }
 

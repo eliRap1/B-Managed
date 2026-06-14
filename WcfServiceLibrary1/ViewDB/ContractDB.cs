@@ -40,7 +40,8 @@ namespace ViewDB
         protected override Base NewEntity() => new Contract();
 
         private static readonly object _schemaLock = new object();
-        private static bool _schemaEnsured;
+        // volatile: prevents JIT reordering in double-checked locking pattern.
+        private static volatile bool _schemaEnsured;
 
         public ContractDB()
         {

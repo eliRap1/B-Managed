@@ -3,7 +3,9 @@
 $ErrorActionPreference = 'Stop'
 
 $dbPath  = "D:\yudb\WcfServiceLibrary1\ViewDB\Database\BManaged.accdb"
-$adminHash = "Wh07bZCwhjvwj4IsSR2nOWYpk6fWPUt6PZFFTLC6S8jg3qMC"  # password = admin1234
+# TODO(audit): Remove the plaintext password comment below. The hash is a demo-only
+# value; never commit real-account hashes or plaintext passwords to source control.
+$adminHash = "Wh07bZCwhjvwj4IsSR2nOWYpk6fWPUt6PZFFTLC6S8jg3qMC"  # demo seed only — see README
 $today   = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
 
 if (Test-Path $dbPath) { Remove-Item $dbPath -Force }
@@ -305,9 +307,11 @@ ExecP "INSERT INTO [Expenses] ([ownerId],[categoryId],[date],[amount],[vatPaid],
   @('@a',180), @('@v',30.6), @('@vd','Paz fuel'), @('@desc','Client visit Haifa'), @('@cur','ILS'))
 
 # Welcome notification
+# TODO(audit): Notification message previously embedded the plaintext password
+# "admin1234". Removed credential from the persisted DB record.
 ExecP "INSERT INTO [Notifications] ([userId],[title],[message],[notificationType],[isRead],[createdAt]) VALUES (?,?,?,?,?,?)" @(
   @('@u',$ownerId), @('@t','Welcome to B-Managed'),
-  @('@m','Demo data seeded. Acme + Globex are pre-loaded customers. Sign in as dana/admin1234 to see the employee view.'),
+  @('@m','Demo data seeded. Acme + Globex are pre-loaded customers. See README for demo login instructions.'),
   @('@nt','Info'), @('@r',$false), @('@c',(Get-Date)))
 
 $conn.Close()

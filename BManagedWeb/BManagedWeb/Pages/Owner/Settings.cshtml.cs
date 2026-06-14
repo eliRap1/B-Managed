@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using BManagedWeb.bsrv;
 using Microsoft.AspNetCore.Mvc;
@@ -153,10 +154,16 @@ namespace BManagedWeb.Pages.Owner
                 .ToUpperInvariant().Where(char.IsLetterOrDigit).Take(4).ToArray());
             if (prefix.Length < 2) prefix = "BMNG";
             const string alpha = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-            var rnd = new Random();
-            var tail = new string(Enumerable.Range(0, 4)
-                .Select(_ => alpha[rnd.Next(alpha.Length)]).ToArray());
-            return prefix + "-" + tail;
+            // Use RandomNumberGenerator (CSPRNG) instead of System.Random.
+            // System.Random is seeded from the clock and its output is predictable;
+            // an attacker who knows the business-name prefix and approximate rotation
+            // time can enumerate the 4-char suffix in ~923 k attempts.
+            var tail = new char[4];
+            var buf  = new byte[4];
+            System.Security.Cryptography.RandomNumberGenerator.Fill(buf);
+            for (int i = 0; i < 4; i++)
+                tail[i] = alpha[buf[i] % alpha.Length];
+            return prefix + "-" + new string(tail);
         }
     }
 }

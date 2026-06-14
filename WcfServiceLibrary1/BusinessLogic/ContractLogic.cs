@@ -24,6 +24,12 @@ namespace BusinessLogic
             return contractDB.Insert(c);
         }
 
+        // TODO(audit): UpdateContract only persists Status + SignedDate (via SetStatus).
+        // Title, Body, TotalAmount, Currency, PdfPath and all other fields on the
+        // Contract object are silently discarded. Callers who expect a full update
+        // (e.g. editing the contract body) will lose their changes with no error.
+        // Add a ContractDB.Update(Contract) method that sets all editable columns,
+        // and call it here instead of SetStatus.
         public void UpdateContract(Contract c)         => contractDB.SetStatus(c.Id, c.Status, c.SignedDate);
         public void DeleteContract(int id)             => contractDB.Delete(id);
         public void MarkContractSigned(int id, DateTime signedDate)

@@ -40,6 +40,13 @@ namespace BManagedClient
         }
     }
 
+    // TODO(audit): TeacherIdRule (and AgeRangeRule, isAdminRule, LessonPriceRule below)
+    // are dead boilerplate copied from a prior "Teacher/Student" project — they are not
+    // wired into any B-Managed XAML. TeacherIdRule is especially dangerous because it
+    // creates a `new Service1Client()` on the UI render thread and never disposes it,
+    // leaking a WCF channel per validation pass. Remove this entire file once any
+    // remaining XAML {Binding, ValidatesOnDataErrors=True} references are audited and
+    // confirmed unused. That clean-up will touch ValidationRules.cs only.
     public class TeacherIdRule : ValidationRule
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
@@ -61,6 +68,8 @@ namespace BManagedClient
                 }
                 try
                 {
+                    // BUG: Service1Client is created on the UI thread and never disposed.
+                    // Do not call this rule — see TODO(audit) above.
                     BMsrv.Service1Client srv = new BMsrv.Service1Client();
                     var user = srv.GetUserById(int.Parse(id));
                     if (user != null)
