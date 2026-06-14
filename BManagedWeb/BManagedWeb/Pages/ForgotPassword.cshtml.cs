@@ -18,15 +18,18 @@ namespace BManagedWeb.Pages
         {
             if (string.IsNullOrEmpty(Username))
             { Message = "Enter a username."; return Page(); }
+            // Constant success message regardless of whether the username exists,
+            // to prevent username enumeration via the forgot-password endpoint.
+            const string safeSuccessMsg = "If that username is registered, its company Owner has been notified and will reset the password.";
             try
             {
                 if (!_srv.CheckUserExist(Username))
-                { Message = "User not found."; IsSuccess = false; return Page(); }
+                { Message = safeSuccessMsg; IsSuccess = true; return Page(); }
 
                 int uid = _srv.GetUserId(Username);
                 var user = _srv.GetUserById(uid);
                 if (user == null)
-                { Message = "User not found."; IsSuccess = false; return Page(); }
+                { Message = safeSuccessMsg; IsSuccess = true; return Page(); }
 
                 // Notify only the Owner of the company this user belongs to —
                 // not every Owner on the server (which leaked the request
@@ -40,12 +43,12 @@ namespace BManagedWeb.Pages
                     UserId = ownerId.Value,
                     Title = "Password reset request",
                     Message = $"User '{user.Username}' ({user.Role}) asked for a password reset. " +
-                              "Open ManageUsers > Reset PW to issue 'reset1234'.",
+                              "Open ManageUsers > Reset PW to issue a temporary password.",
                     NotificationType = "ResetRequest",
                     IsRead = false,
                     CreatedAt = System.DateTime.Now,
                 });
-                Message = "Your company's Owner has been notified. They will reset your password to 'reset1234'.";
+                Message = safeSuccessMsg;
                 IsSuccess = true;
             }
             catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }

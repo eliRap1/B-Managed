@@ -15,8 +15,22 @@ namespace BManagedWeb.Pages.Client
         public IActionResult OnGet(int id)
         {
             if (HttpContext.Session.GetString("Role") != "Client") return RedirectToPage("/Login");
-            Invoice = _srv.GetInvoiceById(id);
-            if (Invoice != null) Lines = (_srv.GetInvoiceLines(id) ?? new InvoiceLine[0]).ToList();
+
+            // SECURITY: Verify the invoice belongs to this Client before loading it.
+            // Previously GetInvoiceById(id) was called without any ownership scope,
+            // allowing any authenticated Client to read any invoice by iterating IDs (IDOR).
+            // We now fetch all invoices for this client and match by id so a Client can
+            // only ever see their own invoices.
+            int clientId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            try
+            {
+                var owned = _srv.GetInvoicesByCustomer(clientId);
+                Invoice = owned?.FirstOrDefault(i => i.Id == id);
+            }
+            catch { }
+
+            if (Invoice == null) return RedirectToPage("/Client/Portal");
+            try { Lines = (_srv.GetInvoiceLines(id) ?? new InvoiceLine[0]).ToList(); } catch { }
             return Page();
         }
     }
