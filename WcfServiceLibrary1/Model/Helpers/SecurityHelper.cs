@@ -106,9 +106,15 @@ namespace Model.Helpers
         }
 
         /// <summary>
-        /// Sanitizes input to prevent SQL injection
-        /// This is a BACKUP - Always use parameterized queries!
+        /// Sanitizes input to prevent SQL injection.
         /// </summary>
+        /// <remarks>
+        /// DO NOT USE — this blacklist-based approach is bypassable (Unicode
+        /// lookalikes, CHAR() injections, Access-specific syntax, etc.) and
+        /// creates a false sense of security. All callers must use
+        /// OleDbParameter (parameterised queries) instead.
+        /// </remarks>
+        [Obsolete("Do not use SanitizeInput. Use OleDbParameter / parameterised queries exclusively.")]
         public static string SanitizeInput(string input)
         {
             if (string.IsNullOrEmpty(input))
