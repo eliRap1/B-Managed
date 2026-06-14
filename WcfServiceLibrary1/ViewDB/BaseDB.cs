@@ -60,8 +60,10 @@ namespace ViewDB
             if (connectionString == null)
             {
                 string ApplicationBaseFolder = AppDomain.CurrentDomain.BaseDirectory;
+                // Persist Security Info=False prevents the connection string from
+                // exposing credentials after the connection is opened.
                 connectionString = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" +
-                    ApplicationBaseFolder + "\\..\\..\\..\\ViewDB\\Database\\BManaged.accdb;Persist Security Info=True";
+                    ApplicationBaseFolder + "\\..\\..\\..\\ViewDB\\Database\\BManaged.accdb;Persist Security Info=False";
             }
             return new OleDbConnection(connectionString);
         }
