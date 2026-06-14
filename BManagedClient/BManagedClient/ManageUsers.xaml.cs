@@ -54,6 +54,10 @@ namespace BManagedClient
             if (Selected == null) return;
             if (MessageBox.Show($"Reset {Selected.Username}'s password to 'reset1234'?", "Confirm",
                     MessageBoxButton.YesNo) != MessageBoxResult.Yes) return;
+            // TODO(audit): "reset1234" is a predictable well-known temporary password.
+            // Generate a random token instead and display it to the Owner so they can
+            // securely pass it to the user. Coordinate with Users.cshtml.cs (Web) and
+            // ForgotPassword.cshtml.cs.
             try { ServiceGateway.Use(c => c.ResetPassword(Selected.Id, "reset1234")); MessageBox.Show("Done."); }
             catch (Exception ex) { MessageBox.Show("Reset failed: " + ex.Message); }
         }

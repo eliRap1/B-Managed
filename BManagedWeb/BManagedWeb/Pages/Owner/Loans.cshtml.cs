@@ -137,6 +137,11 @@ namespace BManagedWeb.Pages.Owner
         {
             var role = HttpContext.Session.GetString("Role");
             if (role != "Owner") return RedirectToPage("/Login");
+            // TODO(audit): DeleteLoan does not verify the loan belongs to this Owner.
+            // An Owner could delete another company's loan by guessing its id (IDOR).
+            // Add a DeleteLoanForOwner(id, ownerId) WCF method that checks
+            // LoanDB.GetById(id)?.OwnerId == ownerId before deleting. Touches
+            // IService1, Service1, LoanLogic, LoanDB — deferred per audit rules.
             try { _srv.DeleteLoan(id); TempData["LoanMsg"] = "Loan deleted."; }
             catch (Exception ex) { TempData["LoanMsg"] = "Failed: " + ex.Message; }
             return RedirectToPage(new { DisplayCurrency });

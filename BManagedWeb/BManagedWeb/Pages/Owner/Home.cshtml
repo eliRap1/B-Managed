@@ -194,11 +194,12 @@
                             <span class="font-semibold @color">@(Model.RevenueChangePct > 0 ? "+" : "")@Model.RevenueChangePct%</span>
                         </li>
                     }
-                    @if (Model.BusinessType == "Patur" || Model.BusinessType == "Zair")
+                    @if (Model.BusinessType == "Patur")
                     {
                         <li>ℹ️
                             Account type:
-                            <span class="font-semibold">@(Model.BusinessType == "Patur" ? "עוסק פטור" : "עוסק זעיר")</span> —
+                            @* BusinessType "Zair" is never stored — Osek Zair is IsZair=true on top of Patur/Murshe. *@
+                            <span class="font-semibold">@(Model.IsZair ? "עוסק זעיר" : "עוסק פטור")</span> —
                             new invoices issued without VAT.
                         </li>
                     }

@@ -78,6 +78,11 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostReset(int id)
         {
             var g = GuardOwner(); if (g != null) return g;
+            // TODO(audit): "reset1234" is a well-known hardcoded temporary password.
+            // Replace with a randomly generated token (e.g. 8-char alphanumeric) and
+            // display it once to the Owner so they can pass it to the user securely.
+            // Coordinate with ManageUsers.xaml.cs (WPF) and ForgotPassword.cshtml.cs
+            // which also embed "reset1234" literally.
             try { _srv.ResetPassword(id, "reset1234"); Message = "Password reset to 'reset1234'."; IsSuccess = true; }
             catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }
             Reload(); return Page();
