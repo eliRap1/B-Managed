@@ -10,7 +10,8 @@ namespace BManagedClient
     public class Sign
     {
         public string Username { get; set; }
-        public string Password { get; set; }
+        // Password field removed — storing plaintext credentials in a long-lived
+        // static object exposes them to crash dumps and memory inspection.
         public string Email { get; set; }
         public string Phone { get; set; }
         public int Id { get; set; }

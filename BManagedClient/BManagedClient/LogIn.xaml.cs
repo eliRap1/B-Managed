@@ -99,7 +99,11 @@ namespace BManagedClient
                 // Persist the user record into the static `sign`. From here
                 // on, any WPF page can read these without another SOAP call.
                 sign.Username          = user.Username;
-                sign.Password          = p;            // kept for re-auth flows
+                // NOTE: plaintext password is NOT persisted in memory.
+                // The previous `sign.Password = p` assignment was removed because
+                // keeping credentials in a public static field exposes them to
+                // crash dumps, memory scans, and any future reflection-based code.
+                // No active re-auth flow in this app required it.
                 sign.Email             = user.Email;
                 sign.Phone             = user.Phone;
                 sign.Id                = user.Id;
