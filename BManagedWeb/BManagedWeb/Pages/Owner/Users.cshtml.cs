@@ -46,14 +46,33 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostApprove(int id)
         {
             var g = GuardOwner(); if (g != null) return g;
+            if (!BelongsToThisOwner(id))
+            { Message = "User not found in your company."; IsSuccess = false; Reload(); return Page(); }
             try { _srv.SetUserActive(id, true); Message = "Approved."; IsSuccess = true; }
             catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }
             Reload(); return Page();
         }
 
+        // Returns true when the target user id belongs to the session owner's
+        // company (is the owner themselves, or has ownerId == sessionOwnerId).
+        // Used by every mutating handler to prevent cross-tenant operations.
+        private bool BelongsToThisOwner(int targetUserId)
+        {
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            if (targetUserId == ownerId) return true;
+            try
+            {
+                var u = _srv.GetUserById(targetUserId);
+                return u != null && u.OwnerId == ownerId;
+            }
+            catch { return false; }
+        }
+
         public IActionResult OnPostToggle(int id)
         {
             var g = GuardOwner(); if (g != null) return g;
+            if (!BelongsToThisOwner(id))
+            { Message = "User not found in your company."; IsSuccess = false; Reload(); return Page(); }
             try
             {
                 var u = _srv.GetUserById(id);
@@ -70,6 +89,8 @@ namespace BManagedWeb.Pages.Owner
             var g = GuardOwner(); if (g != null) return g;
             if (newRole != "Owner" && newRole != "Employee" && newRole != "Client")
             { Message = "Invalid role."; IsSuccess = false; Reload(); return Page(); }
+            if (!BelongsToThisOwner(id))
+            { Message = "User not found in your company."; IsSuccess = false; Reload(); return Page(); }
             try { _srv.UpdateUserRole(id, newRole); Message = "Role updated."; IsSuccess = true; }
             catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }
             Reload(); return Page();
@@ -78,6 +99,8 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostReset(int id)
         {
             var g = GuardOwner(); if (g != null) return g;
+            if (!BelongsToThisOwner(id))
+            { Message = "User not found in your company."; IsSuccess = false; Reload(); return Page(); }
             try { _srv.ResetPassword(id, "reset1234"); Message = "Password reset to 'reset1234'."; IsSuccess = true; }
             catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }
             Reload(); return Page();
@@ -86,6 +109,8 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostDelete(int id)
         {
             var g = GuardOwner(); if (g != null) return g;
+            if (!BelongsToThisOwner(id))
+            { Message = "User not found in your company."; IsSuccess = false; Reload(); return Page(); }
             try { _srv.DeleteUser(id); Message = "Deleted."; IsSuccess = true; }
             catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }
             Reload(); return Page();
