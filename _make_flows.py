@@ -5,7 +5,7 @@ Soft Structuralism palette."""
 import os, math
 from PIL import Image, ImageDraw, ImageFont
 
-OUT = r"D:\yudb"
+OUT = os.path.dirname(os.path.abspath(__file__))
 W, H = 1700, 1000
 PAPER = (250, 250, 247)
 INK = (11, 11, 15)
