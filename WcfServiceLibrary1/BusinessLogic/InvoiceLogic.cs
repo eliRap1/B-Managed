@@ -21,9 +21,13 @@ namespace BusinessLogic
 
         public int  CreateInvoice(Invoice inv)
         {
-            if (string.IsNullOrEmpty(inv.InvoiceNumber))
-                inv.InvoiceNumber = invDB.NextInvoiceNumber();
-            return invDB.Insert(inv);
+            bool needsNumber = string.IsNullOrEmpty(inv.InvoiceNumber);
+            if (needsNumber)
+                inv.InvoiceNumber = "PENDING";
+            int newId = invDB.Insert(inv);
+            if (needsNumber)
+                invDB.SetInvoiceNumber(newId, InvoiceNumberer.Next(newId));
+            return newId;
         }
 
         public int CreateInvoiceForOwner(Invoice inv, int ownerId)

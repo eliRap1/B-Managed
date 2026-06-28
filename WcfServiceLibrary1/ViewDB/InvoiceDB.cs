@@ -141,6 +141,23 @@ namespace ViewDB
             return $"INV-{DateTime.Today:yyyy}-{next:D5}";
         }
 
+        /// <summary>
+        /// Stamp the invoice number after insert using the real @@IDENTITY.
+        /// Call immediately after Insert() with the id it returned.
+        /// </summary>
+        public void SetInvoiceNumber(int invoiceId, string invoiceNumber)
+        {
+            using (var conn = GetConnection())
+            using (var cmd = new OleDbCommand(
+                "UPDATE [Invoices] SET [invoiceNumber]=? WHERE [id]=?", conn))
+            {
+                cmd.Parameters.Add(new OleDbParameter("@n",  OleDbType.VarWChar, 20) { Value = invoiceNumber });
+                cmd.Parameters.Add(new OleDbParameter("@id", OleDbType.Integer)      { Value = invoiceId });
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
         public int Insert(Invoice i)
         {
             string sql = @"INSERT INTO [Invoices]
