@@ -116,7 +116,17 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostDelete(int id)
         {
             if (HttpContext.Session.GetString("Role") != "Owner") return RedirectToPage("/Login");
-            try { _srv.DeleteExpense(id); } catch { }
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            // Confirm the expense belongs to this owner before deleting — the same
+            // ownership pattern used by OnPostMark below. Without this check any
+            // Owner could delete expenses from any other tenant by guessing the id.
+            try
+            {
+                var list = _srv.GetExpensesByOwner(ownerId) ?? new Expense[0];
+                if (list.All(e => e.Id != id)) return RedirectToPage();
+                _srv.DeleteExpense(id);
+            }
+            catch { }
             return RedirectToPage();
         }
 

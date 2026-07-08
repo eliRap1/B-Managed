@@ -53,6 +53,16 @@ namespace BManagedWeb.Pages
             int id = _srv.GetUserId(Username);
             var user = _srv.GetUserById(id);
 
+            // Guard: GetUserId returns -1 when IsSafeString rejects the input,
+            // and GetUserById returns null if the user was concurrently deleted.
+            // Without this check, user.Role at the switch below throws NullReferenceException
+            // and produces an unhandled HTTP 500 instead of a graceful error page.
+            if (id <= 0 || user == null)
+            {
+                ErrorMessage = "Login failed.";
+                return Page();
+            }
+
             HttpContext.Session.SetInt32("UserId", user.Id);
             HttpContext.Session.SetString("Username", user.Username);
             HttpContext.Session.SetString("Role", user.Role);

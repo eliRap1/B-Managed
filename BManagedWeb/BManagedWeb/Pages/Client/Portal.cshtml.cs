@@ -17,14 +17,25 @@ namespace BManagedWeb.Pages.Client
         {
             var role = HttpContext.Session.GetString("Role");
             if (role != "Client") return RedirectToPage("/Login");
-            int id = HttpContext.Session.GetInt32("UserId") ?? 0;
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
             Username = HttpContext.Session.GetString("Username") ?? "";
             try
             {
-                // Client.Email -> matched against Customer.Email -> get invoices.
-                // For demo, the seeded Client user's id may double as customerId.
-                var list = _srv.GetInvoicesByCustomer(id);
-                if (list != null) Invoices = list.OrderByDescending(i => i.IssueDate).ToList();
+                // Resolve the Customer row via the logged-in user's email so the
+                // correct Customer.id (an independent auto-increment PK) is used
+                // instead of User.id, which only coincidentally matches in the
+                // seeded demo data and diverges for any real deployment.
+                var me = _srv.GetUserById(userId);
+                if (me?.OwnerId != null)
+                {
+                    var customers = _srv.GetCustomersForOwner(me.OwnerId.Value) ?? new Customer[0];
+                    var customer = customers.FirstOrDefault(c => c.Email == me.Email);
+                    if (customer != null)
+                    {
+                        var list = _srv.GetInvoicesByCustomer(customer.Id);
+                        if (list != null) Invoices = list.OrderByDescending(i => i.IssueDate).ToList();
+                    }
+                }
             }
             catch { }
             return Page();
