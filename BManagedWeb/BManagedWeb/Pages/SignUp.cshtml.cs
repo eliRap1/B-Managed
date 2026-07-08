@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using BManagedWeb.bsrv;
+using BManagedWeb.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -128,7 +129,7 @@ namespace BManagedWeb.Pages
 
                     // Auto-generate a fresh invite code so the new Owner can
                     // share it with employees right away.
-                    var code = NewInviteCode(BusinessName ?? Username);
+                    var code = InviteCodeHelper.NewInviteCode(BusinessName ?? Username);
                     try { _srv.SetInviteCode(newId, code); GeneratedInviteCode = code; } catch { }
                 }
                 else // Employee or Client
@@ -168,21 +169,5 @@ namespace BManagedWeb.Pages
             { ErrorMessage = "Error: " + ex.Message; return Page(); }
         }
 
-        // Format: PREFIX-XXXX where PREFIX is 4 alpha-numeric chars from the
-        // business name and XXXX is 4 random alpha-numerics. 9 chars total
-        // including the dash. Easy to read / type.
-        private static string NewInviteCode(string seed)
-        {
-            string prefix = new string((seed ?? "")
-                .ToUpperInvariant()
-                .Where(char.IsLetterOrDigit)
-                .Take(4)
-                .ToArray());
-            if (prefix.Length < 2) prefix = "BMNG";
-            const string alpha = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // skip ambiguous I/O/0/1
-            var rnd = new Random();
-            var tail = new string(Enumerable.Range(0, 4).Select(_ => alpha[rnd.Next(alpha.Length)]).ToArray());
-            return prefix + "-" + tail;
-        }
     }
 }

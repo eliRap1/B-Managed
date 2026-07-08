@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using BManagedWeb.bsrv;
+using BManagedWeb.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -139,7 +140,7 @@ namespace BManagedWeb.Pages.Owner
             {
                 var u = _srv.GetUserById(id);
                 string seed = string.IsNullOrWhiteSpace(u?.BusinessName) ? (u?.Username ?? "BMNG") : u.BusinessName;
-                string code = NewInviteCode(seed);
+                string code = InviteCodeHelper.NewInviteCode(seed);
                 var result = _srv.SetInviteCode(id, code);
                 TempData["SetMsg"] = "New invite code: " + (result ?? code);
             }
@@ -147,16 +148,5 @@ namespace BManagedWeb.Pages.Owner
             return RedirectToPage();
         }
 
-        private static string NewInviteCode(string seed)
-        {
-            string prefix = new string((seed ?? "")
-                .ToUpperInvariant().Where(char.IsLetterOrDigit).Take(4).ToArray());
-            if (prefix.Length < 2) prefix = "BMNG";
-            const string alpha = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-            var rnd = new Random();
-            var tail = new string(Enumerable.Range(0, 4)
-                .Select(_ => alpha[rnd.Next(alpha.Length)]).ToArray());
-            return prefix + "-" + tail;
-        }
     }
 }
