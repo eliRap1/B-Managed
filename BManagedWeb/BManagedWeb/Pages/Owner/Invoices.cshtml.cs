@@ -80,10 +80,13 @@ namespace BManagedWeb.Pages.Owner
             }
             else
             {
-                foreach (var c in Customers)
+                // Single WCF call replaces the previous per-customer loop (N+1 fix).
+                var custNameById = Customers.ToDictionary(c => c.Id, c => c.BusinessName);
+                var allArr = _srv.GetInvoicesForOwner(ownerId) ?? new Invoice[0];
+                foreach (var inv in allArr)
                 {
-                    var arr = _srv.GetInvoicesByCustomer(c.Id) ?? new Invoice[0];
-                    foreach (var inv in arr) AllInvoices.Add((inv, c.BusinessName));
+                    custNameById.TryGetValue(inv.CustomerId, out var bizName);
+                    AllInvoices.Add((inv, bizName ?? ""));
                 }
                 if (!string.IsNullOrWhiteSpace(Q))
                 {
