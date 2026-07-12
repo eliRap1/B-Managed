@@ -128,36 +128,6 @@ namespace ViewDB
         }
 
         /// <summary>
-        /// SECURE: Execute SELECT for reviews with parameterized query
-        /// </summary>
-        protected virtual List<string> SelectReview(string sqlCommandTxt, params OleDbParameter[] parameters)
-        {
-            List<string> list = new List<string>();
-            using (var conn = GetConnection())
-            using (var cmd  = new OleDbCommand(sqlCommandTxt, conn))
-            {
-                if (parameters != null && parameters.Length > 0)
-                    cmd.Parameters.AddRange(parameters);
-                try
-                {
-                    conn.Open();
-                    using (var rd = cmd.ExecuteReader())
-                    {
-                        while (rd.Read())
-                            list.Add(rd["Rewiew"].ToString());
-                    }
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine("SelectReview Error: " + ex.Message);
-                    throw new InvalidOperationException(
-                        "SelectReview failed: " + sqlCommandTxt + "  ::  " + ex.Message, ex);
-                }
-            }
-            return list;
-        }
-
-        /// <summary>
         /// SECURE: Execute INSERT/UPDATE/DELETE with parameterized query
         /// </summary>
         protected int SaveChanges(string commandText, params OleDbParameter[] parameters)

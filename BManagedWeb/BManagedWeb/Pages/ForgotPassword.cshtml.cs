@@ -21,7 +21,7 @@ namespace BManagedWeb.Pages
             try
             {
                 if (!_srv.CheckUserExist(Username))
-                { Message = "User not found."; IsSuccess = false; return Page(); }
+                { Message = "If that username exists, the Owner has been notified."; IsSuccess = false; return Page(); }
 
                 int uid = _srv.GetUserId(Username);
                 var user = _srv.GetUserById(uid);
