@@ -108,8 +108,13 @@ namespace ViewDB
 
         public int Insert(Contract c)
         {
-            if (string.IsNullOrEmpty(c.ContractNumber))
-                c.ContractNumber = NextContractNumber();
+            // Use 'PENDING' when no number was supplied; the real number is
+            // computed from @@IDENTITY after INSERT so concurrent inserts can
+            // never collide.  Also avoids the COUNT(*)+1 approach which
+            // reassigns a previously-deleted contract's number.
+            bool autoNum = string.IsNullOrEmpty(c.ContractNumber);
+            if (autoNum) c.ContractNumber = "PENDING";
+
             string sql = @"INSERT INTO [Contracts]
                 ([contractNumber],[projectId],[customerId],[title],[body],
                  [totalAmount],[currency],[status],[createdAt],[signedDate],[pdfPath])
@@ -130,24 +135,25 @@ namespace ViewDB
                 cmd.Parameters.Add(new OleDbParameter("@pp",OleDbType.VarWChar,255) { Value = (object)c.PdfPath ?? DBNull.Value });
                 conn.Open();
                 cmd.ExecuteNonQuery();
+                int newId;
                 using (var idCmd = new OleDbCommand("SELECT @@IDENTITY", conn))
-                    return Convert.ToInt32(idCmd.ExecuteScalar());
-            }
-        }
+                    newId = Convert.ToInt32(idCmd.ExecuteScalar());
 
-        public string NextContractNumber()
-        {
-            int year = DateTime.Today.Year;
-            int seq = 1;
-            using (var conn = GetConnection())
-            using (var cmd = new OleDbCommand(
-                "SELECT COUNT(*) FROM [Contracts] WHERE [contractNumber] LIKE ?", conn))
-            {
-                cmd.Parameters.Add(new OleDbParameter("@y", OleDbType.VarWChar) { Value = "CTR-" + year + "-%" });
-                conn.Open();
-                seq = Convert.ToInt32(cmd.ExecuteScalar()) + 1;
+                // Derive number from actual identity — unique and monotone.
+                if (autoNum)
+                {
+                    string num = $"CTR-{DateTime.Today.Year}-{newId:D3}";
+                    using (var numCmd = new OleDbCommand(
+                        "UPDATE [Contracts] SET [contractNumber]=? WHERE [id]=?", conn))
+                    {
+                        numCmd.Parameters.Add(new OleDbParameter("@n",  OleDbType.VarWChar, 30) { Value = num });
+                        numCmd.Parameters.Add(new OleDbParameter("@id", OleDbType.Integer)      { Value = newId });
+                        numCmd.ExecuteNonQuery();
+                    }
+                    c.ContractNumber = num;
+                }
+                return newId;
             }
-            return "CTR-" + year + "-" + seq.ToString("D3");
         }
 
         public Contract GetById(int id)
