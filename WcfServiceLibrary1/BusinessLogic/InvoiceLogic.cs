@@ -21,8 +21,10 @@ namespace BusinessLogic
 
         public int  CreateInvoice(Invoice inv)
         {
-            if (string.IsNullOrEmpty(inv.InvoiceNumber))
-                inv.InvoiceNumber = invDB.NextInvoiceNumber();
+            // Invoice numbering is now handled inside InvoiceDB.Insert using
+            // @@IDENTITY, so we never call NextInvoiceNumber() here — that
+            // method was racy under concurrent inserts (two callers could both
+            // read the same MAX(id) and produce the same invoice number).
             return invDB.Insert(inv);
         }
 
@@ -114,10 +116,14 @@ namespace BusinessLogic
             try
             {
                 var inv = invDB.GetById(invoiceId);
+                // Guard against NullReferenceException on inv.CustomerId below.
+                if (inv == null)
+                    throw new FaultException("Invoice not found: id=" + invoiceId);
                 var lines = lineDB.GetByInvoice(invoiceId);
                 var customer = custDB.GetById(inv.CustomerId);
                 return new InvoicePdfBuilder().Render(inv, lines, customer);
             }
+            catch (FaultException) { throw; }
             catch (Exception ex)
             {
                 throw new FaultException("GenerateInvoicePdf failed: " + ex.Message);
