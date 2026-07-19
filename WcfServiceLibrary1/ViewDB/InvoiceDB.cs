@@ -34,6 +34,35 @@ namespace ViewDB
     {
         protected override Base NewEntity() => new Invoice();
 
+        // Idempotent migration: adds contractId column if the .accdb was created
+        // before the Contracts feature was wired up (original schema omitted it).
+        private static readonly object _schemaLock = new object();
+        private static bool _schemaEnsured;
+
+        public InvoiceDB()
+        {
+            if (_schemaEnsured) return;
+            lock (_schemaLock)
+            {
+                if (_schemaEnsured) return;
+                AddColumnIfMissing("Invoices", "contractId", "LONG");
+                _schemaEnsured = true;
+            }
+        }
+
+        private void AddColumnIfMissing(string table, string column, string sqlType)
+        {
+            string sql = $"ALTER TABLE [{table}] ADD COLUMN [{column}] {sqlType}";
+            using (var conn = GetConnection())
+            using (var cmd = new OleDbCommand(sql, conn))
+            {
+                try { conn.Open(); cmd.ExecuteNonQuery(); }
+                catch (OleDbException) { /* column already exists — ignore */ }
+                catch (Exception ex)
+                { System.Diagnostics.Debug.WriteLine($"InvoiceDB.AddColumn({table}.{column}): " + ex.Message); }
+            }
+        }
+
         protected override void CreateModel(Base entity)
         {
             base.CreateModel(entity);
@@ -59,6 +88,11 @@ namespace ViewDB
                 i.PaidDate = v == DBNull.Value ? (DateTime?)null : DateTime.Parse(v.ToString());
             } catch { }
             try { i.Notes      = reader["notes"].ToString(); }             catch { }
+            try
+            {
+                var v = reader["contractId"];
+                i.ContractId = v == DBNull.Value ? (int?)null : Convert.ToInt32(v);
+            } catch { }
         }
 
         public Invoice GetById(int id)
@@ -134,19 +168,18 @@ namespace ViewDB
                 new OleDbParameter("@d", DateTime.Today)).OfType<Invoice>().ToList();
         }
 
-        public string NextInvoiceNumber()
-        {
-            object r = SelectScalar("SELECT MAX([id]) FROM [Invoices]");
-            int next = (r != null && r != DBNull.Value) ? Convert.ToInt32(r) + 1 : 1;
-            return $"INV-{DateTime.Today:yyyy}-{next:D5}";
-        }
-
         public int Insert(Invoice i)
         {
+            // Assign a temporary placeholder when no number was pre-supplied.
+            // The real number is computed from @@IDENTITY after INSERT so that
+            // concurrent inserts can never race to the same invoice number.
+            bool autoNum = string.IsNullOrEmpty(i.InvoiceNumber);
+            if (autoNum) i.InvoiceNumber = "PENDING";
+
             string sql = @"INSERT INTO [Invoices]
                 ([invoiceNumber],[projectId],[customerId],[issueDate],[dueDate],
-                 [subtotal],[vatRate],[vatAmount],[total],[currency],[status],[paidDate],[notes])
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                 [subtotal],[vatRate],[vatAmount],[total],[currency],[status],[paidDate],[notes],[contractId])
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             using (var conn = GetConnection())
             using (var cmd = new OleDbCommand(sql, conn))
             {
@@ -163,10 +196,28 @@ namespace ViewDB
                 cmd.Parameters.Add(new OleDbParameter("@st",  OleDbType.VarWChar, 20)  { Value = i.Status ?? "Draft" });
                 cmd.Parameters.Add(new OleDbParameter("@pd",  OleDbType.Date)          { Value = (object)i.PaidDate ?? DBNull.Value });
                 cmd.Parameters.Add(new OleDbParameter("@no",  OleDbType.LongVarWChar)  { Value = (object)i.Notes ?? DBNull.Value });
+                cmd.Parameters.Add(new OleDbParameter("@cid", OleDbType.Integer)       { Value = (object)i.ContractId ?? DBNull.Value });
                 conn.Open();
                 cmd.ExecuteNonQuery();
+                int newId;
                 using (var idCmd = new OleDbCommand("SELECT @@IDENTITY", conn))
-                    return Convert.ToInt32(idCmd.ExecuteScalar());
+                    newId = Convert.ToInt32(idCmd.ExecuteScalar());
+
+                // Derive number from actual identity — guarantees uniqueness even
+                // under concurrent inserts (no more MAX(id)+1 race condition).
+                if (autoNum)
+                {
+                    string num = $"INV-{DateTime.Today:yyyy}-{newId:D5}";
+                    using (var numCmd = new OleDbCommand(
+                        "UPDATE [Invoices] SET [invoiceNumber]=? WHERE [id]=?", conn))
+                    {
+                        numCmd.Parameters.Add(new OleDbParameter("@n",  OleDbType.VarWChar, 20) { Value = num });
+                        numCmd.Parameters.Add(new OleDbParameter("@id", OleDbType.Integer)      { Value = newId });
+                        numCmd.ExecuteNonQuery();
+                    }
+                    i.InvoiceNumber = num;
+                }
+                return newId;
             }
         }
 

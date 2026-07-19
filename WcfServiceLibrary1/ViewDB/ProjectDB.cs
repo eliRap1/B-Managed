@@ -101,7 +101,12 @@ namespace ViewDB
                 cmd.Parameters.Add(new OleDbParameter("@b",   OleDbType.Currency)      { Value = p.TotalBudget });
                 cmd.Parameters.Add(new OleDbParameter("@cur", OleDbType.VarWChar, 3)   { Value = p.Currency ?? "ILS" });
                 conn.Open();
-                return cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQuery();
+                // Return the new row's identity, not ExecuteNonQuery's row-count.
+                // AddProject / AddProjectForOwner declare `int` return (implying the
+                // new id), but the old code returned rows-affected (always 1).
+                using (var idCmd = new OleDbCommand("SELECT @@IDENTITY", conn))
+                    return Convert.ToInt32(idCmd.ExecuteScalar());
             }
         }
 
