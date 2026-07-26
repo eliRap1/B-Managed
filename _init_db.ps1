@@ -84,7 +84,8 @@ CREATE TABLE [Invoices] (
   [currency]      TEXT(3),
   [status]        TEXT(20),
   [paidDate]      DATETIME,
-  [notes]         MEMO
+  [notes]         MEMO,
+  [contractId]    LONG
 )
 "@
 

@@ -34,6 +34,41 @@ namespace ViewDB
     {
         protected override Base NewEntity() => new Invoice();
 
+        // Auto-add contractId column for .accdb files created before the
+        // Contracts feature (May 2026). Existing rows get NULL which is the
+        // correct default (no linked contract).
+        private static readonly object _schemaLock = new object();
+        private static bool _schemaEnsured;
+
+        public InvoiceDB()
+        {
+            if (_schemaEnsured) return;
+            lock (_schemaLock)
+            {
+                if (_schemaEnsured) return;
+                EnsureSchema();
+                _schemaEnsured = true;
+            }
+        }
+
+        private void EnsureSchema()
+        {
+            using (var conn = GetConnection())
+            using (var cmd = new OleDbCommand("ALTER TABLE [Invoices] ADD COLUMN [contractId] LONG", conn))
+            {
+                try { conn.Open(); cmd.ExecuteNonQuery(); }
+                catch (OleDbException ex)
+                {
+                    if (!(ex.Message.IndexOf("already exists",      StringComparison.OrdinalIgnoreCase) >= 0 ||
+                          ex.Message.IndexOf("duplicate column",    StringComparison.OrdinalIgnoreCase) >= 0 ||
+                          ex.Message.IndexOf("already has a field", StringComparison.OrdinalIgnoreCase) >= 0))
+                        System.Diagnostics.Debug.WriteLine("EnsureSchema(Invoices.contractId): " + ex.Message);
+                }
+                catch (Exception ex)
+                { System.Diagnostics.Debug.WriteLine("EnsureSchema(Invoices.contractId): " + ex.Message); }
+            }
+        }
+
         protected override void CreateModel(Base entity)
         {
             base.CreateModel(entity);
@@ -59,6 +94,11 @@ namespace ViewDB
                 i.PaidDate = v == DBNull.Value ? (DateTime?)null : DateTime.Parse(v.ToString());
             } catch { }
             try { i.Notes      = reader["notes"].ToString(); }             catch { }
+            try
+            {
+                var v = reader["contractId"];
+                i.ContractId = v == DBNull.Value ? (int?)null : Convert.ToInt32(v);
+            } catch { }
         }
 
         public Invoice GetById(int id)
@@ -145,8 +185,8 @@ namespace ViewDB
         {
             string sql = @"INSERT INTO [Invoices]
                 ([invoiceNumber],[projectId],[customerId],[issueDate],[dueDate],
-                 [subtotal],[vatRate],[vatAmount],[total],[currency],[status],[paidDate],[notes])
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                 [subtotal],[vatRate],[vatAmount],[total],[currency],[status],[paidDate],[notes],[contractId])
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             using (var conn = GetConnection())
             using (var cmd = new OleDbCommand(sql, conn))
             {
@@ -163,6 +203,7 @@ namespace ViewDB
                 cmd.Parameters.Add(new OleDbParameter("@st",  OleDbType.VarWChar, 20)  { Value = i.Status ?? "Draft" });
                 cmd.Parameters.Add(new OleDbParameter("@pd",  OleDbType.Date)          { Value = (object)i.PaidDate ?? DBNull.Value });
                 cmd.Parameters.Add(new OleDbParameter("@no",  OleDbType.LongVarWChar)  { Value = (object)i.Notes ?? DBNull.Value });
+                cmd.Parameters.Add(new OleDbParameter("@cid", OleDbType.Integer)       { Value = (object)i.ContractId ?? DBNull.Value });
                 conn.Open();
                 cmd.ExecuteNonQuery();
                 using (var idCmd = new OleDbCommand("SELECT @@IDENTITY", conn))

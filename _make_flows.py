@@ -94,7 +94,7 @@ title(d, "B-Managed WPF — page navigation",
 
 card(d, 750,  130, 240, 70, "LogIn", ACCENT, "PBKDF2 verify")
 card(d, 360,  240, 240, 60, "SignUp", AMBER, "")
-card(d, 1140, 240, 240, 60, "ForgotPassword", AMBER, "notifies all Owners")
+card(d, 1140, 240, 240, 60, "ForgotPassword", AMBER, "notifies company Owner")
 arrow(d, 870, 200, 480, 240, AMBER, "/SignUp")
 arrow(d, 870, 200, 1260, 240, AMBER, "/Forgot")
 
