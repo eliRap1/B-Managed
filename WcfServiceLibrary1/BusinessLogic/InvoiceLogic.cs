@@ -114,6 +114,8 @@ namespace BusinessLogic
             try
             {
                 var inv = invDB.GetById(invoiceId);
+                if (inv == null)
+                    throw new InvalidOperationException("Invoice not found: id=" + invoiceId);
                 var lines = lineDB.GetByInvoice(invoiceId);
                 var customer = custDB.GetById(inv.CustomerId);
                 return new InvoicePdfBuilder().Render(inv, lines, customer);
