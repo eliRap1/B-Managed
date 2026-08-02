@@ -45,7 +45,7 @@ namespace BManagedWeb.Pages
                     IsRead = false,
                     CreatedAt = System.DateTime.Now,
                 });
-                Message = "Your company's Owner has been notified. They will reset your password to 'reset1234'.";
+                Message = "Your company's Owner has been notified. They will reset your password to a temporary value — ask them for it directly.";
                 IsSuccess = true;
             }
             catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }
