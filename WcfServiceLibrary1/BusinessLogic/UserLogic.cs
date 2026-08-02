@@ -137,6 +137,10 @@ namespace BusinessLogic
             => userDB.SetInviteCode(userId, inviteCode);
 
         public User GetOwnerByInviteCode(string code)
-            => userDB.GetOwnerByInviteCode(code);
+        {
+            var u = userDB.GetOwnerByInviteCode(code);
+            if (u != null) u.PasswordHash = null;
+            return u;
+        }
     }
 }
