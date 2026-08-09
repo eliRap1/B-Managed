@@ -225,7 +225,19 @@ namespace ViewDB
                     }
                 }
             }
-            return rows;
+            // GROUP BY includes currency so multi-currency customers produce separate rows;
+            // merge them by customer after FX conversion so each customer appears once.
+            var merged = new Dictionary<int, CustomerRevenueRow>();
+            foreach (var row in rows)
+            {
+                if (merged.TryGetValue(row.CustomerId, out var existing))
+                {
+                    existing.TotalInvoiced += row.TotalInvoiced;
+                    existing.TotalPaid     += row.TotalPaid;
+                }
+                else { merged[row.CustomerId] = row; }
+            }
+            return merged.Values.OrderByDescending(r => r.TotalInvoiced).ToList();
         }
 
         // -----------------------------------------------------------------
@@ -265,7 +277,18 @@ namespace ViewDB
                     }
                 }
             }
-            return rows;
+            // GROUP BY includes currency so multi-currency categories produce duplicate rows;
+            // merge by category name after FX conversion.
+            var catMerged = new Dictionary<string, ExpenseBreakdownRow>();
+            foreach (var row in rows)
+            {
+                string key = row.CategoryName ?? "";
+                if (catMerged.TryGetValue(key, out var existing))
+                    existing.Total += row.Total;
+                else
+                    catMerged[key] = row;
+            }
+            return catMerged.Values.OrderByDescending(r => r.Total).ToList();
         }
 
         // -----------------------------------------------------------------
