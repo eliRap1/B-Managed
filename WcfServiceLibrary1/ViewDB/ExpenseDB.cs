@@ -103,7 +103,9 @@ namespace ViewDB
                 cmd.Parameters.Add(new OleDbParameter("@cur", OleDbType.VarWChar, 3)   { Value = e.Currency ?? "ILS" });
                 cmd.Parameters.Add(new OleDbParameter("@rk",  OleDbType.VarWChar, 10)  { Value = (object)NormaliseKind(e.RecurringKind) ?? DBNull.Value });
                 conn.Open();
-                return cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQuery();
+                cmd.CommandText = "SELECT @@IDENTITY";
+                return Convert.ToInt32(cmd.ExecuteScalar());
             }
         }
 

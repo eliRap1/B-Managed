@@ -18,37 +18,40 @@ namespace BManagedWeb.Pages
         {
             if (string.IsNullOrEmpty(Username))
             { Message = "Enter a username."; return Page(); }
+            // Use a single generic message for all non-success outcomes to prevent
+            // username enumeration.
+            const string genericOk = "If that username exists, your company's Owner has been notified to reset your password.";
             try
             {
                 if (!_srv.CheckUserExist(Username))
-                { Message = "User not found."; IsSuccess = false; return Page(); }
+                { Message = genericOk; IsSuccess = true; return Page(); }
 
                 int uid = _srv.GetUserId(Username);
                 var user = _srv.GetUserById(uid);
                 if (user == null)
-                { Message = "User not found."; IsSuccess = false; return Page(); }
+                { Message = genericOk; IsSuccess = true; return Page(); }
 
                 // Notify only the Owner of the company this user belongs to —
                 // not every Owner on the server (which leaked the request
                 // across tenants).
                 int? ownerId = user.Role == "Owner" ? (int?)user.Id : user.OwnerId;
                 if (!ownerId.HasValue || ownerId.Value <= 0)
-                { Message = "No company Owner is linked to this account. Ask an admin."; IsSuccess = false; return Page(); }
+                { Message = genericOk; IsSuccess = true; return Page(); }
 
                 _srv.SendNotification(new Notification
                 {
                     UserId = ownerId.Value,
                     Title = "Password reset request",
                     Message = $"User '{user.Username}' ({user.Role}) asked for a password reset. " +
-                              "Open ManageUsers > Reset PW to issue 'reset1234'.",
+                              "Open ManageUsers > Reset PW to issue a temporary password.",
                     NotificationType = "ResetRequest",
                     IsRead = false,
                     CreatedAt = System.DateTime.Now,
                 });
-                Message = "Your company's Owner has been notified. They will reset your password to 'reset1234'.";
+                Message = genericOk;
                 IsSuccess = true;
             }
-            catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }
+            catch (System.Exception) { Message = genericOk; IsSuccess = true; }
             return Page();
         }
     }
