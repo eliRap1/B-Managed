@@ -101,7 +101,9 @@ namespace ViewDB
                 cmd.Parameters.Add(new OleDbParameter("@b",   OleDbType.Currency)      { Value = p.TotalBudget });
                 cmd.Parameters.Add(new OleDbParameter("@cur", OleDbType.VarWChar, 3)   { Value = p.Currency ?? "ILS" });
                 conn.Open();
-                return cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQuery();
+                using (var idCmd = new OleDbCommand("SELECT @@IDENTITY", conn))
+                    return Convert.ToInt32(idCmd.ExecuteScalar());
             }
         }
 

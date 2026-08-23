@@ -1,6 +1,7 @@
 using Model;
 using System;
 using System.Data.OleDb;
+using System.Diagnostics;
 using System.Linq;
 
 namespace ViewDB
@@ -34,7 +35,9 @@ namespace ViewDB
                 new OleDbParameter("@f", from),
                 new OleDbParameter("@t", to),
                 new OleDbParameter("@d", asOfDate));
-            return (r != null && r != DBNull.Value) ? Convert.ToDouble(r) : 1.0;
+            if (r != null && r != DBNull.Value) return Convert.ToDouble(r);
+            Trace.TraceWarning($"[ExchangeRateDB] No rate found for {from}->{to} as of {asOfDate:yyyy-MM-dd}; falling back to 1.0");
+            return 1.0;
         }
 
         public int Insert(ExchangeRate r)
