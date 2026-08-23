@@ -24,6 +24,10 @@ namespace BusinessLogic
             => expDB.GetByPeriod(ownerId, from, to);
         public List<ExpenseCategory> GetExpenseCategories() => expDB.GetCategories();
 
+        // TODO(security): UploadReceipt has no ownership check — any caller with a valid
+        // expenseId can overwrite another user's receipt path (IDOR). Fixing this requires
+        // adding an ownerId parameter to IService1/Service1/client-proxy (>5 files), which
+        // is out of scope for this audit pass. Track as a dedicated fix.
         public string UploadReceipt(int expenseId, byte[] fileBytes, string fileName)
         {
             try
@@ -49,7 +53,7 @@ namespace BusinessLogic
                 return rel;
             }
             catch (FaultException) { throw; }
-            catch (Exception ex) { throw new FaultException("UploadReceipt failed: " + ex.Message); }
+            catch { throw new FaultException("Receipt upload failed."); }
         }
     }
 }
