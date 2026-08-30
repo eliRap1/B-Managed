@@ -130,6 +130,7 @@ namespace ViewDB
         /// <summary>
         /// SECURE: Execute SELECT for reviews with parameterized query
         /// </summary>
+        // TODO(audit): SelectReview is dead code, remove when confirmed unused
         protected virtual List<string> SelectReview(string sqlCommandTxt, params OleDbParameter[] parameters)
         {
             List<string> list = new List<string>();
@@ -144,7 +145,7 @@ namespace ViewDB
                     using (var rd = cmd.ExecuteReader())
                     {
                         while (rd.Read())
-                            list.Add(rd["Rewiew"].ToString());
+                            list.Add(rd["Review"].ToString());
                     }
                 }
                 catch (Exception ex)
