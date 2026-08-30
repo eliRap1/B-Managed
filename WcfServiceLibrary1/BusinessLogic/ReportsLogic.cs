@@ -46,9 +46,9 @@ namespace BusinessLogic
         {
             var cur = displayCurrency ?? "ILS";
             decimal sumInc = 0, sumExp = 0;
-            int n = 3;
+            int count = 0; // actual months with data — avoid dividing by a hardcoded 3
             var anchor = DateTime.Today;
-            for (int i = 1; i <= n; i++)
+            for (int i = 1; i <= 3; i++)
             {
                 var first = new DateTime(anchor.Year, anchor.Month, 1).AddMonths(-i);
                 var last  = first.AddMonths(1).AddDays(-1);
@@ -56,9 +56,11 @@ namespace BusinessLogic
                 if (pl == null) continue;
                 sumInc += pl.Income;
                 sumExp += pl.Expenses;
+                count++;
             }
-            decimal avgInc = sumInc / n;
-            decimal avgExp = sumExp / n;
+            if (count == 0) count = 1; // guard against empty history (avoid divide-by-zero)
+            decimal avgInc = sumInc / count;
+            decimal avgExp = sumExp / count;
 
             // Outstanding invoices boost the month their dueDate falls in.
             var outstanding = invDB.GetUnpaidForOwner(ownerId);
