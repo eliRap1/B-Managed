@@ -59,6 +59,11 @@ namespace ViewDB
                 i.PaidDate = v == DBNull.Value ? (DateTime?)null : DateTime.Parse(v.ToString());
             } catch { }
             try { i.Notes      = reader["notes"].ToString(); }             catch { }
+            try
+            {
+                var v = reader["contractId"];
+                i.ContractId = v == DBNull.Value ? (int?)null : Convert.ToInt32(v);
+            } catch { }
         }
 
         public Invoice GetById(int id)
@@ -145,8 +150,8 @@ namespace ViewDB
         {
             string sql = @"INSERT INTO [Invoices]
                 ([invoiceNumber],[projectId],[customerId],[issueDate],[dueDate],
-                 [subtotal],[vatRate],[vatAmount],[total],[currency],[status],[paidDate],[notes])
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                 [subtotal],[vatRate],[vatAmount],[total],[currency],[status],[paidDate],[notes],[contractId])
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             using (var conn = GetConnection())
             using (var cmd = new OleDbCommand(sql, conn))
             {
@@ -163,6 +168,7 @@ namespace ViewDB
                 cmd.Parameters.Add(new OleDbParameter("@st",  OleDbType.VarWChar, 20)  { Value = i.Status ?? "Draft" });
                 cmd.Parameters.Add(new OleDbParameter("@pd",  OleDbType.Date)          { Value = (object)i.PaidDate ?? DBNull.Value });
                 cmd.Parameters.Add(new OleDbParameter("@no",  OleDbType.LongVarWChar)  { Value = (object)i.Notes ?? DBNull.Value });
+                cmd.Parameters.Add(new OleDbParameter("@cid", OleDbType.Integer)       { Value = (object)i.ContractId ?? DBNull.Value });
                 conn.Open();
                 cmd.ExecuteNonQuery();
                 using (var idCmd = new OleDbCommand("SELECT @@IDENTITY", conn))
