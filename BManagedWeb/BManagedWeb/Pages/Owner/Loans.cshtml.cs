@@ -112,11 +112,17 @@ namespace BManagedWeb.Pages.Owner
         {
             var role = HttpContext.Session.GetString("Role");
             if (role != "Owner") return RedirectToPage("/Login");
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
             if (loanId <= 0 || amount <= 0)
             { TempData["LoanMsg"] = "Invalid payment."; return RedirectToPage(); }
 
             try
             {
+                // Verify the loan belongs to this owner before recording a payment.
+                var loan = _srv.GetLoanById(loanId);
+                if (loan == null || loan.OwnerId != ownerId)
+                { TempData["LoanMsg"] = "Loan not found."; return RedirectToPage(new { DisplayCurrency }); }
+
                 decimal pp = principalPortion > 0 ? principalPortion : Math.Round(amount * 0.7m, 2);
                 if (pp > amount) pp = amount;
                 _srv.RecordLoanPayment(new LoanPayment
@@ -137,7 +143,17 @@ namespace BManagedWeb.Pages.Owner
         {
             var role = HttpContext.Session.GetString("Role");
             if (role != "Owner") return RedirectToPage("/Login");
-            try { _srv.DeleteLoan(id); TempData["LoanMsg"] = "Loan deleted."; }
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            try
+            {
+                // Verify the loan belongs to this owner before deleting.
+                var loan = _srv.GetLoanById(id);
+                if (loan == null || loan.OwnerId != ownerId)
+                { TempData["LoanMsg"] = "Loan not found."; return RedirectToPage(new { DisplayCurrency }); }
+
+                _srv.DeleteLoan(id);
+                TempData["LoanMsg"] = "Loan deleted.";
+            }
             catch (Exception ex) { TempData["LoanMsg"] = "Failed: " + ex.Message; }
             return RedirectToPage(new { DisplayCurrency });
         }
