@@ -74,8 +74,7 @@ namespace BusinessLogic
                 if (kpis.AvgMonthlyIncome > 0)
                 {
                     decimal annual = kpis.AvgMonthlyIncome * 12m;
-                    s.DebtToAnnualIncomePct = annual <= 0 ? 0
-                        : Math.Round((double)(s.TotalRemaining / annual) * 100.0, 1);
+                    s.DebtToAnnualIncomePct = Math.Round((double)(s.TotalRemaining / annual) * 100.0, 1);
                     s.MonthlyDebtServiceRatioPct = Math.Round(
                         (double)(s.MonthlyPaymentTotal / kpis.AvgMonthlyIncome) * 100.0, 1);
                 }
