@@ -103,7 +103,13 @@ namespace ViewDB
                 cmd.Parameters.Add(new OleDbParameter("@cur", OleDbType.VarWChar, 3)   { Value = e.Currency ?? "ILS" });
                 cmd.Parameters.Add(new OleDbParameter("@rk",  OleDbType.VarWChar, 10)  { Value = (object)NormaliseKind(e.RecurringKind) ?? DBNull.Value });
                 conn.Open();
-                return cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQuery();
+                // Return the auto-generated PK so callers (e.g. UploadReceipt) can
+                // attach related rows to the correct new expense. ExecuteNonQuery()
+                // returns rows-affected (always 1), NOT the new id — use @@IDENTITY
+                // on the same open connection, mirroring the pattern in InvoiceDB.
+                using (var idCmd = new OleDbCommand("SELECT @@IDENTITY", conn))
+                    return Convert.ToInt32(idCmd.ExecuteScalar());
             }
         }
 

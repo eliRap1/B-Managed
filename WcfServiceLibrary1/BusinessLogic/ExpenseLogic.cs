@@ -32,6 +32,12 @@ namespace BusinessLogic
                     throw new FaultException("Empty file.");
                 if (fileBytes.Length > 5 * 1024 * 1024)
                     throw new FaultException("Receipt larger than 5 MB.");
+                // TODO(security): file extension is not validated — an attacker can
+                // upload .aspx, .cs, or .exe files. Add an allowlist check here, e.g.:
+                //   var ext = Path.GetExtension(fileName ?? "").ToLowerInvariant();
+                //   var allowed = new[] { ".pdf", ".png", ".jpg", ".jpeg", ".gif", ".webp" };
+                //   if (!allowed.Contains(ext)) throw new FaultException("Unsupported file type.");
+                // See audit PR weekly-2026-09-20 for full write-up.
 
                 string root = AppDomain.CurrentDomain.BaseDirectory;
                 string dir = System.IO.Path.Combine(root, "Receipts");

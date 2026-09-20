@@ -137,6 +137,10 @@ namespace BManagedWeb.Pages.Owner
         {
             var role = HttpContext.Session.GetString("Role");
             if (role != "Owner") return RedirectToPage("/Login");
+            // TODO(security/IDOR): DeleteLoan(id) has no owner-scope check — any
+            // authenticated Owner can delete another company's loan by guessing id.
+            // Fix: add DeleteLoanForOwner(int id, int ownerId) and call with session
+            // ownerId. See audit PR weekly-2026-09-20 for full write-up.
             try { _srv.DeleteLoan(id); TempData["LoanMsg"] = "Loan deleted."; }
             catch (Exception ex) { TempData["LoanMsg"] = "Failed: " + ex.Message; }
             return RedirectToPage(new { DisplayCurrency });

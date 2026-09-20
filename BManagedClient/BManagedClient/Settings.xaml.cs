@@ -148,9 +148,13 @@ namespace BManagedClient
                 .ToUpperInvariant().Where(char.IsLetterOrDigit).Take(4).ToArray());
             if (prefix.Length < 2) prefix = "BMNG";
             const string alpha = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-            var rnd = new Random();
-            var tail = new string(Enumerable.Range(0, 4)
-                .Select(_ => alpha[rnd.Next(alpha.Length)]).ToArray());
+            // Use a cryptographically secure RNG so invite codes are not
+            // predictable from the process start-up seed (System.Random is not
+            // crypto-safe). RNGCryptoServiceProvider is available on .NET 4.7.2.
+            var buf = new byte[4];
+            using (var rng = new System.Security.Cryptography.RNGCryptoServiceProvider())
+                rng.GetBytes(buf);
+            var tail = new string(buf.Select(b => alpha[b % alpha.Length]).ToArray());
             return prefix + "-" + tail;
         }
     }
