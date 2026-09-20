@@ -153,9 +153,11 @@ namespace BManagedWeb.Pages.Owner
                 .ToUpperInvariant().Where(char.IsLetterOrDigit).Take(4).ToArray());
             if (prefix.Length < 2) prefix = "BMNG";
             const string alpha = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-            var rnd = new Random();
+            // Use a cryptographically secure RNG so rotated invite codes are
+            // not predictable (System.Random is seeded with Environment.TickCount).
             var tail = new string(Enumerable.Range(0, 4)
-                .Select(_ => alpha[rnd.Next(alpha.Length)]).ToArray());
+                .Select(_ => alpha[System.Security.Cryptography.RandomNumberGenerator.GetInt32(alpha.Length)])
+                .ToArray());
             return prefix + "-" + tail;
         }
     }
