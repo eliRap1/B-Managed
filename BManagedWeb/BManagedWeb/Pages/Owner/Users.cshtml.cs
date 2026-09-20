@@ -43,6 +43,13 @@ namespace BManagedWeb.Pages.Owner
             { Message = "Load failed: " + ex.Message; IsSuccess = false; }
         }
 
+        // TODO(security/IDOR): OnPostApprove, OnPostToggle, OnPostPromote, OnPostReset and
+        // OnPostDelete all accept a bare user `id` without verifying the target user
+        // belongs to the session Owner's company. A malicious Owner could approve,
+        // block, promote, reset, or delete users from another tenant by crafting a
+        // POST with an arbitrary id. Fix: verify `GetUserById(id).OwnerId == sessionOwnerId`
+        // (or add scoped service-layer methods) before executing each action.
+        // See audit PR weekly-2026-09-20 for full write-up.
         public IActionResult OnPostApprove(int id)
         {
             var g = GuardOwner(); if (g != null) return g;

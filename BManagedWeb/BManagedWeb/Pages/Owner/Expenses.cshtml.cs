@@ -116,6 +116,11 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostDelete(int id)
         {
             if (HttpContext.Session.GetString("Role") != "Owner") return RedirectToPage("/Login");
+            // TODO(security/IDOR): DeleteExpense(id) has no owner-scope check — any
+            // authenticated Owner can delete another company's expense by guessing the
+            // row id. Fix: add DeleteExpenseForOwner(int id, int ownerId) to
+            // ExpenseDB/ExpenseLogic/IService1/Service1 and call it here with the
+            // session ownerId. See audit PR weekly-2026-09-20 for full write-up.
             try { _srv.DeleteExpense(id); } catch { }
             return RedirectToPage();
         }

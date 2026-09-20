@@ -83,6 +83,10 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostDelete(int id)
         {
             if (HttpContext.Session.GetString("Role") != "Owner") return RedirectToPage("/Login");
+            // TODO(security/IDOR): DeleteContract(id) has no owner-scope check — any
+            // authenticated Owner can delete another company's contract by guessing id.
+            // Fix: add DeleteContractForOwner(int id, int ownerId) and call with session
+            // ownerId. See audit PR weekly-2026-09-20 for full write-up.
             try { _srv.DeleteContract(id); TempData["ContractMsg"] = "Deleted."; }
             catch (Exception ex) { TempData["ContractMsg"] = "Failed: " + ex.Message; }
             return RedirectToPage();
