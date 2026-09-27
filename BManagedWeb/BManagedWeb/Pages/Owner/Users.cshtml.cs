@@ -43,6 +43,11 @@ namespace BManagedWeb.Pages.Owner
             { Message = "Load failed: " + ex.Message; IsSuccess = false; }
         }
 
+        // TODO(audit): SC1 - add tenant ownership check to all mutating user operations
+        // (OnPostApprove, OnPostToggle, OnPostPromote, OnPostReset, OnPostDelete).
+        // The `id` parameter is not verified against the session owner's tenant,
+        // so a malicious Owner can manipulate users of other companies (IDOR).
+        // Fix requires: verify _srv.GetUserById(id).OwnerId == sessionOwnerId before acting.
         public IActionResult OnPostApprove(int id)
         {
             var g = GuardOwner(); if (g != null) return g;

@@ -10,7 +10,7 @@ builder.Services.AddAntiforgery(o =>
 {
     o.Cookie.Name = "BMA-XSRF";
     o.Cookie.HttpOnly = true;
-    o.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest;
+    o.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
     o.HeaderName = "X-CSRF-Token";
 });
 

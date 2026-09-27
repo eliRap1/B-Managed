@@ -106,25 +106,6 @@ namespace Model.Helpers
         }
 
         /// <summary>
-        /// Sanitizes input to prevent SQL injection
-        /// This is a BACKUP - Always use parameterized queries!
-        /// </summary>
-        public static string SanitizeInput(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return input;
-
-            // Remove or escape dangerous characters
-            return input.Replace("'", "''")
-                       .Replace("--", "")
-                       .Replace(";", "")
-                       .Replace("/*", "")
-                       .Replace("*/", "")
-                       .Replace("xp_", "")
-                       .Replace("sp_", "");
-        }
-
-        /// <summary>
         /// Validates that a string is safe for SQL (alphanumeric + limited special chars)
         /// </summary>
         public static bool IsSafeString(string input, int maxLength = 100)
