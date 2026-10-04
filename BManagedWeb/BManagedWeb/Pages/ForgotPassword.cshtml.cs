@@ -21,12 +21,12 @@ namespace BManagedWeb.Pages
             try
             {
                 if (!_srv.CheckUserExist(Username))
-                { Message = "User not found."; IsSuccess = false; return Page(); }
+                { Message = "If that account exists, the owner has been notified."; IsSuccess = true; return Page(); }
 
                 int uid = _srv.GetUserId(Username);
                 var user = _srv.GetUserById(uid);
                 if (user == null)
-                { Message = "User not found."; IsSuccess = false; return Page(); }
+                { Message = "If that account exists, the owner has been notified."; IsSuccess = true; return Page(); }
 
                 // Notify only the Owner of the company this user belongs to —
                 // not every Owner on the server (which leaked the request

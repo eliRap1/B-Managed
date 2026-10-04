@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BManagedWeb.Pages.Client
 {
+    // TODO(audit): invoice is fetched without verifying it belongs to the current client's owner; IDOR vulnerability.
     public class InvoiceViewModel : PageModel
     {
         private readonly Service1Client _srv = new Service1Client();

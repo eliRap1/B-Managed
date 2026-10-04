@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BManagedWeb.Pages.Owner
 {
+    // TODO(audit): user management operations do not verify the target user belongs to the current owner's tenant; IDOR vulnerability.
     public class UsersModel : PageModel
     {
         private readonly Service1Client _srv = new Service1Client();

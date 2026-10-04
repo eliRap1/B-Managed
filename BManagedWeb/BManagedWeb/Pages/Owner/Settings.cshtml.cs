@@ -153,9 +153,10 @@ namespace BManagedWeb.Pages.Owner
                 .ToUpperInvariant().Where(char.IsLetterOrDigit).Take(4).ToArray());
             if (prefix.Length < 2) prefix = "BMNG";
             const string alpha = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-            var rnd = new Random();
+            var bytes = new byte[4];
+            System.Security.Cryptography.RandomNumberGenerator.Fill(bytes);
             var tail = new string(Enumerable.Range(0, 4)
-                .Select(_ => alpha[rnd.Next(alpha.Length)]).ToArray());
+                .Select(i => alpha[bytes[i] % alpha.Length]).ToArray());
             return prefix + "-" + tail;
         }
     }

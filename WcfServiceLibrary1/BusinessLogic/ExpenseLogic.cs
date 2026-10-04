@@ -24,6 +24,7 @@ namespace BusinessLogic
             => expDB.GetByPeriod(ownerId, from, to);
         public List<ExpenseCategory> GetExpenseCategories() => expDB.GetCategories();
 
+        // TODO(audit): receipt upload accepts any file extension; allowlist .jpg/.jpeg/.png/.pdf and validate magic bytes.
         public string UploadReceipt(int expenseId, byte[] fileBytes, string fileName)
         {
             try

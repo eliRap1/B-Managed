@@ -31,6 +31,8 @@ namespace WcfServiceLibrary1
     // =========================================================================
     public class Service1 : IService1
     {
+        // TODO(audit): WCF service has no authentication layer; all operations are unauthenticated. Add ServiceAuthorizationManager or a shared-secret check.
+
         // ===================================================================
         // AUTH & USERS
         // ===================================================================
