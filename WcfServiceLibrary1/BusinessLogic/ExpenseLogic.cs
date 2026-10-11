@@ -33,6 +33,11 @@ namespace BusinessLogic
                 if (fileBytes.Length > 5 * 1024 * 1024)
                     throw new FaultException("Receipt larger than 5 MB.");
 
+                string ext = System.IO.Path.GetExtension(fileName ?? "").ToLowerInvariant();
+                string[] allowed = { ".pdf", ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tif", ".tiff" };
+                if (!Array.Exists(allowed, e => e == ext))
+                    throw new FaultException("File type not allowed. Upload PDF or image files only.");
+
                 string root = AppDomain.CurrentDomain.BaseDirectory;
                 string dir = System.IO.Path.Combine(root, "Receipts");
                 System.IO.Directory.CreateDirectory(dir);

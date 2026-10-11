@@ -50,6 +50,8 @@ namespace WcfServiceLibrary1
         public void ResetPassword(int userId, string newPassword) => new UserLogic().ResetPassword(userId, newPassword);
         public void UpdateUserRole(int userId, string newRole)    => new UserLogic().UpdateUserRole(userId, newRole);
         public bool IsOwner(string username)             => new UserLogic().IsOwner(username);
+        // TODO(audit): GetAllUsers returns ALL users with no tenant scope. Callers that do
+        // not need cross-tenant data should use GetUsersForOwner(ownerId) instead.
         public AllUsers GetAllUsers()                    => new UserLogic().GetAllUsers();
         public List<User> GetAllEmployees()              => new UserLogic().GetAllEmployees();
         public List<User> GetUsersForOwner(int ownerId)     => new UserLogic().GetUsersForOwner(ownerId);
@@ -61,6 +63,8 @@ namespace WcfServiceLibrary1
 
         public void SetBusinessType(int userId, string businessType) => new UserLogic().SetBusinessType(userId, businessType);
         public void SetIsZair(int userId, bool isZair)               => new UserLogic().SetIsZair(userId, isZair);
+        // TODO(audit): SetOwnerId has no caller-authorization check — any authenticated user
+        // can reassign any user to any owner. Add a role/admin guard in UserLogic.SetOwnerId.
         public void SetOwnerId(int userId, int ownerId)              => new UserLogic().SetOwnerId(userId, ownerId);
         public List<User> GetActiveOwners()                          => new UserLogic().GetActiveOwners();
         public void SetBusinessName(int userId, string businessName) => new UserLogic().SetBusinessName(userId, businessName);
@@ -92,6 +96,9 @@ namespace WcfServiceLibrary1
         public int  AddProject(Project p)               => new ProjectLogic().AddProject(p);
         public int  AddProjectForOwner(Project p, int ownerId) => new ProjectLogic().AddProjectForOwner(p, ownerId);
         public void UpdateProject(Project p)            => new ProjectLogic().UpdateProject(p);
+        // TODO(audit): SetProjectStatus has no owner check (IDOR). Prefer SetProjectStatusForOwner
+        // for all owner-context calls; audit clients to ensure SetProjectStatus is only called
+        // from truly admin-privileged paths.
         public void SetProjectStatus(int id, string s)  => new ProjectLogic().SetProjectStatus(id, s);
         public void SetProjectStatusForOwner(int id, int ownerId, string s)
             => new ProjectLogic().SetProjectStatusForOwner(id, ownerId, s);
