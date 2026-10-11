@@ -49,7 +49,10 @@ namespace ViewDB
 
         public List<Customer> Search(string keyword, int ownerId)
         {
-            string like = "%" + (keyword ?? "") + "%";
+            // Escape ANSI SQL LIKE metacharacters so user-supplied wildcards
+            // are treated as literals, not pattern matchers.
+            string safe = (keyword ?? "").Replace("[", "[[]").Replace("%", "[%]").Replace("_", "[_]");
+            string like = "%" + safe + "%";
             return Select(
                 @"SELECT * FROM [Customers]
                   WHERE [ownerId] = ?
