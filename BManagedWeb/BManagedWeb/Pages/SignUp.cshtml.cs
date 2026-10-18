@@ -180,8 +180,7 @@ namespace BManagedWeb.Pages
                 .ToArray());
             if (prefix.Length < 2) prefix = "BMNG";
             const string alpha = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // skip ambiguous I/O/0/1
-            var rnd = new Random();
-            var tail = new string(Enumerable.Range(0, 4).Select(_ => alpha[rnd.Next(alpha.Length)]).ToArray());
+            var tail = new string(Enumerable.Range(0, 4).Select(_ => alpha[System.Security.Cryptography.RandomNumberGenerator.GetInt32(alpha.Length)]).ToArray());
             return prefix + "-" + tail;
         }
     }

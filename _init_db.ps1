@@ -2,7 +2,7 @@
 
 $ErrorActionPreference = 'Stop'
 
-$dbPath  = "D:\yudb\WcfServiceLibrary1\ViewDB\Database\BManaged.accdb"
+$dbPath  = Join-Path $PSScriptRoot "WcfServiceLibrary1\ViewDB\Database\BManaged.accdb"
 $adminHash = "Wh07bZCwhjvwj4IsSR2nOWYpk6fWPUt6PZFFTLC6S8jg3qMC"  # password = admin1234
 $today   = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
 
