@@ -138,6 +138,9 @@ namespace ViewDB
         {
             object r = SelectScalar("SELECT MAX([id]) FROM [Invoices]");
             int next = (r != null && r != DBNull.Value) ? Convert.ToInt32(r) + 1 : 1;
+            // TODO(audit): BusinessLogic.InvoiceNumberer.Next(next) duplicates this format string.
+            // ViewDB cannot depend on BusinessLogic (circular). The fix: expose NextSequenceId()
+            // returning int and have InvoiceLogic call InvoiceNumberer.Next(invDB.NextSequenceId()).
             return $"INV-{DateTime.Today:yyyy}-{next:D5}";
         }
 
