@@ -144,7 +144,7 @@ namespace ViewDB
                     using (var rd = cmd.ExecuteReader())
                     {
                         while (rd.Read())
-                            list.Add(rd["Rewiew"].ToString());
+                            list.Add(rd["Review"].ToString());
                     }
                 }
                 catch (Exception ex)

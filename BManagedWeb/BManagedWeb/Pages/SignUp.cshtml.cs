@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using BManagedWeb.bsrv;
 using Microsoft.AspNetCore.Mvc;
@@ -180,8 +181,9 @@ namespace BManagedWeb.Pages
                 .ToArray());
             if (prefix.Length < 2) prefix = "BMNG";
             const string alpha = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // skip ambiguous I/O/0/1
-            var rnd = new Random();
-            var tail = new string(Enumerable.Range(0, 4).Select(_ => alpha[rnd.Next(alpha.Length)]).ToArray());
+            var buf = new byte[4];
+            RandomNumberGenerator.Fill(buf);
+            var tail = new string(buf.Select(b => alpha[b % alpha.Length]).ToArray());
             return prefix + "-" + tail;
         }
     }
