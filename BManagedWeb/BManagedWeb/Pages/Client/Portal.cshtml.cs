@@ -21,8 +21,15 @@ namespace BManagedWeb.Pages.Client
             Username = HttpContext.Session.GetString("Username") ?? "";
             try
             {
-                // Client.Email -> matched against Customer.Email -> get invoices.
-                // For demo, the seeded Client user's id may double as customerId.
+                // TODO(audit): GetInvoicesByCustomer expects a customerId (Customers.id),
+                // but `id` here is a userId (Users.id). These are from separate
+                // auto-increment sequences and will not match after the first few rows.
+                // In the seed data: acme user has id=3, Acme Studios customer has id=1 —
+                // so this call always returns an empty list for the seeded demo Client.
+                // Fix requires either: (a) adding a [userId] FK to the Customers table
+                // and querying by that, or (b) looking up the Customer by the Client's
+                // email, then fetching invoices by that customerId. See InvoiceView.cshtml.cs
+                // for the related IDOR guard that relies on the same convention.
                 var list = _srv.GetInvoicesByCustomer(id);
                 if (list != null) Invoices = list.OrderByDescending(i => i.IssueDate).ToList();
             }
