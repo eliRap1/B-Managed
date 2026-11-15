@@ -32,7 +32,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="InvoiceNumberer.cs" />
     <Compile Include="InvoicePdfBuilder.cs" />
     <Compile Include="ContractPdfBuilder.cs" />
     <Compile Include="VatCalculator.cs" />
