@@ -21,6 +21,22 @@ namespace BManagedWeb.Pages.Owner
             return null;
         }
 
+        // Verify the target user belongs to this Owner's company before any mutation.
+        // Prevents cross-tenant IDOR where an Owner from company A could modify
+        // users from company B by guessing numeric IDs in a crafted POST.
+        private bool TargetBelongsToOwner(int targetUserId, int ownerId)
+        {
+            try
+            {
+                var u = _srv.GetUserById(targetUserId);
+                if (u == null) return false;
+                // The Owner may act on themselves or on any user whose ownerId points
+                // to this Owner (Employees / Clients that signed up with their code).
+                return u.Id == ownerId || u.OwnerId == ownerId;
+            }
+            catch { return false; }
+        }
+
         public IActionResult OnGet()
         {
             var g = GuardOwner(); if (g != null) return g;
@@ -46,6 +62,9 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostApprove(int id)
         {
             var g = GuardOwner(); if (g != null) return g;
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            if (!TargetBelongsToOwner(id, ownerId))
+            { Message = "User not found."; IsSuccess = false; Reload(); return Page(); }
             try { _srv.SetUserActive(id, true); Message = "Approved."; IsSuccess = true; }
             catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }
             Reload(); return Page();
@@ -54,6 +73,9 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostToggle(int id)
         {
             var g = GuardOwner(); if (g != null) return g;
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            if (!TargetBelongsToOwner(id, ownerId))
+            { Message = "User not found."; IsSuccess = false; Reload(); return Page(); }
             try
             {
                 var u = _srv.GetUserById(id);
@@ -70,6 +92,9 @@ namespace BManagedWeb.Pages.Owner
             var g = GuardOwner(); if (g != null) return g;
             if (newRole != "Owner" && newRole != "Employee" && newRole != "Client")
             { Message = "Invalid role."; IsSuccess = false; Reload(); return Page(); }
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            if (!TargetBelongsToOwner(id, ownerId))
+            { Message = "User not found."; IsSuccess = false; Reload(); return Page(); }
             try { _srv.UpdateUserRole(id, newRole); Message = "Role updated."; IsSuccess = true; }
             catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }
             Reload(); return Page();
@@ -78,6 +103,9 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostReset(int id)
         {
             var g = GuardOwner(); if (g != null) return g;
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            if (!TargetBelongsToOwner(id, ownerId))
+            { Message = "User not found."; IsSuccess = false; Reload(); return Page(); }
             try { _srv.ResetPassword(id, "reset1234"); Message = "Password reset to 'reset1234'."; IsSuccess = true; }
             catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }
             Reload(); return Page();
@@ -86,6 +114,9 @@ namespace BManagedWeb.Pages.Owner
         public IActionResult OnPostDelete(int id)
         {
             var g = GuardOwner(); if (g != null) return g;
+            int ownerId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            if (!TargetBelongsToOwner(id, ownerId))
+            { Message = "User not found."; IsSuccess = false; Reload(); return Page(); }
             try { _srv.DeleteUser(id); Message = "Deleted."; IsSuccess = true; }
             catch (System.Exception ex) { Message = ex.Message; IsSuccess = false; }
             Reload(); return Page();

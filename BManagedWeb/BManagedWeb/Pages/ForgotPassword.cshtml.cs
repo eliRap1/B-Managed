@@ -20,13 +20,15 @@ namespace BManagedWeb.Pages
             { Message = "Enter a username."; return Page(); }
             try
             {
+                // Return the same message whether the username exists or not to
+                // prevent username enumeration via the forgot-password page.
                 if (!_srv.CheckUserExist(Username))
-                { Message = "User not found."; IsSuccess = false; return Page(); }
+                { Message = "If this account exists, the company Owner has been notified."; IsSuccess = true; return Page(); }
 
                 int uid = _srv.GetUserId(Username);
                 var user = _srv.GetUserById(uid);
                 if (user == null)
-                { Message = "User not found."; IsSuccess = false; return Page(); }
+                { Message = "If this account exists, the company Owner has been notified."; IsSuccess = true; return Page(); }
 
                 // Notify only the Owner of the company this user belongs to —
                 // not every Owner on the server (which leaked the request
